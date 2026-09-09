@@ -43,7 +43,7 @@
             <button class="suggestion">Calcule 25 divisé par 48</button>
             <button class="suggestion">Qui suis-je ?</button>
         </div>
-        <footer class="composer"><div class="input-wrap"><textarea id="messageInput" placeholder="Écris ton message à Nexus AI..." rows="1"></textarea><button id="sendButton" aria-label="Envoyer">➤</button></div><div class="hint">Entrée pour envoyer • Maj + Entrée pour aller à la ligne</div></footer>
+        <footer class="composer"><div class="input-wrap"><textarea id="messageInput" placeholder="Écris ton message à Nexus AI...&#10;Tu peux aussi coller plusieurs questions, une par ligne." rows="1"></textarea><button id="sendButton" aria-label="Envoyer">➤</button></div><div class="hint">Entrée pour envoyer • Maj + Entrée pour aller à la ligne • Plusieurs lignes = plusieurs questions</div></footer>
     </main>
 </div>
 
@@ -116,7 +116,6 @@
         const city=detectCity(raw);if(city)return city;
         const n=normalize(raw);
 
-        // Intentions avec tolérance aux fautes.
         if(includesAny(n,['aide','que peux tu faire','que sais tu faire','tu peux faire quoi'])||(closeToWord(n,'faire')&&closeToWord(n,'peux')))return helpReply();
         if(includesAny(n,['bonjour','salut','hello','coucou','bonsoir'])||closeToWord(n,'bonjour')||closeToWord(n,'salut'))return memory.prenom?`Bonjour ${memory.prenom} ! 👋`:'Bonjour ! 👋';
         if(includesAny(n,['qui es tu','qui est nexus','presente toi','tu es quoi']))return 'Je suis Nexus AI V0.6 🤖, un assistant Web en développement. Cette version améliore ma compréhension, ma mémoire et mes outils de base.';
@@ -143,7 +142,28 @@
     function renderMessage(sender,text,type,persist=true){const row=document.createElement('div');row.className='message-row '+type;const bubble=document.createElement('div');bubble.className='bubble '+type;bubble.innerHTML=formatMarkdown(text);row.appendChild(bubble);chat.appendChild(row);if(persist){conversation.push({sender,text,type,time:Date.now()});saveConversation()}chat.scrollTop=chat.scrollHeight}
     function renderHistory(){chat.innerHTML='';if(!conversation.length){renderMessage('Nexus AI',`Bonjour${memory.prenom?' '+memory.prenom:''} ! 👋\n\nJe suis Nexus AI V0.6. Pose-moi une question pour commencer.`,'nexus',false);return}conversation.forEach(x=>renderMessage(x.sender,x.text,x.type,false))}
     function setTyping(){const row=document.createElement('div');row.className='message-row nexus';row.id='typingRow';const bubble=document.createElement('div');bubble.className='bubble nexus typing';bubble.textContent='Nexus AI réfléchit…';row.appendChild(bubble);chat.appendChild(row);chat.scrollTop=chat.scrollHeight}
-    function sendMessage(text=input.value){const message=text.trim();if(!message||sendButton.disabled)return;input.value='';input.style.height='auto';renderMessage('Toi',message,'user');sendButton.disabled=true;setTyping();setTimeout(()=>{document.getElementById('typingRow')?.remove();renderMessage('Nexus AI',answer(message),'nexus');sendButton.disabled=false;input.focus()},Math.min(900,Math.max(180,message.length*6)))}
+
+    // Accepte une ou plusieurs lignes. Chaque ligne devient une question indépendante.
+    function sendMessage(text=input.value){
+        const lines=text.split(/\r?\n/).map(line=>line.trim()).filter(Boolean);
+        if(!lines.length||sendButton.disabled)return;
+        input.value='';input.style.height='auto';sendButton.disabled=true;setTyping();
+        lines.forEach(line=>renderMessage('Toi',line,'user'));
+        const totalDelay=Math.min(1400,Math.max(300,lines.length*320));
+        let i=0;
+        const next=()=>{
+            if(i>=lines.length){document.getElementById('typingRow')?.remove();sendButton.disabled=false;input.focus();return}
+            document.getElementById('typingRow')?.remove();
+            setTyping();
+            const current=lines[i++];
+            setTimeout(()=>{
+                document.getElementById('typingRow')?.remove();
+                renderMessage('Nexus AI',answer(current),'nexus');
+                if(i<lines.length)setTimeout(next,180);else{sendButton.disabled=false;input.focus()}
+            },Math.min(750,Math.max(180,current.length*5)));
+        };
+        setTimeout(next,totalDelay);
+    }
 
     document.querySelectorAll('.suggestion').forEach(b=>b.addEventListener('click',()=>sendMessage(b.textContent)));
     sendButton.addEventListener('click',()=>sendMessage());
