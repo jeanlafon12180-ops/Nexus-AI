@@ -20,156 +20,118 @@
 <button class="side-button" id="helpButton">❓ Aide</button>
 <button class="side-button" id="clearMemoryButton">🗑️ Effacer ma mémoire</button>
 <div class="side-title">V0.6</div>
-<div style="color:#94a3b8;font-size:13px;line-height:1.6">Moteur plus robuste, fautes de frappe, mémoire locale, calculs naturels et traitement fiable des blocs de questions.</div>
+<div style="color:#94a3b8;font-size:13px;line-height:1.6">Correctif complet du traitement multi-questions, tolérance aux fautes, mémoire locale et calculs en langage naturel.</div>
 </aside>
 <main class="main">
 <header class="topbar"><div class="status"><span class="dot"></span> Nexus est en ligne</div><div class="version">Nexus AI v0.6</div></header>
 <section id="chat" class="chat" aria-live="polite"></section>
 <div class="suggestions"><button class="suggestion">Que peux-tu faire ?</button><button class="suggestion">Je m'appelle Jean</button><button class="suggestion">Calcule 25 divisé par 48</button><button class="suggestion">Qui suis-je ?</button></div>
-<footer class="composer"><div class="input-wrap"><textarea id="messageInput" placeholder="Écris ton message à Nexus AI...&#10;Tu peux coller plusieurs questions, une par ligne." rows="1"></textarea><button id="sendButton" aria-label="Envoyer">➤</button></div><div class="hint">Entrée = envoyer • Maj + Entrée = nouvelle ligne • Plusieurs lignes = plusieurs réponses</div></footer>
+<footer class="composer"><div class="input-wrap"><textarea id="messageInput" placeholder="Écris ton message à Nexus AI...&#10;Tu peux coller plusieurs questions à la fois." rows="1"></textarea><button id="sendButton" aria-label="Envoyer">➤</button></div><div class="hint">Entrée = envoyer • Maj + Entrée = nouvelle ligne • Plusieurs lignes = plusieurs réponses</div></footer>
 </main>
 </div>
 <script>
-const MEMORY_KEY='nexus_ai_memory_v06',CHAT_KEY='nexus_ai_conversation_v06';
-let memory=loadObject(MEMORY_KEY,{prenom:'',ville:'',notes:[]});
-let conversation=loadArray(CHAT_KEY,[]);
+'use strict';
+const MEMORY_KEY='nexus_ai_memory_v06_final';
+const CHAT_KEY='nexus_ai_conversation_v06_final';
+const makeMemory=()=>({prenom:'',ville:'',notes:[]});
+let memory=loadMemory();
+let conversation=loadConversation();
 const chat=document.getElementById('chat');
 const input=document.getElementById('messageInput');
 const sendButton=document.getElementById('sendButton');
 
-function loadObject(key,fallback){try{const raw=localStorage.getItem(key);if(!raw)return fallback;const value=JSON.parse(raw);return value&&typeof value==='object'?{...fallback,...value}:fallback}catch{return fallback}}
-function loadArray(key,fallback){try{const raw=localStorage.getItem(key);const value=raw?JSON.parse(raw):[];return Array.isArray(value)?value:fallback}catch{return fallback}}
+function loadMemory(){try{const raw=localStorage.getItem(MEMORY_KEY);if(!raw)return makeMemory();const value=JSON.parse(raw);return value&&typeof value==='object'?{...makeMemory(),...value}:makeMemory()}catch{return makeMemory()}}
+function loadConversation(){try{const raw=localStorage.getItem(CHAT_KEY);const value=raw?JSON.parse(raw):[];return Array.isArray(value)?value:[]}catch{return []}}
 function saveMemory(){try{localStorage.setItem(MEMORY_KEY,JSON.stringify(memory))}catch{}}
 function saveConversation(){try{localStorage.setItem(CHAT_KEY,JSON.stringify(conversation.slice(-150)))}catch{}}
-
-function normalize(text){return String(text).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[’']/g,' ').replace(/[_]+/g,' ').replace(/[!?.,;:()[\]{}]/g,' ').replace(/\s+/g,' ').trim()}
-function tokenize(text){return normalize(text).split(' ').filter(Boolean)}
-function levenshtein(a,b){if(a===b)return 0;if(!a)return b.length;if(!b)return a.length;let prev=Array.from({length:b.length+1},(_,i)=>i);for(let i=1;i<=a.length;i++){const cur=[i];for(let j=1;j<=b.length;j++)cur[j]=Math.min(cur[j-1]+1,prev[j]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));prev=cur}return prev[b.length]}
-function closeWord(token,target){if(token===target)return true;const limit=target.length<=5?1:2;return token.length>=3&&levenshtein(token,target)<=limit}
-function fuzzyPhrase(text,phrase){const a=tokenize(text),b=tokenize(phrase);if(!a.length||!b.length)return false;for(let i=0;i<=a.length-b.length;i++){let ok=true;for(let j=0;j<b.length;j++){if(!closeWord(a[i+j],b[j])){ok=false;break}}if(ok)return true}return false}
+function normalize(text){return String(text).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[’']/g,' ').replace(/[!?.,;:()[\]{}]/g,' ').replace(/\s+/g,' ').trim()}
+function tokens(text){return normalize(text).split(' ').filter(Boolean)}
+function levenshtein(a,b){if(a===b)return 0;if(!a)return b.length;if(!b)return a.length;let p=Array.from({length:b.length+1},(_,i)=>i);for(let i=1;i<=a.length;i++){const c=[i];for(let j=1;j<=b.length;j++)c[j]=Math.min(c[j-1]+1,p[j]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[b.length]}
+function closeWord(token,target){if(token===target)return true;const max=target.length<=4?1:2;return token.length>=Math.max(3,target.length-2)&&levenshtein(token,target)<=max}
+function fuzzyPhrase(text,phrase){const a=tokens(text),b=tokens(phrase);if(!a.length||!b.length)return false;if(a.length===1&&b.length===1)return closeWord(a[0],b[0]);if(a.length<b.length)return false;for(let i=0;i<=a.length-b.length;i++){let ok=true;for(let j=0;j<b.length;j++){if(!closeWord(a[i+j],b[j])){ok=false;break}}if(ok)return true}return false}
 function anyPhrase(text,list){return list.some(p=>text.includes(p)||fuzzyPhrase(text,p))}
-
 function getTime(){return new Intl.DateTimeFormat('fr-FR',{hour:'2-digit',minute:'2-digit'}).format(new Date())}
 function getDate(){return new Intl.DateTimeFormat('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date())}
-function cleanName(value){return value.trim().replace(/\s+/g,' ').split(' ').slice(0,2).map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' ')}
+function firstName(value){return value.trim().replace(/\s+/g,' ').split(' ').slice(0,2).map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' ')}
 
 function detectName(raw){
-    const n=normalize(raw);
-    const patterns=[
-        /^je m appelle (.+)$/,
-        /^mon prenom est (.+)$/,
-        /^moi c est (.+)$/,
-        /^je suis appele (.+)$/,
-        /^je suis nomme (.+)$/
-    ];
-    for(const p of patterns){const m=n.match(p);if(m){const name=cleanName(m[1]);if(name.length>=2&&name.length<=30){memory.prenom=name;saveMemory();return `Enchanté ${name} ! 👋 Je m'en souviendrai.`}}}
-    const words=tokenize(raw);
-    if((words[0]==='je'||words[0]==='j')&&words.length>=4&&closeWord(words[1],'m')&&closeWord(words[2],'appelle')){
-        const name=cleanName(words[3]);
-        if(name.length>=2){memory.prenom=name;saveMemory();return `Enchanté ${name} ! 👋 Je m'en souviendrai.`}
-    }
-    return null;
+ const n=normalize(raw);
+ const exact=[/^je m appelle (.+)$/,/^mon prenom est (.+)$/,/^moi c est (.+)$/,/^je suis appele (.+)$/,/^je suis nomme (.+)$/];
+ for(const p of exact){const m=n.match(p);if(m){const name=firstName(m[1]);if(name.length>=2&&name.length<=30){memory.prenom=name;saveMemory();return `Enchanté ${name} ! 👋 Je m'en souviendrai.`}}}
+ const w=tokens(raw);
+ if(w.length>=4&&(w[0]==='je'||w[0]==='j')){const middle=w.slice(1,3).join(' ');if(fuzzyPhrase(middle,'m appelle')||fuzzyPhrase(middle,'m apelle')){const name=firstName(w[3]);if(name.length>=2){memory.prenom=name;saveMemory();return `Enchanté ${name} ! 👋 Je m'en souviendrai.`}}}
+ return null;
 }
-
-function detectCity(raw){
-    const n=normalize(raw);
-    let m=n.match(/^j habite a (.+)$/)||n.match(/^ma ville est (.+)$/)||n.match(/^je vis a (.+)$/);
-    if(!m)return null;
-    memory.ville=cleanName(m[1]);saveMemory();return `D'accord ! 🏠 Je retiens que tu habites à ${memory.ville}.`;
-}
+function detectCity(raw){const n=normalize(raw);const m=n.match(/^j habite a (.+)$/)||n.match(/^ma ville est (.+)$/)||n.match(/^je vis a (.+)$/);if(!m)return null;memory.ville=firstName(m[1]);saveMemory();return `D'accord ! 🏠 Je retiens que tu habites à ${memory.ville}.`}
 
 const numberWords={zero:0,un:1,une:1,deux:2,trois:3,quatre:4,cinq:5,six:6,sept:7,huit:8,neuf:9,dix:10,onze:11,douze:12,treize:13,quatorze:14,quinze:15,seize:16,vingt:20,trente:30,quarante:40,cinquante:50,soixante:60,cent:100,mille:1000};
-function replaceNumberWords(text){return tokenize(text).map(w=>Object.prototype.hasOwnProperty.call(numberWords,w)?String(numberWords[w]):w).join(' ')}
+function replaceNumberWords(text){return tokens(text).map(w=>Object.prototype.hasOwnProperty.call(numberWords,w)?String(numberWords[w]):w).join(' ')}
 function calculate(raw){
-    let e=normalize(raw);
-    e=e.replace(/divisee?\s+par/g,'/').replace(/divise\s+par/g,'/').replace(/multipliee?\s+par/g,'*').replace(/fois/g,'*').replace(/plus/g,'+').replace(/moins/g,'-').replace(/\bx\b/g,'*');
-    e=replaceNumberWords(e);
-    if(!/^[0-9+\-*/().%\s]+$/.test(e))return null;
-    try{const result=Function('"use strict";return ('+e+')')();if(typeof result!=='number'||!Number.isFinite(result))return null;return Math.round(result*1e12)/1e12}catch{return null}
+ let e=normalize(raw);
+ e=e.replace(/divise(?:e|es)?\s+par/g,'/').replace(/multiplie(?:e|es)?\s+par/g,'*').replace(/fois/g,'*').replace(/plus/g,'+').replace(/moins/g,'-');
+ e=replaceNumberWords(e).replace(/\bx\b/g,'*');
+ if(!/^[0-9+\-*/().%\s]+$/.test(e))return null;
+ try{const result=Function('"use strict";return ('+e+')')();return typeof result==='number'&&Number.isFinite(result)?Math.round(result*1e12)/1e12:null}catch{return null}
 }
-
-function memoryReply(){const out=[];if(memory.prenom)out.push(`Prénom : ${memory.prenom}`);if(memory.ville)out.push(`Ville : ${memory.ville}`);if(memory.notes.length)out.push(`Notes : ${memory.notes.join(' • ')}`);return out.length?'🧠 Voici ce que je retiens :\n\n'+out.join('\n'):'🧠 Ma mémoire est encore vide.'}
-function helpReply(){return `🤖 Nexus AI V0.6 peut :\n\n• retenir ton prénom et ta ville\n• tolérer certaines fautes de frappe\n• comprendre plusieurs formulations\n• répondre à plusieurs questions collées en même temps\n• calculer des opérations écrites en chiffres ou en mots\n• donner la date et l'heure\n• conserver une partie de la conversation sur cet appareil\n\nTu peux coller plusieurs lignes d'un coup.`}
-function knowledge(n){
-    if(n.includes('france')&&(n.includes('capital')||n.includes('capitale')))return 'La capitale de la France est Paris. 🇫🇷';
-    if(n.includes('planete la plus proche du soleil'))return 'La planète la plus proche du Soleil est Mercure. ☀️';
-    if(n.includes('plus grand ocean'))return "Le plus grand océan de la Terre est l'océan Pacifique. 🌊";
-    if(n.includes('vitesse lumiere'))return 'Dans le vide, la lumière se déplace à environ 299 792 km/s. ⚡';
-    if(n.includes('eau bout'))return "Au niveau de la mer, l'eau bout à environ 100 °C. 🌡️";
-    if(n.includes('python'))return 'Python est un langage de programmation utilisé notamment pour le Web, l’automatisation, la data et l’intelligence artificielle. 🐍';
-    if(n.includes('html'))return 'HTML sert à structurer le contenu d’une page Web. 🌐';
-    if(n.includes('javascript'))return 'JavaScript permet notamment de rendre une page Web interactive. ⚙️';
-    if(n.includes('github'))return 'GitHub permet notamment d’héberger du code et de suivre les versions d’un projet. 🐙';
-    return null;
-}
-
+function memoryReply(){const a=[];if(memory.prenom)a.push(`Prénom : ${memory.prenom}`);if(memory.ville)a.push(`Ville : ${memory.ville}`);return a.length?'🧠 Je retiens :\n\n'+a.join('\n'):'🧠 Ma mémoire est encore vide.'}
+function helpReply(){return `🤖 Nexus AI V0.6 peut :\n\n• comprendre plusieurs formulations\n• tolérer certaines fautes de frappe\n• retenir ton prénom et ta ville\n• conserver une partie de la conversation\n• faire des calculs en langage naturel\n• donner la date et l'heure\n• répondre à plusieurs questions collées en même temps\n\nExemple : colle plusieurs lignes et Nexus répondra à chaque ligne.`}
+function knowledge(n){if(n.includes('france')&&(n.includes('capital')||n.includes('capitale')))return 'La capitale de la France est Paris. 🇫🇷';if(n.includes('planete la plus proche du soleil'))return 'La planète la plus proche du Soleil est Mercure. ☀️';if(n.includes('plus grand ocean'))return "Le plus grand océan de la Terre est l'océan Pacifique. 🌊";if(n.includes('vitesse lumiere'))return 'Dans le vide, la lumière se déplace à environ 299 792 km/s. ⚡';if(n.includes('eau bout'))return "Au niveau de la mer, l'eau bout à environ 100 °C. 🌡️";if(n.includes('python'))return 'Python est un langage de programmation utilisé notamment pour le Web, l’automatisation, la data et l’intelligence artificielle. 🐍';if(n.includes('html'))return 'HTML sert à structurer le contenu d’une page Web. 🌐';if(n.includes('javascript'))return 'JavaScript permet notamment de rendre les pages Web interactives. ⚙️';if(n.includes('github'))return 'GitHub permet notamment d’héberger du code et de suivre les versions d’un projet. 🐙';return null}
 function answer(raw){
-    const name=detectName(raw);if(name)return name;
-    const city=detectCity(raw);if(city)return city;
-    const n=normalize(raw);
-    if(anyPhrase(n,['aide','que peux tu faire','que sais tu faire','tu peux faire quoi']))return helpReply();
-    if(anyPhrase(n,['bonjour','salut','hello','coucou','bonsoir']))return memory.prenom?`Bonjour ${memory.prenom} ! 👋`:'Bonjour ! 👋';
-    if(anyPhrase(n,['qui es tu','qui est nexus','presente toi','tu es quoi']))return 'Je suis Nexus AI V0.6 🤖, un assistant Web en développement.';
-    if(anyPhrase(n,['qui suis je','tu sais qui je suis','quel est mon prenom','comment je m appelle']))return memory.prenom?`Tu es ${memory.prenom}. 🧠`:'Je ne connais pas encore ton prénom. 🧠';
-    if(anyPhrase(n,['quelle heure','il est quelle heure','heure']))return `Il est ${getTime()} ⏰`;
-    if(anyPhrase(n,['quelle date','quel jour','date du jour']))return `Nous sommes ${getDate()}. 📅`;
-    if(anyPhrase(n,['ca va','comment vas tu','tu vas bien']))return 'Je vais très bien ! 🤖';
-    if(anyPhrase(n,['merci','merci beaucoup']))return 'Avec plaisir ! 😄';
-    if(anyPhrase(n,['au revoir','aurevoir','bye']))return 'À bientôt ! 🚀';
-    if(n==='memoire'||n.includes('montre ma memoire')||n.includes('que sais tu sur moi'))return memoryReply();
-    if(n==='oublie tout'||n.includes('efface ma memoire')||n.includes('oublie moi')){memory={prenom:'',ville:'',notes:[]};saveMemory();return 'C’est fait. 🧹🧠 Ma mémoire locale a été effacée.'}
-
-    const looksLikeCalculation=/\d/.test(n)&&(n.includes('divis')||n.includes('fois')||n.includes('multipli')||n.includes('plus')||n.includes('moins')||n.startsWith('calcule')||n.startsWith('calcul')||n.startsWith('combien'));
-    if(looksLikeCalculation){const expression=raw.replace(/^\s*(calcule?|calcul|combien font|combien fait)\s*/i,'');const result=calculate(expression);if(result!==null)return `Le résultat est **${result}**. 🧮`}
-    const direct=calculate(n);if(direct!==null&&/\d/.test(n))return `Le résultat est **${direct}**. 🧮`;
-
-    const k=knowledge(n);if(k)return k;
-    return 'Je ne comprends pas encore complètement cette question. 🧠\n\nEssaie une autre formulation ou tape « aide ».';
+ const name=detectName(raw);if(name)return name;const city=detectCity(raw);if(city)return city;const n=normalize(raw);
+ if(anyPhrase(n,['aide','que peux tu faire','que sais tu faire','tu peux faire quoi']))return helpReply();
+ if(anyPhrase(n,['bonjour','salut','hello','coucou','bonsoir']))return memory.prenom?`Bonjour ${memory.prenom} ! 👋`:'Bonjour ! 👋';
+ if(anyPhrase(n,['qui es tu','qui est nexus','presente toi','tu es quoi']))return 'Je suis Nexus AI V0.6 🤖, un assistant Web en développement.';
+ if(anyPhrase(n,['qui suis je','tu sais qui je suis','quel est mon prenom','comment je m appelle']))return memory.prenom?`Tu es ${memory.prenom}. 🧠`:'Je ne connais pas encore ton prénom. 🧠';
+ if(anyPhrase(n,['quelle heure','il est quelle heure','heure']))return `Il est ${getTime()} ⏰`;
+ if(anyPhrase(n,['quelle date','quel jour','date du jour']))return `Nous sommes ${getDate()}. 📅`;
+ if(anyPhrase(n,['ca va','comment vas tu','tu vas bien']))return 'Je vais très bien ! 🤖';
+ if(anyPhrase(n,['merci','merci beaucoup']))return 'Avec plaisir ! 😄';
+ if(anyPhrase(n,['au revoir','aurevoir','bye']))return 'À bientôt ! 🚀';
+ if(n==='memoire'||n.includes('montre ma memoire')||n.includes('que sais tu sur moi'))return memoryReply();
+ if(n==='oublie tout'||n.includes('efface ma memoire')||n.includes('oublie moi')){memory=makeMemory();saveMemory();return 'C’est fait. 🧹🧠 Ma mémoire locale a été effacée.'}
+ if(/\d/.test(n)&&(n.includes('divise')||n.includes('multiplie')||n.includes('fois')||n.includes('plus')||n.includes('moins')||n.startsWith('calcule')||n.startsWith('calcul')||n.startsWith('combien'))){const expr=raw.replace(/^\s*(calcule?|calcul|combien font|combien fait)\s*/i,'');const result=calculate(expr);if(result!==null)return `Le résultat est **${result}**. 🧮`}
+ const direct=calculate(n);if(direct!==null&&/\d/.test(n))return `Le résultat est **${direct}**. 🧮`;
+ const k=knowledge(n);if(k)return k;
+ return 'Je ne comprends pas encore complètement cette question. 🧠\n\nEssaie une formulation plus précise ou tape « aide ».';
 }
-
-function format(text){return text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}
-function render(sender,text,type,persist=true){const row=document.createElement('div');row.className='message-row '+type;const bubble=document.createElement('div');bubble.className='bubble '+type;bubble.innerHTML=format(text);row.appendChild(bubble);chat.appendChild(row);if(persist){conversation.push({sender,text,type,time:Date.now()});saveConversation()}chat.scrollTop=chat.scrollHeight}
+function escapeHtml(value){return String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
+function render(sender,text,type,persist=true){const row=document.createElement('div');row.className='message-row '+type;const bubble=document.createElement('div');bubble.className='bubble '+type;bubble.innerHTML=escapeHtml(text).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');row.appendChild(bubble);chat.appendChild(row);if(persist){conversation.push({sender,text,type,time:Date.now()});saveConversation()}chat.scrollTop=chat.scrollHeight}
 function renderHistory(){chat.innerHTML='';if(!conversation.length){render('Nexus AI',`Bonjour${memory.prenom?' '+memory.prenom:''} ! 👋\n\nJe suis Nexus AI V0.6. Pose-moi une question pour commencer.`,'nexus',false);return}conversation.forEach(x=>render(x.sender,x.text,x.type,false))}
 
-// Découpe un collage en questions indépendantes.
-function splitIntoQuestions(text){
-    const cleaned=text.replace(/\r/g,'').trim();
-    if(!cleaned)return [];
-    // Priorité aux lignes : c'est le cas idéal pour un bloc collé depuis un document ou un message.
-    let lines=cleaned.split('\n').map(line=>line.trim()).filter(Boolean);
-    // Retire les préfixes de liste : 1., -, •, etc.
-    lines=lines.map(line=>line.replace(/^(?:[-•*]\s+|\d+[.)]\s+)/,'').trim()).filter(Boolean);
-    if(lines.length>1)return lines;
-    // Si tout est sur une seule ligne, sépare les phrases qui se terminent par ? ou !.
-    const parts=cleaned.match(/[^?!]+[?!]+|[^?!]+$/g)?.map(x=>x.trim()).filter(Boolean)||[cleaned];
-    return parts.length>1?parts:lines;
+function splitQuestions(text){
+ const clean=String(text).replace(/\r\n/g,'\n').replace(/\r/g,'\n').trim();
+ if(!clean)return [];
+ let lines=clean.split('\n').map(line=>line.trim()).filter(Boolean);
+ lines=lines.map(line=>line.replace(/^(?:[-•*]|\d+[.)])\s+/,'').trim()).filter(Boolean);
+ if(lines.length>1)return lines;
+ const sentenceParts=clean.match(/[^?!]+[?!]+|[^?!]+$/g)?.map(x=>x.trim()).filter(Boolean)||[];
+ return sentenceParts.length>1?sentenceParts:lines;
 }
 
 function sendMessage(text=input.value){
-    if(sendButton.disabled)return;
-    const questions=splitIntoQuestions(text);
-    if(!questions.length)return;
-    input.value='';input.style.height='auto';sendButton.disabled=true;
-
-    questions.forEach(q=>render('Toi',q,'user'));
-
-    // Une réponse par question, dans le même ordre, sans boucle de timers imbriqués.
-    questions.forEach((q,index)=>{
-        setTimeout(()=>{
-            render('Nexus AI',answer(q),'nexus');
-            if(index===questions.length-1){sendButton.disabled=false;input.focus()}
-        },250+index*300);
-    });
+ if(sendButton.disabled)return;
+ const questions=splitQuestions(text);
+ if(!questions.length)return;
+ input.value='';input.style.height='auto';sendButton.disabled=true;
+ questions.forEach(q=>render('Toi',q,'user'));
+ showTyping();
+ setTimeout(()=>{
+   document.getElementById('typingRow')?.remove();
+   // Toutes les questions sont traitées dans la même opération, aucune chaîne de timers.
+   for(const q of questions){render('Nexus AI',answer(q),'nexus')}
+   sendButton.disabled=false;input.focus();
+ },200);
 }
+function showTyping(){const row=document.createElement('div');row.className='message-row nexus';row.id='typingRow';const bubble=document.createElement('div');bubble.className='bubble nexus typing';bubble.textContent='Nexus AI réfléchit…';row.appendChild(bubble);chat.appendChild(row);chat.scrollTop=chat.scrollHeight}
 
-document.querySelectorAll('.suggestion').forEach(button=>button.addEventListener('click',()=>sendMessage(button.textContent)));
+document.querySelectorAll('.suggestion').forEach(b=>b.addEventListener('click',()=>sendMessage(b.textContent)));
 sendButton.addEventListener('click',()=>sendMessage());
-input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}});
+input.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}});
 input.addEventListener('input',()=>{input.style.height='auto';input.style.height=Math.min(input.scrollHeight,220)+'px'});
 document.getElementById('memoryButton').addEventListener('click',()=>render('Nexus AI',memoryReply(),'nexus'));
 document.getElementById('helpButton').addEventListener('click',()=>render('Nexus AI',helpReply(),'nexus'));
 document.getElementById('clearButton').addEventListener('click',()=>{conversation=[];try{localStorage.removeItem(CHAT_KEY)}catch{}renderHistory()});
-document.getElementById('clearMemoryButton').addEventListener('click',()=>{memory={prenom:'',ville:'',notes:[]};saveMemory();render('Nexus AI','C’est fait. 🧹🧠 Ma mémoire locale a été effacée.','nexus')});
+document.getElementById('clearMemoryButton').addEventListener('click',()=>{memory=makeMemory();saveMemory();render('Nexus AI','C’est fait. 🧹🧠 Ma mémoire locale a été effacée.','nexus')});
 renderHistory();
 </script>
 </body>
