@@ -1,27 +1,41 @@
-# 🤖 Nexus AI
+# 🤖 Nexus IA
 
 Projet d'intelligence artificielle développé progressivement.
 
 ## 🚀 Version actuelle
 
-**Nexus AI v0.6**
+**Nexus IA v0.7**
 
-La V0.6 est une version de correctifs et d'amélioration du moteur :
+### Principales améliorations
 
-- 🧠 meilleure détection du prénom et de la ville
-- ✍️ tolérance aux petites fautes d'orthographe
-- 🧩 meilleure reconnaissance des intentions
-- 🧮 calculs en langage naturel, notamment « divisé par »
-- ⏰ date et heure
-- 🌍 connaissances générales intégrées
-- 💾 mémoire et historique locaux
-- 📱 interface adaptée aux mobiles
-- 🛠️ outils pour afficher ou effacer la mémoire et la conversation
+- 🧠 mémoire locale structurée
+- 💬 contexte de conversation préparé pour les futures versions
+- ✍️ meilleure compréhension et tolérance aux fautes
+- 🧮 moteur de calcul dédié et plus sûr
+- 🛠️ architecture modulaire
+- 📱 interface Web responsive
+- 📚 connaissances générales intégrées
+- 🧩 traitement de plusieurs questions
+- 🖼️ architecture préparée pour l'intégration d'images en V1
+- 💻 architecture préparée pour l'intégration du code en V1
 
-## 🌐 Site
+## 📁 Architecture
 
-Le site public utilise GitHub Pages et l'interface `index.html`.
+```text
+Nexus-AI/
+├── index.html
+├── style.css
+├── js/
+│   ├── app.js
+│   ├── brain.js
+│   └── memory.js
+└── README.md
+```
 
-## 📌 Feuille de route
+## 🌐 Publication
 
-Les futures versions pourront ajouter un véritable moteur d'IA côté serveur, tout en conservant l'interface Web et la mémoire locale.
+Le projet est conçu pour être publié avec GitHub Pages.
+
+## 🛣️ Suite du projet
+
+La V0.7 sert de fondation technique. La V1 pourra ajouter un véritable moteur d'IA, l'analyse d'images, des fonctions liées au code et un backend sécurisé.
