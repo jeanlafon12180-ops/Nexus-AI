@@ -3,341 +3,635 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus AI V0.4</title>
+    <meta name="description" content="Nexus AI V0.5 — assistant web intelligent en développement.">
+    <title>Nexus AI V0.5</title>
 
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        :root {
+            --bg: #0b1120;
+            --panel: #111827;
+            --panel-2: #172033;
+            --border: #263449;
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --user: #1d4ed8;
+            --nexus: #243247;
+            --danger: #dc2626;
         }
+
+        * { box-sizing: border-box; }
 
         body {
-            font-family: Arial, sans-serif;
-            background: #0f172a;
-            color: white;
+            margin: 0;
             min-height: 100vh;
+            font-family: Inter, Arial, sans-serif;
+            background: radial-gradient(circle at top, #18233a 0%, var(--bg) 55%);
+            color: var(--text);
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 20px;
+            padding: 18px;
         }
 
-        .container {
+        .app {
+            width: min(1100px, 100%);
+            min-height: calc(100vh - 36px);
+            display: grid;
+            grid-template-columns: 230px 1fr;
+            background: rgba(17, 24, 39, 0.96);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0,0,0,.4);
+        }
+
+        .sidebar {
+            border-right: 1px solid var(--border);
+            padding: 20px;
+            background: rgba(11,17,32,.75);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .logo {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            background: var(--accent);
+            font-size: 22px;
+        }
+
+        .brand h1 { margin: 0; font-size: 19px; }
+        .brand span { color: var(--muted); font-size: 12px; }
+
+        .side-title {
+            color: var(--muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            margin: 18px 0 8px;
+        }
+
+        .side-button {
             width: 100%;
-            max-width: 800px;
-            height: 700px;
-            background: #1e293b;
-            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--panel);
+            color: var(--text);
+            padding: 11px 12px;
+            border-radius: 11px;
+            cursor: pointer;
+            text-align: left;
+            margin-bottom: 8px;
+        }
+
+        .side-button:hover { border-color: #3b82f6; }
+
+        .main {
             display: flex;
             flex-direction: column;
-            overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            min-width: 0;
         }
 
-        .header {
-            padding: 20px;
-            background: #111827;
-            border-bottom: 1px solid #334155;
-            text-align: center;
+        .topbar {
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
         }
 
-        .header h1 {
-            font-size: 28px;
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 13px;
         }
 
-        .header p {
-            margin-top: 5px;
-            color: #94a3b8;
+        .dot {
+            width: 9px;
+            height: 9px;
+            background: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #22c55e;
+        }
+
+        .version {
+            color: #cbd5e1;
+            font-size: 13px;
+            padding: 7px 10px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
         }
 
         .chat {
             flex: 1;
-            padding: 20px;
             overflow-y: auto;
+            padding: 24px;
         }
 
-        .message {
-            margin-bottom: 15px;
-            padding: 12px 16px;
-            border-radius: 15px;
-            max-width: 80%;
-            line-height: 1.5;
+        .message-row {
+            display: flex;
+            margin-bottom: 16px;
+        }
+
+        .message-row.user { justify-content: flex-end; }
+
+        .bubble {
+            max-width: min(760px, 90%);
+            padding: 13px 16px;
+            border-radius: 17px;
+            line-height: 1.55;
             white-space: pre-wrap;
+            overflow-wrap: anywhere;
         }
 
-        .nexus {
-            background: #334155;
-            margin-right: auto;
+        .bubble.nexus { background: var(--nexus); border-bottom-left-radius: 5px; }
+        .bubble.user { background: var(--user); border-bottom-right-radius: 5px; }
+
+        .meta {
+            margin-top: 6px;
+            color: var(--muted);
+            font-size: 11px;
         }
 
-        .user {
-            background: #2563eb;
-            margin-left: auto;
+        .typing {
+            opacity: .75;
+            font-style: italic;
         }
 
-        .input-area {
+        .suggestions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 0 24px 12px;
+        }
+
+        .suggestion {
+            border: 1px solid var(--border);
+            background: var(--panel-2);
+            color: #dbeafe;
+            border-radius: 999px;
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        .suggestion:hover { border-color: #60a5fa; }
+
+        .composer {
+            padding: 15px;
+            border-top: 1px solid var(--border);
+            background: rgba(11,17,32,.8);
+        }
+
+        .input-wrap {
             display: flex;
             gap: 10px;
-            padding: 15px;
-            background: #111827;
-            border-top: 1px solid #334155;
+            align-items: stretch;
         }
 
         #messageInput {
             flex: 1;
-            padding: 15px;
-            border: none;
+            resize: none;
+            min-height: 52px;
+            max-height: 160px;
+            border: 1px solid var(--border);
             outline: none;
-            border-radius: 12px;
-            background: #334155;
-            color: white;
+            border-radius: 14px;
+            background: var(--panel-2);
+            color: var(--text);
+            padding: 14px;
             font-size: 16px;
         }
 
+        #messageInput:focus { border-color: #3b82f6; }
+
         #sendButton {
+            width: 58px;
             border: none;
-            border-radius: 12px;
-            padding: 0 22px;
-            background: #2563eb;
+            border-radius: 14px;
+            background: var(--accent);
             color: white;
-            font-size: 18px;
+            font-size: 20px;
             cursor: pointer;
         }
 
-        #sendButton:hover {
-            background: #1d4ed8;
+        #sendButton:hover { background: var(--accent-hover); }
+        #sendButton:disabled { opacity: .55; cursor: not-allowed; }
+
+        .hint {
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 8px;
+            text-align: center;
         }
 
-        @media (max-width: 600px) {
-            body {
-                padding: 0;
-            }
-
-            .container {
-                height: 100vh;
-                border-radius: 0;
-            }
-
-            .message {
-                max-width: 90%;
-            }
+        @media (max-width: 820px) {
+            body { padding: 0; }
+            .app { grid-template-columns: 1fr; min-height: 100vh; border-radius: 0; }
+            .sidebar { display: none; }
+            .chat { padding: 16px; }
+            .suggestions { padding: 0 16px 10px; }
         }
     </style>
 </head>
-
 <body>
-
-<div class="container">
-
-    <div class="header">
-        <h1>🤖 Nexus AI</h1>
-        <p>Version 0.4 — Assistant intelligent</p>
-    </div>
-
-    <div id="chat" class="chat">
-
-        <div class="message nexus">
-            Nexus AI : Bonjour ! 👋
-            <br>
-            Je suis Nexus AI V0.4.
-            <br>
-            Comment puis-je t'aider ?
+<div class="app">
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="logo">🤖</div>
+            <div>
+                <h1>Nexus AI</h1>
+                <span>Assistant intelligent</span>
+            </div>
         </div>
 
-    </div>
+        <div class="side-title">Outils</div>
+        <button class="side-button" id="memoryButton">🧠 Ma mémoire</button>
+        <button class="side-button" id="clearButton">🧹 Effacer la conversation</button>
+        <button class="side-button" id="helpButton">❓ Aide</button>
 
-    <div class="input-area">
-        <input
-            id="messageInput"
-            type="text"
-            placeholder="Écris ton message..."
-            autocomplete="off"
-        >
+        <div class="side-title">V0.5</div>
+        <div style="color:#94a3b8;font-size:13px;line-height:1.6">
+            Mémoire locale, calculs, date/heure, compréhension de plusieurs formulations et réponses spécialisées.
+        </div>
+    </aside>
 
-        <button id="sendButton">➤</button>
-    </div>
+    <main class="main">
+        <header class="topbar">
+            <div class="status"><span class="dot"></span> Nexus est en ligne</div>
+            <div class="version">Nexus AI v0.5</div>
+        </header>
 
+        <section id="chat" class="chat" aria-live="polite"></section>
+
+        <div class="suggestions">
+            <button class="suggestion">Que peux-tu faire ?</button>
+            <button class="suggestion">Quelle heure est-il ?</button>
+            <button class="suggestion">Calcule 125 * 8</button>
+            <button class="suggestion">Qui es-tu ?</button>
+        </div>
+
+        <footer class="composer">
+            <div class="input-wrap">
+                <textarea id="messageInput" placeholder="Écris ton message à Nexus AI..." rows="1"></textarea>
+                <button id="sendButton" aria-label="Envoyer">➤</button>
+            </div>
+            <div class="hint">Entrée pour envoyer • Maj + Entrée pour aller à la ligne</div>
+        </footer>
+    </main>
 </div>
 
 <script>
+    const STORAGE_KEY = 'nexus_ai_v05';
 
-    let prenom = "";
+    let memory = loadMemory();
+    let conversation = loadConversation();
 
-    const chat = document.getElementById("chat");
-    const input = document.getElementById("messageInput");
-    const button = document.getElementById("sendButton");
+    const chat = document.getElementById('chat');
+    const input = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
 
-    function ajouterMessage(message, type) {
+    function defaultMemory() {
+        return {
+            prenom: '',
+            ville: '',
+            notes: []
+        };
+    }
 
-        const div = document.createElement("div");
+    function loadMemory() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY + '_memory');
+            return raw ? { ...defaultMemory(), ...JSON.parse(raw) } : defaultMemory();
+        } catch {
+            return defaultMemory();
+        }
+    }
 
-        div.classList.add("message", type);
+    function saveMemory() {
+        localStorage.setItem(STORAGE_KEY + '_memory', JSON.stringify(memory));
+    }
 
-        div.textContent = message;
+    function loadConversation() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY + '_conversation');
+            return raw ? JSON.parse(raw) : [];
+        } catch {
+            return [];
+        }
+    }
 
-        chat.appendChild(div);
+    function saveConversation() {
+        localStorage.setItem(STORAGE_KEY + '_conversation', JSON.stringify(conversation.slice(-80)));
+    }
+
+    function normalize(text) {
+        return text
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[!?.,;:]+/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    function escapeName(value) {
+        return value.trim().replace(/\s+/g, ' ').replace(/^./, c => c.toUpperCase());
+    }
+
+    function getTime() {
+        return new Intl.DateTimeFormat('fr-FR', {
+            hour: '2-digit',
+            minute: '2-digit'
+        }).format(new Date());
+    }
+
+    function getDate() {
+        return new Intl.DateTimeFormat('fr-FR', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        }).format(new Date());
+    }
+
+    function safeCalculate(expression) {
+        let exp = expression
+            .replace(/,/g, '.')
+            .replace(/×/g, '*')
+            .replace(/÷/g, '/')
+            .replace(/plus/gi, '+')
+            .replace(/moins/gi, '-')
+            .replace(/fois/gi, '*')
+            .replace(/divise par/gi, '/')
+            .replace(/multiplié par/gi, '*')
+            .replace(/multiplie par/gi, '*')
+            .trim();
+
+        if (!/^[0-9+\-*/().%\s]+$/.test(exp)) return null;
+
+        try {
+            const result = Function('"use strict"; return (' + exp + ')')();
+            if (typeof result !== 'number' || !Number.isFinite(result)) return null;
+            return Math.round(result * 1e10) / 1e10;
+        } catch {
+            return null;
+        }
+    }
+
+    function rememberFromMessage(raw) {
+        const m = normalize(raw);
+
+        const namePatterns = [
+            /^je m appelle (.+)$/,
+            /^mon prenom est (.+)$/,
+            /^moi c est (.+)$/,
+            /^moi cest (.+)$/
+        ];
+
+        for (const pattern of namePatterns) {
+            const match = m.match(pattern);
+            if (match) {
+                const original = raw
+                    .replace(/^.*?(je\s*m['’]?appelle|mon\s*pr[ée]nom\s*est|moi\s*c['’]?est)\s+/i, '')
+                    .trim();
+                memory.prenom = escapeName(original || match[1]);
+                saveMemory();
+                return `Enchanté ${memory.prenom} ! 👋 Je m'en souviendrai.`;
+            }
+        }
+
+        const cityMatch = m.match(/^j habite (?:a|à) (.+)$/) || m.match(/^ma ville est (.+)$/);
+        if (cityMatch) {
+            memory.ville = cityMatch[1].trim().replace(/^./, c => c.toUpperCase());
+            saveMemory();
+            return `D'accord ! 🏠 Je retiens que tu habites à ${memory.ville}.`;
+        }
+
+        return null;
+    }
+
+    function memoryReply() {
+        const known = [];
+        if (memory.prenom) known.push(`Prénom : ${memory.prenom}`);
+        if (memory.ville) known.push(`Ville : ${memory.ville}`);
+        if (memory.notes.length) known.push(`Notes : ${memory.notes.join(' • ')}`);
+        return known.length
+            ? '🧠 Voici ce que je retiens :\n\n' + known.join('\n')
+            : '🧠 Ma mémoire est encore vide. Tu peux me dire ton prénom ou ta ville.';
+    }
+
+    function helpReply() {
+        return `🤖 Nexus AI v0.5 sait maintenant :
+
+• retenir ton prénom et ta ville dans ton navigateur
+• retrouver les informations mémorisées
+• comprendre plusieurs formulations proches
+• donner la date et l'heure
+• faire des calculs simples
+• répondre à des questions courantes
+• analyser quelques sujets généraux
+• conserver une partie de la conversation sur cet appareil
+
+Exemples :
+"Je m'appelle Jean"
+"J'habite à Rodez"
+"Qui suis-je ?"
+"Calcule 25 * 48"
+"Quelle est la capitale de la France ?"
+"Quelle date sommes-nous ?"`;
+    }
+
+    function knowledgeReply(m) {
+        if (m.includes('capitale de la france')) return 'La capitale de la France est Paris. 🇫🇷';
+        if (m.includes('planete la plus proche du soleil')) return 'La planète la plus proche du Soleil est Mercure. ☀️';
+        if (m.includes('plus grand ocean')) return "Le plus grand océan de la Terre est l'océan Pacifique. 🌊";
+        if (m.includes('combien de continents')) return 'On compte généralement 7 continents dans le modèle le plus utilisé en France : Afrique, Amérique, Antarctique, Asie, Europe, Océanie et Amérique du Nord/Sud selon la convention retenue. 🌍';
+        if (m.includes('vitesse lumiere')) return 'Dans le vide, la lumière se déplace à environ 299 792 km/s. ⚡';
+        if (m.includes('eau bout')) return 'Au niveau de la mer, l’eau bout à environ 100 °C. La température varie avec la pression. 🌡️';
+        if (m.includes('python')) return 'Python est un langage de programmation très utilisé pour le web, l’automatisation, la data et l’intelligence artificielle. 🐍';
+        if (m.includes('html')) return 'HTML est le langage de balisage qui structure le contenu d’une page Web. 🌐';
+        if (m.includes('javascript')) return 'JavaScript permet notamment de rendre une page Web interactive et dynamique. ⚙️';
+        if (m.includes('github')) return 'GitHub est une plateforme de développement qui permet notamment d’héberger du code, suivre les versions et collaborer sur des projets. 🐙';
+        return null;
+    }
+
+    function answer(raw) {
+        const remembered = rememberFromMessage(raw);
+        if (remembered) return remembered;
+
+        const m = normalize(raw);
+
+        if (m === 'aide' || m === 'help' || m.includes('que peux tu faire')) return helpReply();
+
+        if (m === 'bonjour' || m === 'salut' || m === 'hello' || m === 'coucou' || m === 'bonsoir') {
+            return memory.prenom ? `Bonjour ${memory.prenom} ! 👋` : 'Bonjour ! 👋';
+        }
+
+        if (m.includes('qui es tu') || m.includes('qui est nexus') || m.includes('presente toi')) {
+            return `Je suis Nexus AI V0.5 🤖\n\nJe suis un assistant Web en développement. Cette version possède une mémoire locale, plusieurs outils intégrés et un moteur de compréhension par règles. Mon objectif est de devenir progressivement beaucoup plus puissant.`;
+        }
+
+        if (m === 'qui suis je' || m.includes('tu sais qui je suis')) {
+            if (memory.prenom && memory.ville) return `Tu t'appelles ${memory.prenom} et tu m'as dit habiter à ${memory.ville}. 🧠`;
+            if (memory.prenom) return `Tu m'as dit que tu t'appelles ${memory.prenom}. 🧠`;
+            if (memory.ville) return `Tu m'as dit habiter à ${memory.ville}. 🧠`;
+            return 'Je ne connais pas encore ton identité. Tu peux me dire ton prénom.';
+        }
+
+        if (m.includes('quelle heure') || m === 'heure' || m.includes('il est quelle heure')) {
+            return `Il est ${getTime()} ⏰`;
+        }
+
+        if (m.includes('quelle date') || m.includes('quel jour') || m === 'date') {
+            return `Nous sommes ${getDate()}. 📅`;
+        }
+
+        if (m === 'ca va' || m.includes('comment vas tu') || m.includes('tu vas bien')) {
+            return 'Je vais très bien ! 🤖 Merci de demander.';
+        }
+
+        if (m === 'merci' || m.includes('merci beaucoup')) return 'Avec plaisir ! 😄';
+        if (m === 'au revoir' || m === 'bye' || m === 'aurevoir') return 'À bientôt ! 🚀';
+
+        if (m === 'memoire' || m.includes('montre ma memoire') || m.includes('que sais tu sur moi')) return memoryReply();
+
+        if (m === 'oublie tout' || m === 'efface ma memoire' || m === 'oublie moi') {
+            memory = defaultMemory();
+            saveMemory();
+            return 'C’est fait. 🧹🧠 J’ai effacé ma mémoire locale.';
+        }
+
+        if (m.startsWith('calcule ') || m.startsWith('calcul ')) {
+            const expr = raw.replace(/^calcul(?:e)?\s+/i, '');
+            const result = safeCalculate(expr);
+            return result === null ? 'Je n’ai pas réussi à comprendre ce calcul. Essaie par exemple : « Calcule 125 * 8 ». 🧮' : `Le résultat est **${result}**. 🧮`;
+        }
+
+        // Calcul direct si le message est uniquement une expression mathématique.
+        const directResult = safeCalculate(m);
+        if (directResult !== null && /\d/.test(m)) return `Le résultat est **${directResult}**. 🧮`;
+
+        const knowledge = knowledgeReply(m);
+        if (knowledge) return knowledge;
+
+        if (m.includes('bonjour nexus') || m.includes('salut nexus')) return memory.prenom ? `Salut ${memory.prenom} ! 👋` : 'Salut ! 👋';
+
+        if (m.includes('v0 5') || m.includes('version 0 5')) return 'Tu es actuellement sur Nexus AI V0.5 🚀';
+
+        return 'Je ne connais pas encore assez bien cette question. 🧠\n\nEssaie une formulation plus précise, ou tape « aide » pour voir mes capacités actuelles.';
+    }
+
+    function formatMarkdown(text) {
+        return text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    }
+
+    function renderMessage(sender, text, type, persist = true) {
+        const row = document.createElement('div');
+        row.className = 'message-row ' + type;
+
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble ' + type;
+        bubble.innerHTML = formatMarkdown(text);
+
+        row.appendChild(bubble);
+        chat.appendChild(row);
+
+        if (persist) {
+            conversation.push({ sender, text, type, time: Date.now() });
+            saveConversation();
+        }
 
         chat.scrollTop = chat.scrollHeight;
     }
 
-
-    function repondre(message) {
-
-        const texte = message.toLowerCase().trim();
-
-
-        // Prénom
-
-        if (texte.startsWith("je m'appelle ")) {
-
-            prenom = message
-                .substring(13)
-                .trim();
-
-            return "Enchanté " + prenom + " ! 👋";
-        }
-
-
-        // Salutations
-
-        if (
-            texte === "bonjour" ||
-            texte === "salut" ||
-            texte === "hello" ||
-            texte === "coucou"
-        ) {
-
-            if (prenom) {
-
-                return "Bonjour " + prenom + " ! 👋";
-
-            } else {
-
-                return "Bonjour ! 👋";
-            }
-        }
-
-
-        // Identité
-
-        if (
-            texte === "qui suis-je" ||
-            texte === "qui suis je"
-        ) {
-
-            if (prenom) {
-
-                return "Tu m'as dit que tu t'appelles " + prenom + ". 🧠";
-
-            } else {
-
-                return "Je ne connais pas encore ton prénom.";
-            }
-        }
-
-
-        // Comment ça va
-
-        if (
-            texte === "ça va" ||
-            texte === "ca va" ||
-            texte === "comment ça va" ||
-            texte === "comment ca va" ||
-            texte === "tu vas bien"
-        ) {
-
-            return "Je vais très bien ! 🤖";
-        }
-
-
-        // Merci
-
-        if (
-            texte === "merci" ||
-            texte === "merci beaucoup"
-        ) {
-
-            return "Avec plaisir ! 😄";
-        }
-
-
-        // Aide
-
-        if (
-            texte === "aide" ||
-            texte === "help"
-        ) {
-
-            return `🤖 Nexus AI V4 peut actuellement :
-
-• retenir ton prénom
-• te reconnaître
-• répondre aux salutations
-• répondre à quelques questions simples
-• discuter avec toi
-
-Tape par exemple :
-"Je m'appelle Jean"
-ou
-"Qui suis-je ?"`;
-        }
-
-
-        // Au revoir
-
-        if (
-            texte === "au revoir" ||
-            texte === "aurevoir" ||
-            texte === "bye"
-        ) {
-
-            return "À bientôt ! 🚀";
-        }
-
-
-        // Réponse inconnue
-
-        return "Je ne connais pas encore cette question. 🧠";
-    }
-
-
-    function envoyerMessage() {
-
-        const message = input.value.trim();
-
-        if (message === "") {
+    function renderHistory() {
+        chat.innerHTML = '';
+        if (!conversation.length) {
+            renderMessage('Nexus AI', `Bonjour${memory.prenom ? ' ' + memory.prenom : ''} ! 👋\n\nJe suis Nexus AI V0.5. Pose-moi une question pour commencer.`, 'nexus', false);
             return;
         }
-
-        ajouterMessage("Toi : " + message, "user");
-
-        input.value = "";
-
-        setTimeout(() => {
-
-            const reponse = repondre(message);
-
-            ajouterMessage("Nexus AI : " + reponse, "nexus");
-
-        }, 300);
+        for (const item of conversation) renderMessage(item.sender, item.text, item.type, false);
     }
 
+    function setTyping() {
+        const row = document.createElement('div');
+        row.className = 'message-row nexus';
+        row.id = 'typingRow';
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble nexus typing';
+        bubble.textContent = 'Nexus AI réfléchit…';
+        row.appendChild(bubble);
+        chat.appendChild(row);
+        chat.scrollTop = chat.scrollHeight;
+    }
 
-    button.addEventListener("click", envoyerMessage);
+    function sendMessage(text = input.value) {
+        const message = text.trim();
+        if (!message || sendButton.disabled) return;
 
+        input.value = '';
+        input.style.height = 'auto';
+        renderMessage('Toi', message, 'user');
 
-    input.addEventListener("keydown", function(event) {
+        sendButton.disabled = true;
+        setTyping();
 
-        if (event.key === "Enter") {
+        const delay = Math.min(850, Math.max(250, message.length * 8));
 
-            envoyerMessage();
+        setTimeout(() => {
+            document.getElementById('typingRow')?.remove();
+            const reply = answer(message);
+            renderMessage('Nexus AI', reply, 'nexus');
+            sendButton.disabled = false;
+            input.focus();
+        }, delay);
+    }
 
-        }
-
+    document.querySelectorAll('.suggestion').forEach(button => {
+        button.addEventListener('click', () => sendMessage(button.textContent));
     });
 
-</script>
+    sendButton.addEventListener('click', () => sendMessage());
 
+    input.addEventListener('keydown', event => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            sendMessage();
+        }
+    });
+
+    input.addEventListener('input', () => {
+        input.style.height = 'auto';
+        input.style.height = Math.min(input.scrollHeight, 160) + 'px';
+    });
+
+    document.getElementById('memoryButton').addEventListener('click', () => {
+        renderMessage('Nexus AI', memoryReply(), 'nexus');
+    });
+
+    document.getElementById('helpButton').addEventListener('click', () => {
+        renderMessage('Nexus AI', helpReply(), 'nexus');
+    });
+
+    document.getElementById('clearButton').addEventListener('click', () => {
+        conversation = [];
+        localStorage.removeItem(STORAGE_KEY + '_conversation');
+        renderHistory();
+    });
+
+    renderHistory();
+</script>
 </body>
 </html>
