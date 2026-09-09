@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus AI V4</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f172a;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            height: 700px;
+            background: #1e293b;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .header {
+            padding: 20px;
+            background: #111827;
+            border-bottom: 1px solid #334155;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+        }
+
+        .header p {
+            margin-top: 5px;
+            color: #94a3b8;
+        }
+
+        .chat {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 15px;
+            max-width: 80%;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .nexus {
+            background: #334155;
+            margin-right: auto;
+        }
+
+        .user {
+            background: #2563eb;
+            margin-left: auto;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+            background: #111827;
+            border-top: 1px solid #334155;
+        }
+
+        #messageInput {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            outline: none;
+            border-radius: 12px;
+            background: #334155;
+            color: white;
+            font-size: 16px;
+        }
+
+        #sendButton {
+            border: none;
+            border-radius: 12px;
+            padding: 0 22px;
+            background: #2563eb;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        #sendButton:hover {
+            background: #1d4ed8;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 0;
+            }
+
+            .container {
+                height: 100vh;
+                border-radius: 0;
+            }
+
+            .message {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>🤖 Nexus AI</h1>
+        <p>Version 4 — Assistant intelligent</p>
+    </div>
+
+    <div id="chat" class="chat">
+
+        <div class="message nexus">
+            Nexus AI : Bonjour ! 👋
+            <br>
+            Je suis Nexus AI V4.
+            <br>
+            Comment puis-je t'aider ?
+        </div>
+
+    </div>
+
+    <div class="input-area">
+        <input
+            id="messageInput"
+            type="text"
+            placeholder="Écris ton message..."
+            autocomplete="off"
+        >
+
+        <button id="sendButton">➤</button>
+    </div>
+
+</div>
+
+<script>
+
+    let prenom = "";
+
+    const chat = document.getElementById("chat");
+    const input = document.getElementById("messageInput");
+    const button = document.getElementById("sendButton");
+
+    function ajouterMessage(message, type) {
+
+        const div = document.createElement("div");
+
+        div.classList.add("message", type);
+
+        div.textContent = message;
+
+        chat.appendChild(div);
+
+        chat.scrollTop = chat.scrollHeight;
+    }
+
+
+    function repondre(message) {
+
+        const texte = message.toLowerCase().trim();
+
+
+        // Prénom
+
+        if (texte.startsWith("je m'appelle ")) {
+
+            prenom = message
+                .substring(13)
+                .trim();
+
+            return "Enchanté " + prenom + " ! 👋";
+        }
+
+
+        // Salutations
+
+        if (
+            texte === "bonjour" ||
+            texte === "salut" ||
+            texte === "hello" ||
+            texte === "coucou"
+        ) {
+
+            if (prenom) {
+
+                return "Bonjour " + prenom + " ! 👋";
+
+            } else {
+
+                return "Bonjour ! 👋";
+            }
+        }
+
+
+        // Identité
+
+        if (
+            texte === "qui suis-je" ||
+            texte === "qui suis je"
+        ) {
+
+            if (prenom) {
+
+                return "Tu m'as dit que tu t'appelles " + prenom + ". 🧠";
+
+            } else {
+
+                return "Je ne connais pas encore ton prénom.";
+            }
+        }
+
+
+        // Comment ça va
+
+        if (
+            texte === "ça va" ||
+            texte === "ca va" ||
+            texte === "comment ça va" ||
+            texte === "comment ca va" ||
+            texte === "tu vas bien"
+        ) {
+
+            return "Je vais très bien ! 🤖";
+        }
+
+
+        // Merci
+
+        if (
+            texte === "merci" ||
+            texte === "merci beaucoup"
+        ) {
+
+            return "Avec plaisir ! 😄";
+        }
+
+
+        // Aide
+
+        if (
+            texte === "aide" ||
+            texte === "help"
+        ) {
+
+            return `🤖 Nexus AI V4 peut actuellement :
+
+• retenir ton prénom
+• te reconnaître
+• répondre aux salutations
+• répondre à quelques questions simples
+• discuter avec toi
+
+Tape par exemple :
+"Je m'appelle Jean"
+ou
+"Qui suis-je ?"`;
+        }
+
+
+        // Au revoir
+
+        if (
+            texte === "au revoir" ||
+            texte === "aurevoir" ||
+            texte === "bye"
+        ) {
+
+            return "À bientôt ! 🚀";
+        }
+
+
+        // Réponse inconnue
+
+        return "Je ne connais pas encore cette question. 🧠";
+    }
+
+
+    function envoyerMessage() {
+
+        const message = input.value.trim();
+
+        if (message === "") {
+            return;
+        }
+
+        ajouterMessage("Toi : " + message, "user");
+
+        input.value = "";
+
+        setTimeout(() => {
+
+            const reponse = repondre(message);
+
+            ajouterMessage("Nexus AI : " + reponse, "nexus");
+
+        }, 300);
+    }
+
+
+    button.addEventListener("click", envoyerMessage);
+
+
+    input.addEventListener("keydown", function(event) {
+
+        if (event.key === "Enter") {
+
+            envoyerMessage();
+
+        }
+
+    });
+
+</script>
+
+</body>
+</html>
