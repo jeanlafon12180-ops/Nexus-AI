@@ -1,15 +1,200 @@
 import { loadMemory, saveMemory } from './memory.js';
 import { findKnowledge, knowledgeCount } from './knowledge.js';
 
-export const norm = (text) => String(text).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[’']/g,' ').replace(/[^a-z0-9+\-*/().%\s]/g,' ').replace(/\s+/g,' ').trim();
-const dist = (a,b) => { const row=Array.from({length:b.length+1},(_,i)=>i); for(let i=1;i<=a.length;i++){ let previous=row[0]; row[0]=i; for(let j=1;j<=b.length;j++){ const current=row[j]; row[j]=Math.min(row[j]+1,row[j-1]+1,previous+(a[i-1]===b[j-1]?0:1)); previous=current; } } return row[b.length]; };
-const similar = (a,b) => a===b || (a.length>=3 && dist(a,b)<= (b.length<=5?1:2));
-const phrase = (text,target) => { const a=norm(text).split(' ').filter(Boolean), b=norm(target).split(' ').filter(Boolean); if(a.length<b.length) return false; for(let i=0;i<=a.length-b.length;i++){ let ok=true; for(let j=0;j<b.length;j++){ if(!similar(a[i+j],b[j])){ok=false;break;} } if(ok) return true; } return false; };
-const intent = (text,list) => list.some(item=>text.includes(item)||phrase(text,item));
-const nums={zero:0,un:1,une:1,deux:2,trois:3,quatre:4,cinq:5,six:6,sept:7,huit:8,neuf:9,dix:10,onze:11,douze:12,treize:13,quatorze:14,quinze:15,seize:16,vingt:20,trente:30,quarante:40,cinquante:50,soixante:60,cent:100};
-function words(text){return norm(text).split(' ').filter(Boolean).map(word=>Object.hasOwn(nums,word)?String(nums[word]):word).join(' ');}
-function calc(text){let expression=words(text).replace(/divise(?:e|es)?\s+par/g,'/').replace(/multiplie(?:e|es)?\s+par/g,'*').replace(/fois/g,'*').replace(/plus/g,'+').replace(/moins/g,'-').replace(/\bx\b/g,'*'); if(!/^[0-9+\-*/().%\s]+$/.test(expression))return null; const tokens=expression.match(/\d+(?:\.\d+)?|[()+\-*/%]/g)||[]; if(tokens.join('')!==expression.replace(/\s+/g,''))return null; let position=0; const primary=()=>{const token=tokens[position++]; if(token==='('){const value=expr(); if(tokens[position++]!==')')throw new Error('Parentheses'); return value;} if(token==null||Number.isNaN(Number(token)))throw new Error('Number'); return Number(token);}; const factor=()=>{if(tokens[position]==='-'){position++;return-factor();} if(tokens[position]==='+'){position++;return factor();} return primary();}; const term=()=>{let value=factor(); while(['*','/','%'].includes(tokens[position])){const operator=tokens[position++],right=factor(); if(operator==='*')value*=right; else if(operator==='/'){if(right===0)throw new Error('Division by zero'); value/=right;} else value%=right;} return value;}; function expr(){let value=term(); while(['+','-'].includes(tokens[position])){const operator=tokens[position++],right=term(); value=operator==='+'?value+right:value-right;} return value;} try{const result=expr(); return position===tokens.length&&Number.isFinite(result)?Math.round(result*1e12)/1e12:null;}catch{return null;}}
-const memoryText=memory=>{const items=[]; if(memory.prenom)items.push(`Prénom : ${memory.prenom}`); if(memory.ville)items.push(`Ville : ${memory.ville}`); return items.length?`🧠 Je retiens :\n\n${items.join('\n')}`:'🧠 Ma mémoire est encore vide.';};
-function capitalizeFirst(text){return text?text.charAt(0).toUpperCase()+text.slice(1):text;}
-function learn(raw,memory){const text=norm(raw); let match=text.match(/^je m appelle (.+)$/)||text.match(/^mon prenom est (.+)$/)||text.match(/^moi c est (.+)$/); if(match){memory.prenom=capitalizeFirst(match[1].trim().split(' ')[0]); saveMemory(memory); return `Enchanté ${memory.prenom} ! 👋 Je m’en souviendrai.`;} match=text.match(/^j habite a (.+)$/)||text.match(/^ma ville est (.+)$/); if(match){memory.ville=capitalizeFirst(match[1].trim()); saveMemory(memory); return `D’accord ! 🏠 Je retiens que tu habites à ${memory.ville}.`;} return null;}
-export function createBrain(){const state={memory:loadMemory(),context:[]}; const reply=raw=>{const learned=learn(raw,state.memory); if(learned)return learned; const text=norm(raw); if(intent(text,['aide','que peux tu faire','que sais tu faire','tu peux faire quoi'])) return `🤖 Nexus IA V0.8\n\nJe peux comprendre plusieurs formulations, certaines fautes, retenir des informations sur cet appareil, garder un contexte récent, calculer, expliquer des notions scolaires et traiter plusieurs questions.\n\n📚 Base de connaissances : ${knowledgeCount} notions.\n🖥️ Mémoire : séparée pour cet appareil.`; if(intent(text,['bonjour','salut','hello','coucou','bonsoir']))return state.memory.prenom?`Bonjour ${state.memory.prenom} ! 👋`:'Bonjour ! 👋'; if(intent(text,['qui suis je','quel est mon prenom','comment je m appelle']))return state.memory.prenom?`Tu es ${state.memory.prenom}. 🧠`:'Je ne connais pas encore ton prénom. 🧠'; if(intent(text,['qui es tu','presente toi','tu es quoi','qui est nexus']))return 'Je suis Nexus IA V0.8 🤖, ton assistant Web en développement.'; if(intent(text,['quelle heure','il est quelle heure','donne moi l heure']))return `Il est ${new Intl.DateTimeFormat('fr-FR',{hour:'2-digit',minute:'2-digit'}).format(new Date())} ⏰`; if(intent(text,['quelle date','quel jour','date du jour']))return `Nous sommes ${new Intl.DateTimeFormat('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date())}. 📅`; if(intent(text,['memoire','montre ma memoire','que sais tu sur moi']))return memoryText(state.memory); if(intent(text,['merci','merci beaucoup']))return 'Avec plaisir ! 😄'; if(intent(text,['au revoir','aurevoir','bye']))return 'À bientôt ! 🚀'; const knowledgeAnswer=findKnowledge(text); if(knowledgeAnswer)return knowledgeAnswer; const result=calc(text); if(result!==null&&/\d/.test(text))return `Le résultat est **${result}**. 🧮`; return 'Je ne connais pas encore cette réponse. 🧠 Tape « aide » pour voir mes capacités.'; }; return {reply,getMemory:()=>state.memory,getContext:()=>state.context}; }
+export const norm = (text) => String(text).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[’']/g, ' ').replace(/[^a-z0-9+\-*/().%\s?]/g, ' ').replace(/\s+/g, ' ').trim();
+
+const dist = (a, b) => {
+  const row = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    let previous = row[0];
+    row[0] = i;
+    for (let j = 1; j <= b.length; j++) {
+      const current = row[j];
+      row[j] = Math.min(row[j] + 1, row[j - 1] + 1, previous + (a[i - 1] === b[j - 1] ? 0 : 1));
+      previous = current;
+    }
+  }
+  return row[b.length];
+};
+
+const similar = (a, b) => a === b || (a.length >= 3 && dist(a, b) <= (b.length <= 5 ? 1 : 2));
+
+const phrase = (text, target) => {
+  const a = norm(text).split(' ').filter(Boolean);
+  const b = norm(target).split(' ').filter(Boolean);
+  if (a.length < b.length) return false;
+  for (let i = 0; i <= a.length - b.length; i++) {
+    let ok = true;
+    for (let j = 0; j < b.length; j++) {
+      if (!similar(a[i + j], b[j])) { ok = false; break; }
+    }
+    if (ok) return true;
+  }
+  return false;
+};
+
+const intent = (text, list) => list.some(item => text.includes(item) || phrase(text, item));
+
+const nums = { zero: 0, un: 1, une: 1, deux: 2, trois: 3, quatre: 4, cinq: 5, six: 6, sept: 7, huit: 8, neuf: 9, dix: 10, onze: 11, douze: 12, treize: 13, quatorze: 14, quinze: 15, seize: 16, vingt: 20, trente: 30, quarante: 40, cinquante: 50, soixante: 60, cent: 100 };
+
+function words(text) {
+  return norm(text).split(' ').filter(Boolean).map(word => Object.hasOwn(nums, word) ? String(nums[word]) : word).join(' ');
+}
+
+function calc(text) {
+  let expression = words(text).replace(/divise(?:e|es)?\s+par/g, '/').replace(/multiplie(?:e|es)?\s+par/g, '*').replace(/fois/g, '*').replace(/plus/g, '+').replace(/moins/g, '-').replace(/\bx\b/g, '*');
+  if (!/^[0-9+\-*/().%\s]+$/.test(expression)) return null;
+  const tokens = expression.match(/\d+(?:\.\d+)?|[()+\-*/%]/g) || [];
+  if (tokens.join('') !== expression.replace(/\s+/g, '')) return null;
+  let position = 0;
+  const primary = () => {
+    const token = tokens[position++];
+    if (token === '(') { const value = expr(); if (tokens[position++] !== ')') throw new Error('Parentheses'); return value; }
+    if (token == null || Number.isNaN(Number(token))) throw new Error('Number');
+    return Number(token);
+  };
+  const factor = () => {
+    if (tokens[position] === '-') { position++; return -factor(); }
+    if (tokens[position] === '+') { position++; return factor(); }
+    return primary();
+  };
+  const term = () => {
+    let value = factor();
+    while (['*', '/', '%'].includes(tokens[position])) {
+      const operator = tokens[position++];
+      const right = factor();
+      if (operator === '*') value *= right;
+      else if (operator === '/') { if (right === 0) throw new Error('Division by zero'); value /= right; }
+      else value %= right;
+    }
+    return value;
+  };
+  function expr() {
+    let value = term();
+    while (['+', '-'].includes(tokens[position])) {
+      const operator = tokens[position++];
+      const right = term();
+      value = operator === '+' ? value + right : value - right;
+    }
+    return value;
+  }
+  try {
+    const result = expr();
+    return position === tokens.length && Number.isFinite(result) ? Math.round(result * 1e12) / 1e12 : null;
+  } catch { return null; }
+}
+
+const memoryText = memory => {
+  const items = [];
+  if (memory.prenom) items.push(`Prénom : ${memory.prenom}`);
+  if (memory.ville) items.push(`Ville : ${memory.ville}`);
+  if (memory.preferences && Object.keys(memory.preferences).length) {
+    Object.entries(memory.preferences).forEach(([key, value]) => items.push(`${key} : ${value}`));
+  }
+  return items.length ? `🧠 Je retiens :\n\n${items.join('\n')}` : '🧠 Ma mémoire est encore vide.';
+};
+
+function capitalizeFirst(text) { return text ? text.charAt(0).toUpperCase() + text.slice(1) : text; }
+
+function learn(raw, memory) {
+  const text = norm(raw);
+  let match = text.match(/^je m appelle (.+)$/) || text.match(/^mon prenom est (.+)$/) || text.match(/^moi c est (.+)$/);
+  if (match) {
+    memory.prenom = capitalizeFirst(match[1].trim().split(' ')[0]);
+    saveMemory(memory);
+    return `Enchanté ${memory.prenom} ! 👋 Je m’en souviendrai.`;
+  }
+  match = text.match(/^j habite a (.+)$/) || text.match(/^ma ville est (.+)$/) || text.match(/^je vis a (.+)$/);
+  if (match) {
+    memory.ville = capitalizeFirst(match[1].trim());
+    saveMemory(memory);
+    return `D’accord ! 🏠 Je retiens que tu habites à ${memory.ville}.`;
+  }
+  const preference = text.match(/^j aime (.+)$/) || text.match(/^j adore (.+)$/) || text.match(/^je prefere (.+)$/);
+  if (preference) {
+    const value = preference[1].trim();
+    memory.preferences = memory.preferences || {};
+    memory.preferences.derniere_preference = value;
+    saveMemory(memory);
+    return `Compris ! ❤️ Je retiens que tu aimes ${value}.`;
+  }
+  return null;
+}
+
+function recentContextText(context) {
+  return context.slice(-4).map(item => item.text).filter(Boolean).join(' ');
+}
+
+function contextualKnowledge(text, context) {
+  const direct = findKnowledge(text);
+  if (direct) return direct;
+  const followUp = /^(et|et pour|et concernant|mais|du coup|pourquoi|comment)\b/.test(text);
+  if (!followUp || !context.length) return null;
+  return findKnowledge(`${recentContextText(context)} ${text}`);
+}
+
+function contextualReply(text, state) {
+  const lastUser = [...state.context].reverse().find(item => item.role === 'user')?.text || '';
+  if (intent(text, ['et toi', 'toi alors', 'et toi alors'])) return 'Moi, je suis toujours là pour t’aider ! 🤖';
+  if (intent(text, ['pourquoi', 'pour quelle raison']) && lastUser) return `Je peux poursuivre sur ce sujet. Ta question précédente était : « ${lastUser} ». 🧠`;
+  if (intent(text, ['c est quoi', 'c quoi', 'ca veut dire quoi']) && lastUser) return `Tu fais probablement référence à « ${lastUser} ». Donne-moi le mot ou le sujet précis et je l’expliquerai. 📚`;
+  return null;
+}
+
+export function createBrain() {
+  const state = { memory: loadMemory(), context: [] };
+
+  const reply = raw => {
+    const original = String(raw);
+    const learned = learn(original, state.memory);
+    if (learned) {
+      state.context.push({ role: 'user', text: original });
+      state.context.push({ role: 'nexus', text: learned });
+      state.context = state.context.slice(-12);
+      return learned;
+    }
+
+    const text = norm(original);
+    let answer = null;
+
+    if (intent(text, ['aide', 'que peux tu faire', 'que sais tu faire', 'tu peux faire quoi'])) {
+      answer = `🤖 Nexus IA V0.9\n\nJe comprends mieux les formulations différentes et certaines fautes, je garde un contexte récent, je peux retenir quelques informations, calculer et consulter ma base de connaissances.\n\n📚 Base de connaissances : ${knowledgeCount} notions.\n🧠 Mémoire : prénom, ville et préférences sur cet appareil.`;
+    } else if (intent(text, ['bonjour', 'salut', 'hello', 'coucou', 'yo', 'bonsoir'])) {
+      answer = state.memory.prenom ? `Bonjour ${state.memory.prenom} ! 👋` : 'Bonjour ! 👋';
+    } else if (intent(text, ['qui suis je', 'quel est mon prenom', 'comment je m appelle'])) {
+      answer = state.memory.prenom ? `Tu es ${state.memory.prenom}. 🧠` : 'Je ne connais pas encore ton prénom. 🧠';
+    } else if (intent(text, ['qui es tu', 'presente toi', 'tu es quoi', 'qui est nexus'])) {
+      answer = 'Je suis Nexus IA V0.9 🤖, ton assistant Web en développement.';
+    } else if (intent(text, ['quelle heure', 'il est quelle heure', 'donne moi l heure'])) {
+      answer = `Il est ${new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' }).format(new Date())} ⏰`;
+    } else if (intent(text, ['quelle date', 'quel jour', 'date du jour'])) {
+      answer = `Nous sommes ${new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date())}. 📅`;
+    } else if (intent(text, ['memoire', 'montre ma memoire', 'que sais tu sur moi'])) {
+      answer = memoryText(state.memory);
+    } else if (intent(text, ['merci', 'merci beaucoup', 'thanks'])) {
+      answer = 'Avec plaisir ! 😄';
+    } else if (intent(text, ['au revoir', 'aurevoir', 'bye', 'quitter'])) {
+      answer = 'À bientôt ! 🚀';
+    } else {
+      const knowledgeAnswer = contextualKnowledge(text, state.context);
+      if (knowledgeAnswer) answer = knowledgeAnswer;
+      else {
+        const contextual = contextualReply(text, state);
+        if (contextual) answer = contextual;
+        else {
+          const result = calc(text);
+          if (result !== null && /\d/.test(text)) answer = `Le résultat est **${result}**. 🧮`;
+          else if (text.length > 18 && /\b(je|tu|il|elle|on|nous|vous|ils|elles)\b/.test(text)) answer = 'Je comprends ta phrase, mais je n’ai pas encore assez de connaissances pour y répondre correctement. 🧠';
+          else answer = 'Je ne connais pas encore cette réponse. 🧠 Tape « aide » pour voir mes capacités.';
+        }
+      }
+    }
+
+    state.context.push({ role: 'user', text: original });
+    state.context.push({ role: 'nexus', text: answer });
+    state.context = state.context.slice(-12);
+    return answer;
+  };
+
+  return { reply, getMemory: () => state.memory, getContext: () => state.context };
+}
