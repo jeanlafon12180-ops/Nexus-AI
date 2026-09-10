@@ -3,64 +3,60 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Nexus IA V0.8 — assistant web en développement.">
-<title>Nexus IA V0.8</title>
+<meta name="description" content="Nexus IA V1.0 — assistant web intelligent en développement.">
+<title>Nexus IA V1.0</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="app">
-<aside class="sidebar">
-  <div class="brand">
-    <div class="logo">🤖</div>
-    <div><h1>Nexus IA</h1><span>Assistant intelligent</span></div>
-  </div>
-  <div class="side-title">Outils</div>
-  <button class="side-button" id="memoryButton">🧠 Ma mémoire</button>
-  <button class="side-button" id="helpButton">❓ Aide</button>
-  <button class="side-button" id="clearButton">🧹 Effacer la conversation</button>
-  <button class="side-button" id="clearMemoryButton">🗑️ Effacer ma mémoire</button>
-  <div class="side-title">V0.8</div>
-  <div class="side-info">Mémoire isolée par appareil, connaissances scolaires, compréhension améliorée, calcul et architecture modulaire.</div>
-</aside>
+  <aside class="sidebar" aria-label="Navigation">
+    <div class="brand">
+      <div class="logo">N</div>
+      <div><h1>Nexus IA</h1><span>Assistant intelligent</span></div>
+    </div>
+    <button class="new-chat" id="newChatButton">＋ Nouvelle discussion</button>
+    <div class="side-title">Outils</div>
+    <button class="side-button" id="memoryButton">🧠 Mémoire</button>
+    <button class="side-button" id="imageButton">🎨 Générer une image</button>
+    <button class="side-button" id="helpButton">❓ Capacités</button>
+    <button class="side-button" id="clearMemoryButton">🗑️ Effacer la mémoire</button>
+    <div class="side-spacer"></div>
+    <div class="side-version">Nexus IA <strong>V1.0</strong><br><span>Architecture locale • mode conversation</span></div>
+  </aside>
 
-<main class="main">
-  <header class="topbar">
-    <div class="status"><span class="dot"></span> Nexus IA est en ligne</div>
-    <div class="version">Nexus IA v0.8</div>
-  </header>
+  <main class="main">
+    <header class="topbar">
+      <div class="mobile-brand"><span class="mobile-logo">N</span><strong>Nexus IA</strong></div>
+      <div class="status"><span class="dot"></span> En ligne</div>
+      <div class="version">V1.0</div>
+    </header>
 
-  <section id="chat" class="chat" aria-live="polite">
-    <div class="message-row nexus fallback-welcome">
-      <div class="bubble nexus welcome-card">
-        <div class="welcome-title">Bonjour 👋</div>
-        <div>Je suis <strong>Nexus IA V0.8</strong>, ton assistant intelligent.</div>
-        <div>🖥️ Ma mémoire et mes conversations sont séparées pour cet appareil.</div>
-        <div>📚 Je peux aussi expliquer de nombreuses notions scolaires.</div>
-        <div class="welcome-tip">💡 Écris directement ta question ou utilise un des boutons ci-dessous.</div>
+    <section id="chat" class="chat" aria-live="polite">
+      <div class="empty-state">
+        <div class="empty-logo">N</div>
+        <h2>Que puis-je faire pour toi ?</h2>
+        <p>Je peux discuter, mémoriser certaines informations, calculer, expliquer des notions et générer du code.</p>
+        <div class="quick-grid">
+          <button class="quick-card suggestion">Explique-moi le théorème de Pythagore</button>
+          <button class="quick-card suggestion">Écris-moi un site HTML simple</button>
+          <button class="quick-card suggestion">12 × 8 + 5</button>
+          <button class="quick-card suggestion">Que sais-tu faire ?</button>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <div class="suggestions">
-    <button class="suggestion">Que peux-tu faire ?</button>
-    <button class="suggestion">Je m'appelle Jean</button>
-    <button class="suggestion">C'est quoi le cosinus ?</button>
-    <button class="suggestion">Explique Pythagore</button>
-  </div>
-
-  <footer class="composer">
-    <div class="input-wrap">
-      <textarea id="messageInput" placeholder="Écris à Nexus IA...&#10;Tu peux aussi coller plusieurs questions, une par ligne." rows="1"></textarea>
-      <button id="sendButton" aria-label="Envoyer">➤</button>
+    <div class="composer-area">
+      <div class="composer">
+        <button class="composer-tool" id="composerImageButton" aria-label="Générer une image" title="Générer une image">＋</button>
+        <textarea id="messageInput" placeholder="Message à Nexus IA..." rows="1"></textarea>
+        <button id="sendButton" aria-label="Envoyer" title="Envoyer">↑</button>
+      </div>
+      <div class="hint">Nexus IA peut faire des erreurs. Vérifie les informations importantes.</div>
     </div>
-    <div class="hint">Entrée = envoyer • Maj + Entrée = nouvelle ligne • Plusieurs lignes = plusieurs réponses</div>
-  </footer>
-</main>
+  </main>
 </div>
 
-<noscript>
-  <div class="noscript-warning">⚠️ JavaScript est désactivé. Nexus IA a besoin de JavaScript pour répondre aux messages.</div>
-</noscript>
+<noscript><div class="noscript-warning">⚠️ JavaScript est désactivé. Nexus IA a besoin de JavaScript.</div></noscript>
 <script type="module" src="js/app.js"></script>
 </body>
 </html>
