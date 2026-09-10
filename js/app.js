@@ -7,7 +7,6 @@ const input=document.getElementById('messageInput');
 const send=document.getElementById('sendButton');
 const deviceId=getDeviceId();
 let history=loadConversation();
-const API_BASE=window.NEXUS_API_BASE||'';
 
 function html(text){
   let safe=String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -27,7 +26,7 @@ function render(){
   chat.innerHTML='';
   if(!history.length){
     const empty=document.createElement('div'); empty.className='empty-state';
-    empty.innerHTML='<div class="empty-logo">N</div><h2>Que puis-je faire pour toi ?</h2><p>Je peux discuter, expliquer, écrire du code et lancer une vraie génération d’image quand le backend est configuré.</p><div class="quick-grid"><button class="quick-card suggestion">Explique-moi le théorème de Pythagore</button><button class="quick-card suggestion">Écris-moi un site HTML simple</button><button class="quick-card suggestion">12 × 8 + 5</button><button class="quick-card suggestion">Crée une image d’un chat réaliste</button></div>';
+    empty.innerHTML='<div class="empty-logo">N</div><h2>Que puis-je faire pour toi ?</h2><p>Je peux discuter, mémoriser certaines informations, calculer, expliquer des notions et générer du code.</p><div class="quick-grid"><button class="quick-card suggestion">Explique-moi le théorème de Pythagore</button><button class="quick-card suggestion">Écris-moi un site HTML simple</button><button class="quick-card suggestion">Crée une image d’un chat réaliste</button><button class="quick-card suggestion">Que sais-tu faire ?</button></div>';
     chat.appendChild(empty);
   }else history.forEach(item=>{if(item&&typeof item.text==='string'&&(item.type==='user'||item.type==='nexus'))show(item.text,item.type,false);});
   bindSuggestions();
@@ -36,33 +35,42 @@ function render(){
 function bindSuggestions(){document.querySelectorAll('.suggestion').forEach(button=>button.addEventListener('click',()=>sendText(button.textContent)));}
 function splitQuestions(text){return String(text).replace(/\r/g,'').split(/\n/).map(x=>x.trim()).map(x=>x.replace(/^[-•*]\s+/,'').replace(/^\d+[.)]\s+/,'').trim()).filter(Boolean);}
 function setBusy(value){send.disabled=value;input.disabled=value;}
-function isImagePrompt(text){return /\b(cr[ée]e|g[ée]n[èe]re|dessine|fais|produis)\b.*\bimage\b/i.test(text)||/\bimage d(?:e|u|es|un|une)\b/i.test(text);}
+function isImagePrompt(text){return /\b(cr[ée]e|g[ée]n[èe]re|dessine|fais|produis|fabrique)\b.*\bimage\b/i.test(text)||/\bimage d(?:e|u|des|un|une)\b/i.test(text);}
 
 function showImageLoading(prompt){
-  const row=document.createElement('div'); row.className='message-row nexus image-row';
-  const bubble=document.createElement('div'); bubble.className='bubble nexus image-card loading-image';
-  bubble.innerHTML='<div class="image-title">🎨 Génération d’image</div><div class="image-spinner" aria-hidden="true"></div><div class="image-status">Prompt reçu. Création de l’image…</div><div class="image-prompt"></div>';
-  bubble.querySelector('.image-prompt').textContent=prompt;
-  row.appendChild(bubble); chat.appendChild(row); chat.scrollTop=chat.scrollHeight; return row;
-}
-
-function showImageResult(prompt,data){
-  const row=document.createElement('div'); row.className='message-row nexus image-row';
+  const row=document.createElement('div'); row.className='message-row nexus';
   const bubble=document.createElement('div'); bubble.className='bubble nexus image-card';
-  const title=document.createElement('div'); title.className='image-title'; title.textContent='🖼️ Image prête';
-  const image=document.createElement('img'); image.className='generated-image'; image.alt=prompt; image.loading='lazy'; image.src=data.url?data.url:`data:image/png;base64,${data.b64_json}`;
-  const caption=document.createElement('div'); caption.className='image-prompt'; caption.textContent=`Prompt : ${prompt}`;
-  bubble.append(title,image,caption); row.appendChild(bubble); chat.appendChild(row); chat.scrollTop=chat.scrollHeight;
+  bubble.innerHTML='<strong>🎨 Génération d’image</strong><p>Prompt reçu :</p><div class="image-prompt"></div><div class="image-loading"><span></span><span></span><span></span> Génération en cours…</div>';
+  bubble.querySelector('.image-prompt').textContent=prompt;
+  chat.appendChild(row); row.appendChild(bubble); chat.scrollTop=chat.scrollHeight;
+  return bubble;
 }
 
-async function generateImage(prompt){
-  const loading=showImageLoading(prompt);
+function showGeneratedImage(bubble,data,prompt){
+  const loading=bubble.querySelector('.image-loading');
+  if(loading)loading.remove();
+  if(data?.url){
+    const img=document.createElement('img'); img.className='generated-image'; img.src=data.url; img.alt=prompt; img.loading='lazy';
+    bubble.appendChild(img);
+  }else if(data?.b64_json){
+    const img=document.createElement('img'); img.className='generated-image'; img.src=`data:image/png;base64,${data.b64_json}`; img.alt=prompt;
+    bubble.appendChild(img);
+  }
+  const done=document.createElement('p'); done.className='image-status'; done.textContent='✅ Image générée.'; bubble.appendChild(done);
+  history.push({text:`[Image générée] ${prompt}`,type:'nexus',time:Date.now()}); history=history.slice(-150); saveConversation(history);
+  chat.scrollTop=chat.scrollHeight;
+}
+
+async function generateImage(prompt,bubble){
   try{
-    const response=await fetch(`${API_BASE}/api/generate-image`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
-    const data=await response.json().catch(()=>({})); loading.remove();
-    if(!response.ok)throw new Error(data.error||'Le moteur d’image n’est pas disponible.');
-    showImageResult(prompt,data);
-  }catch(error){loading.remove();show(`🎨 **Génération d’image**\n\n⚠️ ${error.message||'Erreur pendant la génération.'}\n\nLe code attend maintenant un backend sécurisé à l’adresse **/api/generate-image**.`,'nexus');}
+    const response=await fetch('/api/generate-image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,model:'flux'})});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(data?.error||'Le moteur d’image est indisponible.');
+    showGeneratedImage(bubble,data,prompt);
+  }catch(error){
+    const loading=bubble.querySelector('.image-loading'); if(loading)loading.remove();
+    const errorBox=document.createElement('p'); errorBox.className='image-error'; errorBox.textContent=`⚠️ ${error.message}`; bubble.appendChild(errorBox);
+  }
 }
 
 async function sendText(text){
@@ -71,8 +79,13 @@ async function sendText(text){
   try{
     questions.forEach(q=>show(q,'user'));
     for(const q of questions){
-      if(isImagePrompt(q)){await generateImage(q.replace(/^(cr[ée]e|g[ée]n[èe]re|dessine|fais|produis)\s+/i,'').trim()||q);continue;}
-      await new Promise(r=>setTimeout(r,120)); show(brain.reply(q),'nexus');
+      await new Promise(r=>setTimeout(r,120));
+      if(isImagePrompt(q)){
+        const bubble=showImageLoading(q);
+        await generateImage(q,bubble);
+      }else{
+        show(brain.reply(q),'nexus');
+      }
     }
   }catch(error){console.error('Nexus IA error:',error);show('⚠️ Une erreur est survenue. Recharge la page puis réessaie.','nexus');}
   finally{setBusy(false);input.focus();}
