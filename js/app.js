@@ -5,13 +5,15 @@ import {
   clearConversation,
   clearMemory,
   createMemory,
-  saveMemory
+  saveMemory,
+  getDeviceId
 } from './memory.js';
 
 const brain = createBrain();
 const chat = document.getElementById('chat');
 const input = document.getElementById('messageInput');
 const send = document.getElementById('sendButton');
+const deviceId = getDeviceId();
 let history = loadConversation();
 
 function html(text) {
@@ -46,7 +48,7 @@ function render() {
 
   if (!history.length) {
     show(
-      'Bonjour ! 👋\n\nJe suis **Nexus IA V0.7**, ton assistant intelligent.\nPose-moi une question pour commencer ! 🚀',
+      'Bonjour ! 👋\n\nJe suis **Nexus IA V0.8**, ton assistant intelligent.\n🖥️ Cette conversation et ma mémoire sont enregistrées séparément sur cet appareil.\n\nPose-moi une question pour commencer ! 🚀',
       'nexus',
       false
     );
@@ -108,8 +110,8 @@ function memoryView() {
   if (memory.ville) items.push(`Ville : ${memory.ville}`);
 
   return items.length
-    ? `🧠 Je retiens :\n\n${items.join('\n')}`
-    : '🧠 Ma mémoire est encore vide.';
+    ? `🧠 **Mémoire de cet appareil**\n\n${items.join('\n')}\n\n🖥️ Appareil : ${deviceId.slice(0, 8)}`
+    : `🧠 **Mémoire de cet appareil**\n\nMa mémoire est encore vide.\n\n🖥️ Appareil : ${deviceId.slice(0, 8)}`;
 }
 
 document.querySelectorAll('.suggestion').forEach(button => {
@@ -147,7 +149,7 @@ document.getElementById('clearButton').addEventListener('click', () => {
 document.getElementById('clearMemoryButton').addEventListener('click', () => {
   clearMemory();
   saveMemory(createMemory());
-  show('🧹 Ma mémoire locale a été effacée.', 'nexus');
+  show('🧹 La mémoire de **cet appareil** a été effacée.','nexus');
 });
 
 window.addEventListener('error', event => {
