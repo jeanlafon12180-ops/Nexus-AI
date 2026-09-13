@@ -43,7 +43,7 @@ Pour les questions scolaires, explique avec des exemples. Pour les calculs, vér
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'qwen-coder-large',
+        model: 'qwen-coder',
         messages,
         temperature: 0.15,
         max_tokens: 8000
