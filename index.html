@@ -17,7 +17,6 @@
 <button class="new-chat" id="newChatButton">＋ Nouvelle discussion</button>
 <div class="side-title">Outils</div>
 <button class="side-button" id="memoryButton">🧠 Mémoire</button>
-<button class="side-button" id="imageButton">🎨 Générer une image</button>
 <button class="side-button" id="helpButton">❓ Capacités</button>
 <button class="side-button" id="clearMemoryButton">🗑️ Effacer la mémoire</button>
 <div class="side-spacer"></div><div class="side-version">Nexus IA <strong>V1.4</strong><br><span>Images + documents</span></div>
@@ -27,8 +26,20 @@
 <section id="chat" class="chat" aria-live="polite"><div class="empty-state"><div class="empty-logo">N</div><h2>Que puis-je faire pour toi ?</h2><p>Je peux discuter, analyser des images et des documents, répondre à tes questions, générer des images et du code.</p><div class="quick-grid"><button class="quick-card suggestion">Explique-moi le théorème de Pythagore</button><button class="quick-card suggestion">Écris-moi un site HTML simple</button><button class="quick-card suggestion">Crée une image d’un chat réaliste</button><button class="quick-card suggestion">Que sais-tu faire ?</button></div></div></section>
 <div class="composer-area">
 <div id="filePreview" class="file-preview" hidden><div class="file-icon">📎</div><div class="file-info"><strong id="fileName"></strong><span id="fileMeta"></span></div><button id="removeFileButton" type="button" aria-label="Retirer le fichier">×</button></div>
-<div class="composer"><button class="composer-tool" id="imageUploadButton" aria-label="Ajouter un fichier" title="Ajouter une image ou un document">📎</button><input id="imageFileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif,.pdf,.docx,.odt,.txt,.md,.csv,.json" hidden><button class="composer-tool" id="composerImageButton" aria-label="Générer une image" title="Générer une image">🎨</button><textarea id="messageInput" placeholder="Message à Nexus IA..." rows="1"></textarea><button id="sendButton" aria-label="Envoyer" title="Envoyer">↑</button></div>
-<div class="hint">📎 Images, PDF, Word (.docx), LibreOffice (.odt) et fichiers texte</div>
+<div class="composer">
+<div class="attach-menu-wrap">
+<button class="composer-tool" id="imageUploadButton" aria-label="Ouvrir le menu" title="Ouvrir le menu">📎</button>
+<div id="attachMenu" class="attach-menu" hidden>
+<button type="button" id="menuCodeButton">💻 <span>Création de code</span></button>
+<button type="button" id="menuImageButton">🎨 <span>Création d’image</span></button>
+<button type="button" id="menuUploadButton">📎 <span>Télécharger un fichier</span></button>
+</div>
+</div>
+<input id="imageFileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif,.pdf,.docx,.odt,.txt,.md,.csv,.json" hidden>
+<textarea id="messageInput" placeholder="Message à Nexus IA..." rows="1"></textarea>
+<button id="sendButton" aria-label="Envoyer" title="Envoyer">↑</button>
+</div>
+<div class="hint">📎 Menu : création de code, création d’image et téléchargement de fichiers</div>
 </div></main></div>
 <noscript><div class="noscript-warning">⚠️ JavaScript est désactivé. Nexus IA a besoin de JavaScript.</div></noscript>
 <script type="module" src="js/app.js"></script>
