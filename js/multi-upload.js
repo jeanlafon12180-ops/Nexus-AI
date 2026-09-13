@@ -1,5 +1,8 @@
 (() => {
   const MAX_IMAGES = 20;
+  const MAX_VIDEOS = 5;
+  const MAX_ANALYSIS_FRAMES = 20;
+  const FRAMES_PER_VIDEO = 4;
   const MAX_TOTAL_DATA = 8000000;
   const input = document.getElementById('messageInput');
   const fileInput = document.getElementById('imageFileInput');
@@ -9,7 +12,7 @@
   const removeButton = document.getElementById('removeFileButton');
   const sendButton = document.getElementById('sendButton');
   const chat = document.getElementById('chat');
-  let images = [];
+  let mediaItems = [];
   let busy = false;
 
   const escapeHtml = (value) => String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#039;');
@@ -38,52 +41,127 @@
     });
   }
 
+  function extractVideoFrames(file) {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement('video');
+      const objectUrl = URL.createObjectURL(file);
+      video.preload = 'metadata';
+      video.muted = true;
+      video.playsInline = true;
+      video.src = objectUrl;
+
+      const cleanup = () => {
+        URL.revokeObjectURL(objectUrl);
+        video.removeAttribute('src');
+        video.load();
+      };
+
+      video.onerror = () => {
+        cleanup();
+        reject(new Error(`Impossible de lire la vidéo « ${file.name} ». Utilise de préférence MP4 ou WebM.`));
+      };
+
+      video.onloadedmetadata = async () => {
+        try {
+          const duration = Number(video.duration);
+          if (!Number.isFinite(duration) || duration <= 0) throw new Error('Durée vidéo invalide.');
+          const canvas = document.createElement('canvas');
+          const max = 960;
+          const scale = Math.min(1, max / Math.max(video.videoWidth || 1, video.videoHeight || 1));
+          canvas.width = Math.max(1, Math.round((video.videoWidth || 960) * scale));
+          canvas.height = Math.max(1, Math.round((video.videoHeight || 540) * scale));
+          const ctx = canvas.getContext('2d');
+          if (!ctx) throw new Error('Impossible de préparer les images de la vidéo.');
+
+          const times = duration <= 1
+            ? [0]
+            : Array.from({length: FRAMES_PER_VIDEO}, (_, i) => duration * ((i + 1) / (FRAMES_PER_VIDEO + 1)));
+          const frames = [];
+
+          for (const time of times) {
+            await new Promise((resolveSeek, rejectSeek) => {
+              const onSeeked = () => { video.removeEventListener('seeked', onSeeked); resolveSeek(); };
+              const onError = () => { video.removeEventListener('seeked', onSeeked); rejectSeek(new Error(`Impossible d’extraire une image de « ${file.name} ».`)); };
+              video.addEventListener('seeked', onSeeked, {once:true});
+              video.addEventListener('error', onError, {once:true});
+              video.currentTime = Math.min(Math.max(0, time), Math.max(0, duration - 0.05));
+            });
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            frames.push(canvas.toDataURL('image/jpeg', 0.68));
+          }
+          cleanup();
+          resolve({duration, frames});
+        } catch (error) {
+          cleanup();
+          reject(error);
+        }
+      };
+    });
+  }
+
   function renderPreview() {
-    if (!images.length) {
+    if (!mediaItems.length) {
       filePreview.hidden = true;
       return;
     }
+    const imageCount = mediaItems.filter(item => item.kind === 'image').length;
+    const videoCount = mediaItems.filter(item => item.kind === 'video').length;
     filePreview.hidden = false;
-    fileName.textContent = `${images.length} photo${images.length > 1 ? 's' : ''} sélectionnée${images.length > 1 ? 's' : ''}`;
-    fileMeta.textContent = 'Photos prêtes pour une analyse groupée';
+    fileName.textContent = `${imageCount ? `${imageCount} photo${imageCount > 1 ? 's' : ''}` : ''}${imageCount && videoCount ? ' + ' : ''}${videoCount ? `${videoCount} vidéo${videoCount > 1 ? 's' : ''}` : ''} sélectionnée${imageCount + videoCount > 1 ? 's' : ''}`;
+    fileMeta.textContent = videoCount ? `Jusqu’à ${MAX_VIDEOS} vidéos · ${FRAMES_PER_VIDEO} images extraites par vidéo pour l’analyse` : `Maximum : ${MAX_IMAGES} photos · analyse groupée`;
     filePreview.innerHTML = `
       <div style="display:flex;align-items:center;gap:10px;min-width:0;width:100%;">
-        <div class="file-icon">🖼️</div>
+        <div class="file-icon">${videoCount ? '🎬' : '🖼️'}</div>
         <div class="file-info" style="flex:1;min-width:0;">
-          <strong>${images.length} photo${images.length > 1 ? 's' : ''}</strong>
-          <span>Maximum : ${MAX_IMAGES} · analyse groupée</span>
+          <strong>${escapeHtml(fileName.textContent)}</strong>
+          <span>${escapeHtml(fileMeta.textContent)}</span>
         </div>
-        <button id="removeMultiImages" type="button" aria-label="Retirer les photos">×</button>
+        <button id="removeMultiImages" type="button" aria-label="Retirer les médias">×</button>
       </div>
       <div style="display:flex;gap:6px;overflow-x:auto;margin-top:8px;padding-bottom:2px;">
-        ${images.map((item, i) => `<img src="${item.data}" alt="Photo ${i + 1}" title="${escapeHtml(item.name)}" style="width:52px;height:52px;object-fit:cover;border-radius:8px;flex:0 0 auto;">`).join('')}
+        ${mediaItems.map((item, i) => item.kind === 'image'
+          ? `<img src="${item.data}" alt="Photo ${i + 1}" title="${escapeHtml(item.name)}" style="width:52px;height:52px;object-fit:cover;border-radius:8px;flex:0 0 auto;">`
+          : `<div title="${escapeHtml(item.name)}" style="width:52px;height:52px;border-radius:8px;flex:0 0 auto;display:grid;place-items:center;background:rgba(255,255,255,.08);font-size:25px;">🎬</div>`).join('')}
       </div>`;
-    document.getElementById('removeMultiImages')?.addEventListener('click', clearImages);
+    document.getElementById('removeMultiImages')?.addEventListener('click', clearMedia);
   }
 
-  function clearImages() {
-    images = [];
+  function clearMedia() {
+    mediaItems = [];
     renderPreview();
     if (fileInput) fileInput.value = '';
     if (input) input.placeholder = 'Message à Nexus IA...';
   }
 
-  function showImages() {
-    images.forEach((item, index) => {
+  function showUserMedia(selected) {
+    selected.forEach((item, index) => {
       const row = document.createElement('div');
       row.className = 'message-row user';
       const bubble = document.createElement('div');
       bubble.className = 'bubble user image-user-card';
-      const img = document.createElement('img');
-      img.className = 'attached-image';
-      img.src = item.data;
-      img.alt = `Photo ${index + 1}`;
-      bubble.appendChild(img);
+      if (item.kind === 'image') {
+        const img = document.createElement('img');
+        img.className = 'attached-image';
+        img.src = item.data;
+        img.alt = `Photo ${index + 1}`;
+        bubble.appendChild(img);
+      } else {
+        const title = document.createElement('div');
+        title.style.fontSize = '16px';
+        title.textContent = `🎬 ${item.name}`;
+        bubble.appendChild(title);
+        const meta = document.createElement('div');
+        meta.style.marginTop = '5px';
+        meta.style.fontSize = '12px';
+        meta.style.opacity = '0.7';
+        meta.textContent = 'Vidéo envoyée · images clés extraites pour l’analyse';
+        bubble.appendChild(meta);
+      }
       const label = document.createElement('div');
       label.style.marginTop = '6px';
       label.style.fontSize = '12px';
       label.style.opacity = '0.7';
-      label.textContent = `${index + 1}/${images.length} · ${item.name}`;
+      label.textContent = `${index + 1}/${selected.length} · ${item.name}`;
       bubble.appendChild(label);
       row.appendChild(bubble);
       chat.appendChild(row);
@@ -102,25 +180,29 @@
     chat.scrollTop = chat.scrollHeight;
   }
 
-  async function sendImages() {
-    if (busy || !images.length) return;
-    const question = String(input?.value || '').trim() || 'Analyse ces photos ensemble et explique-moi ce que tu observes. Compare-les si cela est pertinent.';
-    const selected = images.slice();
+  async function sendMedia() {
+    if (busy || !mediaItems.length) return;
+    const question = String(input?.value || '').trim() || 'Analyse ces médias et explique-moi ce que tu observes. Pour les vidéos, décris les éléments importants visibles dans les images extraites et compare les vidéos si nécessaire.';
+    const selected = mediaItems.slice();
     busy = true;
     if (sendButton) sendButton.disabled = true;
     if (input) { input.value = ''; input.disabled = true; }
-    showImages();
+    showUserMedia(selected);
     try {
-      const total = selected.reduce((sum, item) => sum + item.data.length, 0);
+      const analysisImages = selected.flatMap(item => item.kind === 'image' ? [item.data] : item.frames);
+      if (analysisImages.length > MAX_ANALYSIS_FRAMES) {
+        throw new Error(`Cette sélection représente ${analysisImages.length} images d’analyse. La limite est de ${MAX_ANALYSIS_FRAMES}. Pour analyser ${MAX_VIDEOS} vidéos, sélectionne-les seules.`);
+      }
+      const total = analysisImages.reduce((sum, data) => sum + data.length, 0);
       if (total > MAX_TOTAL_DATA) {
-        throw new Error('Les photos sont trop lourdes pour être envoyées ensemble. Réduis le nombre de photos ou choisis des photos plus légères.');
+        throw new Error('Les médias sont trop lourds pour être envoyés ensemble. Réduis le nombre de fichiers ou choisis des fichiers plus légers.');
       }
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: question,
-          imageDataList: selected.map(item => item.data)
+          imageDataList: analysisImages
         })
       });
       const data = await response.json().catch(() => ({}));
@@ -130,7 +212,7 @@
     } catch (error) {
       showResponse(`⚠️ ${error.message || 'Une erreur est survenue.'}`);
     } finally {
-      clearImages();
+      clearMedia();
       busy = false;
       if (sendButton) sendButton.disabled = false;
       if (input) { input.disabled = false; input.focus(); }
@@ -140,45 +222,59 @@
   fileInput?.addEventListener('change', async (event) => {
     const files = [...(event.target.files || [])];
     if (!files.length) return;
-    event.stopImmediatePropagation();
     const imageFiles = files.filter(file => file.type.startsWith('image/'));
-    if (!imageFiles.length) return;
+    const videoFiles = files.filter(file => file.type.startsWith('video/'));
+    if (!imageFiles.length && !videoFiles.length) return;
+    event.stopImmediatePropagation();
 
     if (imageFiles.length > MAX_IMAGES) {
-      alert(`Nexus AI accepte au maximum ${MAX_IMAGES} photos à la fois. ${imageFiles.length} photos ont été sélectionnées : l’envoi est refusé.`);
+      alert(`Nexus AI accepte au maximum ${MAX_IMAGES} photos à la fois.`);
+      if (fileInput) fileInput.value = '';
+      return;
+    }
+    if (videoFiles.length > MAX_VIDEOS) {
+      alert(`Nexus AI accepte au maximum ${MAX_VIDEOS} vidéos à la fois.`);
       if (fileInput) fileInput.value = '';
       return;
     }
 
     try {
-      images = [];
+      mediaItems = [];
       for (const file of imageFiles) {
         const data = await compressImage(file);
-        images.push({ name: file.name, data });
+        mediaItems.push({kind:'image', name:file.name, data});
+      }
+      for (const file of videoFiles) {
+        const result = await extractVideoFrames(file);
+        mediaItems.push({kind:'video', name:file.name, duration:result.duration, frames:result.frames});
+      }
+      const analysisCount = mediaItems.reduce((sum, item) => sum + (item.kind === 'image' ? 1 : item.frames.length), 0);
+      if (analysisCount > MAX_ANALYSIS_FRAMES) {
+        throw new Error(`Cette sélection dépasse la limite de ${MAX_ANALYSIS_FRAMES} images d’analyse. Avec ${videoFiles.length} vidéo(s), sélectionne moins de photos en même temps.`);
       }
       renderPreview();
-      if (input) input.placeholder = images.length > 1 ? 'Pose une question sur ces photos…' : 'Pose une question sur cette photo…';
+      if (input) input.placeholder = videoFiles.length ? 'Pose une question sur ces vidéos…' : (imageFiles.length > 1 ? 'Pose une question sur ces photos…' : 'Pose une question sur cette photo…');
     } catch (error) {
-      clearImages();
+      clearMedia();
       showResponse(`⚠️ ${error.message}`);
     }
   }, true);
 
   sendButton?.addEventListener('click', (event) => {
-    if (!images.length) return;
+    if (!mediaItems.length) return;
     event.preventDefault();
     event.stopImmediatePropagation();
-    sendImages();
+    sendMedia();
   }, true);
 
   input?.addEventListener('keydown', (event) => {
-    if (!images.length || event.key !== 'Enter' || event.shiftKey) return;
+    if (!mediaItems.length || event.key !== 'Enter' || event.shiftKey) return;
     event.preventDefault();
     event.stopImmediatePropagation();
-    sendImages();
+    sendMedia();
   }, true);
 
   removeButton?.addEventListener('click', () => {
-    if (images.length) clearImages();
+    if (mediaItems.length) clearMedia();
   }, true);
 })();
