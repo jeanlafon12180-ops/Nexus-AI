@@ -73,6 +73,14 @@ async function generateImage(prompt,bubble){
   }
 }
 
+async function askAI(message){
+  const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message,history:history.slice(-12)})});
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(data?.error||'Le moteur IA est indisponible.');
+  if(!data?.text)throw new Error('Le moteur IA n’a renvoyé aucune réponse.');
+  return data.text;
+}
+
 async function sendText(text){
   if(send.disabled)return; const questions=splitQuestions(text); if(!questions.length)return;
   input.value=''; input.style.height='auto'; setBusy(true);
@@ -84,7 +92,13 @@ async function sendText(text){
         const bubble=showImageLoading(q);
         await generateImage(q,bubble);
       }else{
-        show(brain.reply(q),'nexus');
+        try{
+          const answer=await askAI(q);
+          show(answer,'nexus');
+        }catch(error){
+          console.error('Nexus AI server error:',error);
+          show(brain.reply(q),'nexus');
+        }
       }
     }
   }catch(error){console.error('Nexus IA error:',error);show('⚠️ Une erreur est survenue. Recharge la page puis réessaie.','nexus');}
