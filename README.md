@@ -4,26 +4,22 @@ Projet d'intelligence artificielle développé progressivement.
 
 ## 🚀 Version actuelle
 
-**Nexus IA V1.0**
+**Nexus IA V1.1**
 
-### Ce qui change en V1.0
+### Ce qui change en V1.1
 
 - 💬 interface de discussion plein écran, sombre et épurée
-- 🧠 contexte conversationnel récent et compréhension plus tolérante
-- 💾 mémoire locale par appareil avec migration depuis les anciennes versions
-- ❤️ mémoire de préférences en plus du prénom et de la ville
-- 🧮 moteur de calcul dédié
-- 📚 moteur de connaissances scolaires
-- 💻 génération de code guidée (HTML, Python, JavaScript et demandes générales)
+- 🧠 contexte conversationnel récent
+- 💾 mémoire locale par appareil
+- 🧮 calcul et explications scolaires
+- 💻 génération de code plus fiable et plus complète via le backend IA
 - 📋 copie des blocs de code depuis la conversation
-- 🎨 mode image avec interface dédiée et détection des demandes de génération
+- 🎨 génération réelle d'images via le backend sécurisé
 - 📱 design responsive ordinateur et mobile
 
-## 🧠 Limite importante
+### Backend IA
 
-Le dépôt est publié avec GitHub Pages et son code côté navigateur ne doit pas contenir de clé secrète. Le mode image de V1.0 est donc préparé côté interface, mais une vraie génération doit passer par un endpoint serveur sécurisé connecté à un service de génération d'images.
-
-De même, le cerveau local V1.0 améliore fortement la compréhension par règles, contexte, mémoire, calcul et connaissances, mais il ne remplace pas encore un véritable modèle de langage distant. Une intelligence générative réellement avancée nécessitera un backend sécurisé.
+Nexus IA V1.1 utilise un endpoint serveur sécurisé pour communiquer avec le modèle IA. La clé API reste côté serveur et n'est pas exposée dans le navigateur.
 
 ## 📁 Architecture
 
@@ -31,18 +27,20 @@ De même, le cerveau local V1.0 améliore fortement la compréhension par règle
 Nexus-AI/
 ├── index.html
 ├── style.css
-├── js/
-│   ├── app.js
-│   ├── brain.js
-│   ├── memory.js
-│   └── knowledge.js
-└── README.md
+├── api/
+│   ├── chat.js
+│   └── generate-image.js
+└── js/
+    ├── app.js
+    ├── brain.js
+    ├── memory.js
+    └── knowledge.js
 ```
 
 ## 🌐 Publication
 
-Le projet est conçu pour être publié avec GitHub Pages.
+Le projet peut être publié sur GitHub Pages pour la partie statique et sur Vercel pour les endpoints serveur.
 
 ## 🛣️ Suite du projet
 
-La prochaine étape majeure est de brancher un backend sécurisé pour ajouter un véritable modèle génératif, la génération réelle d'images, la recherche Web, l'analyse de fichiers et une mémoire synchronisée entre appareils.
+Les prochaines améliorations pourront renforcer la fiabilité, la mémoire, la recherche Web, l'analyse de fichiers et les capacités multimodales.
