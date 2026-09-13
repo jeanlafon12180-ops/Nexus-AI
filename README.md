@@ -23,13 +23,13 @@ Projet d'intelligence artificielle développé progressivement.
 | **V1.5** | ⚙️ Amélioration générale de Nexus IA : IA, code, images, documents, interface, performances et fiabilité. |
 | **V1.6** | 🎥 Prise en charge des vidéos, avec analyse par extraction d'images. Jusqu'à 5 vidéos ou 20 photos. Ajout de l'étoile multicolore animée pendant la réflexion. |
 | **V1.7** | 🎙️ Prise en charge de l'audio : enregistrement depuis le micro, fichiers audio et transcription. |
-| **V1.8** | 🔴 **LIVE — en préparation** : conversation vocale en direct, écoute continue, réponse vocale et traînée multicolore animée qui réagit à la voix. |
+| **V1.8** | 🔴 **LIVE** : conversation vocale en direct, écoute continue, traitement automatique des phrases, réponse vocale et traînée multicolore réactive au son du micro. |
 
 ## 📌 Version actuelle
 
-**Nexus IA V1.7**
+**Nexus IA V1.8**
 
-La V1.8 est la prochaine évolution prévue.
+La V1.8 est maintenant intégrée au projet.
 
 ## ✨ Capacités actuelles
 
@@ -46,18 +46,27 @@ La V1.8 est la prochaine évolution prévue.
 - 🎵 Import de fichiers audio
 - 📝 Transcription audio
 - ✨ Animation étoile multicolore pendant la réflexion
-
-## 🔜 V1.8 — LIVE
-
-Objectif : transformer Nexus IA en assistant vocal en direct.
-
-- 🔴 Mode LIVE
-- 🎙️ Écoute en temps réel
-- 🌈 Traînée multicolore qui réagit au volume de la voix
-- 🤖 Traitement automatique des phrases
+- 🔴 Mode LIVE vocal
+- 👂 Écoute continue en français
 - 🔊 Réponse vocale de Nexus
-- ⏹️ Bouton pour arrêter le LIVE
-- 💬 Conservation de la conversation dans le chat
+- 🌈 Traînée multicolore animée réactive au volume du micro
+- ⏹️ Arrêt immédiat du mode LIVE
+- 📱 Interface LIVE adaptée au mobile et au bureau
+
+## 🔴 V1.8 — LIVE
+
+La V1.8 transforme Nexus IA en assistant vocal en direct.
+
+- 🔴 Activation/désactivation du LIVE
+- 🎙️ Reconnaissance vocale française continue
+- 👂 Nexus écoute sans demander de cliquer sur Envoyer à chaque phrase
+- 🤖 Les phrases reconnues sont automatiquement envoyées au backend IA
+- 🧠 L'étoile de réflexion existante s'affiche pendant le traitement serveur
+- 🔊 Nexus lit ses réponses avec la synthèse vocale du navigateur
+- 🌈 Le trail multicolore réagit en temps réel au niveau sonore du micro
+- ⏹️ Bouton Arrêter pour couper le micro et la synthèse vocale
+- 💬 Les messages restent visibles dans la conversation
+- 📱 Contrôles responsive pour ordinateur et mobile
 
 > Cet historique doit être complété à chaque sortie de nouvelle version. Les nouvelles versions seront ajoutées ici au fur et à mesure de leur développement.
 
