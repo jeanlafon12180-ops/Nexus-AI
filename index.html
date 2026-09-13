@@ -35,12 +35,13 @@
 <button type="button" id="menuUploadButton">📎 <span>Télécharger un fichier</span></button>
 </div>
 </div>
-<input id="imageFileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif,.pdf,.docx,.odt,.txt,.md,.csv,.json" hidden>
+<input id="imageFileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif,.pdf,.docx,.odt,.txt,.md,.csv,.json" multiple hidden>
 <textarea id="messageInput" placeholder="Message à Nexus IA..." rows="1"></textarea>
 <button id="sendButton" aria-label="Envoyer" title="Envoyer">↑</button>
 </div>
-<div class="hint">📎 Menu : création de code, création d’image et téléchargement de fichiers</div>
+<div class="hint">📎 Menu : création de code, création d’image et téléchargement de fichiers · jusqu’à 20 photos à la fois</div>
 </div></main></div>
 <noscript><div class="noscript-warning">⚠️ JavaScript est désactivé. Nexus IA a besoin de JavaScript.</div></noscript>
+<script src="js/multi-upload.js"></script>
 <script type="module" src="js/app.js"></script>
 </body></html>
