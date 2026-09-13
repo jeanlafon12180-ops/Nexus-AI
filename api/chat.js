@@ -1,3 +1,9 @@
+export const config = {
+  api: {
+    bodyParser: { sizeLimit: '10mb' }
+  }
+};
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée.' });
 
@@ -8,20 +14,25 @@ export default async function handler(req, res) {
     const body = req.body || {};
     const message = String(body.message || '').trim();
     const imageData = typeof body.imageData === 'string' ? body.imageData.trim() : '';
+    const imageDataList = Array.isArray(body.imageDataList)
+      ? body.imageDataList.filter(item => typeof item === 'string' && /^data:image\/(png|jpe?g|webp|gif);base64,/i.test(item.trim())).slice(0, 20)
+      : [];
     const documentText = typeof body.documentText === 'string' ? body.documentText.trim() : '';
     const documentName = typeof body.documentName === 'string' ? body.documentName.trim() : '';
     if (!message) return res.status(400).json({ error: 'Message vide.' });
 
     const codeRequest = /\b(code|programme|programmer|développe|developpe|développer|developper|html|css|javascript|js|python|site|jeu|snake|typescript|react|next\.js|node\.js|sql|api)\b/i.test(message);
-    const hasImage = /^data:image\/(png|jpe?g|webp|gif);base64,/i.test(imageData);
+    const images = imageDataList.length ? imageDataList : (imageData ? [imageData] : []);
+    const hasImage = images.length > 0;
     const hasDocument = documentText.length > 0;
 
     const systemPrompt = `Tu es Nexus AI 1.4, un assistant intelligent francophone avec compréhension d'images et de documents.
 Réponds en français sauf si l'utilisateur demande une autre langue.
 
-${hasImage ? `Une image est jointe à la demande. Analyse réellement son contenu avant de répondre.
+${hasImage ? `Une ou plusieurs images sont jointes à la demande. Analyse réellement leur contenu avant de répondre.
 - Décris uniquement ce que tu peux raisonnablement observer.
-- Réponds aux questions en t'appuyant sur l'image.
+- Réponds aux questions en t'appuyant sur toutes les images disponibles.
+- Compare les images lorsque la demande s'y prête.
 - Si un élément est illisible, incertain ou absent, dis-le clairement au lieu de l'inventer.
 - Pour une image contenant du texte, lis-le avec prudence.
 - Ne prétends jamais avoir vu un élément qui n'est pas visible.` : ''}
@@ -52,7 +63,7 @@ Pour les questions scolaires, explique avec des exemples. Pour les calculs, vér
     const userContent = hasImage
       ? [
           { type: 'text', text: message },
-          { type: 'image_url', image_url: { url: imageData } }
+          ...images.map(url => ({ type: 'image_url', image_url: { url } }))
         ]
       : hasDocument
         ? `${message}\n\n--- CONTENU DU DOCUMENT : ${documentName || 'document'} ---\n${documentText}\n--- FIN DU DOCUMENT ---`
