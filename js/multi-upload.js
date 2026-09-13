@@ -1,6 +1,6 @@
 (() => {
   const MAX_IMAGES = 20;
-  const MAX_TOTAL_DATA = 4200000;
+  const MAX_TOTAL_DATA = 8000000;
   const input = document.getElementById('messageInput');
   const fileInput = document.getElementById('imageFileInput');
   const filePreview = document.getElementById('filePreview');
@@ -12,7 +12,7 @@
   let images = [];
   let busy = false;
 
-  const escapeHtml = (value) => String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+  const escapeHtml = (value) => String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#039;');
 
   function compressImage(file) {
     return new Promise((resolve, reject) => {
@@ -26,6 +26,7 @@
           canvas.width = Math.max(1, Math.round(img.width * scale));
           canvas.height = Math.max(1, Math.round(img.height * scale));
           const ctx = canvas.getContext('2d');
+          if (!ctx) return reject(new Error(`Impossible de préparer « ${file.name} ».`));
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
           resolve(canvas.toDataURL('image/jpeg', 0.68));
         };
@@ -44,7 +45,7 @@
     }
     filePreview.hidden = false;
     fileName.textContent = `${images.length} photo${images.length > 1 ? 's' : ''} sélectionnée${images.length > 1 ? 's' : ''}`;
-    fileMeta.textContent = 'Les photos seront envoyées ensemble à Nexus AI';
+    fileMeta.textContent = 'Photos prêtes pour une analyse groupée';
     filePreview.innerHTML = `
       <div style="display:flex;align-items:center;gap:10px;min-width:0;width:100%;">
         <div class="file-icon">🖼️</div>
@@ -64,6 +65,7 @@
     images = [];
     renderPreview();
     if (fileInput) fileInput.value = '';
+    if (input) input.placeholder = 'Message à Nexus IA...';
   }
 
   function showImages() {
@@ -111,7 +113,7 @@
     try {
       const total = selected.reduce((sum, item) => sum + item.data.length, 0);
       if (total > MAX_TOTAL_DATA) {
-        throw new Error('Les 20 photos sont trop lourdes pour être envoyées ensemble. Sélectionne des photos moins lourdes ou moins nombreuses.');
+        throw new Error('Les photos sont trop lourdes pour être envoyées ensemble. Réduis le nombre de photos ou choisis des photos plus légères.');
       }
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -141,17 +143,21 @@
     event.stopImmediatePropagation();
     const imageFiles = files.filter(file => file.type.startsWith('image/'));
     if (!imageFiles.length) return;
+
     if (imageFiles.length > MAX_IMAGES) {
-      alert(`Nexus AI accepte au maximum ${MAX_IMAGES} photos à la fois.`);
+      alert(`Nexus AI accepte au maximum ${MAX_IMAGES} photos à la fois. ${imageFiles.length} photos ont été sélectionnées : l’envoi est refusé.`);
+      if (fileInput) fileInput.value = '';
+      return;
     }
+
     try {
       images = [];
-      for (const file of imageFiles.slice(0, MAX_IMAGES)) {
+      for (const file of imageFiles) {
         const data = await compressImage(file);
         images.push({ name: file.name, data });
       }
       renderPreview();
-      if (input) input.placeholder = 'Pose une question sur ces photos…';
+      if (input) input.placeholder = images.length > 1 ? 'Pose une question sur ces photos…' : 'Pose une question sur cette photo…';
     } catch (error) {
       clearImages();
       showResponse(`⚠️ ${error.message}`);
