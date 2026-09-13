@@ -7,112 +7,36 @@ const input=document.getElementById('messageInput');
 const send=document.getElementById('sendButton');
 const deviceId=getDeviceId();
 let history=loadConversation();
+let selectedImageData='';
 
-function html(text){
-  let safe=String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  safe=safe.replace(/```([a-z0-9_-]+)?\n([\s\S]*?)```/gi,(_,lang,code)=>`<pre class="code-block"><code>${code.trim()}</code><button class="copy-code" type="button">Copier</button></pre>`);
-  return safe.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
-}
-
-function show(text,type,persist=true){
-  const row=document.createElement('div'); row.className=`message-row ${type}`;
-  const bubble=document.createElement('div'); bubble.className=`bubble ${type}`; bubble.innerHTML=html(text); row.appendChild(bubble); chat.appendChild(row);
-  if(persist){history.push({text:String(text),type,time:Date.now()});history=history.slice(-150);saveConversation(history);}
-  bubble.querySelectorAll('.copy-code').forEach(button=>button.addEventListener('click',async()=>{const code=button.parentElement.querySelector('code')?.textContent||'';try{await navigator.clipboard.writeText(code);button.textContent='Copié';setTimeout(()=>button.textContent='Copier',1200);}catch{button.textContent='Erreur';}}));
-  chat.scrollTop=chat.scrollHeight;
-}
-
-function render(){
-  chat.innerHTML='';
-  if(!history.length){
-    const empty=document.createElement('div'); empty.className='empty-state';
-    empty.innerHTML='<div class="empty-logo">N</div><h2>Que puis-je faire pour toi ?</h2><p>Je peux discuter, mémoriser certaines informations, calculer, expliquer des notions et générer du code.</p><div class="quick-grid"><button class="quick-card suggestion">Explique-moi le théorème de Pythagore</button><button class="quick-card suggestion">Écris-moi un site HTML simple</button><button class="quick-card suggestion">Crée une image d’un chat réaliste</button><button class="quick-card suggestion">Que sais-tu faire ?</button></div>';
-    chat.appendChild(empty);
-  }else history.forEach(item=>{if(item&&typeof item.text==='string'&&(item.type==='user'||item.type==='nexus'))show(item.text,item.type,false);});
-  bindSuggestions();
-}
-
+function html(text){let safe=String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');safe=safe.replace(/```([a-z0-9_-]+)?\n([\s\S]*?)```/gi,(_,lang,code)=>`<pre class="code-block"><code>${code.trim()}</code><button class="copy-code" type="button">Copier</button></pre>`);return safe.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');}
+function show(text,type,persist=true){const row=document.createElement('div');row.className=`message-row ${type}`;const bubble=document.createElement('div');bubble.className=`bubble ${type}`;bubble.innerHTML=html(text);row.appendChild(bubble);chat.appendChild(row);if(persist){history.push({text:String(text),type,time:Date.now()});history=history.slice(-150);saveConversation(history);}bubble.querySelectorAll('.copy-code').forEach(button=>button.addEventListener('click',async()=>{const code=button.parentElement.querySelector('code')?.textContent||'';try{await navigator.clipboard.writeText(code);button.textContent='Copié';setTimeout(()=>button.textContent='Copier',1200);}catch{button.textContent='Erreur';}}));chat.scrollTop=chat.scrollHeight;}
+function showUserImage(dataUrl){const row=document.createElement('div');row.className='message-row user';const bubble=document.createElement('div');bubble.className='bubble user image-user-card';const img=document.createElement('img');img.className='attached-image';img.src=dataUrl;img.alt='Image jointe à Nexus AI';bubble.appendChild(img);chat.appendChild(row);row.appendChild(bubble);chat.scrollTop=chat.scrollHeight;}
+function render(){chat.innerHTML='';if(!history.length){const empty=document.createElement('div');empty.className='empty-state';empty.innerHTML='<div class="empty-logo">N</div><h2>Que puis-je faire pour toi ?</h2><p>Je peux discuter, analyser des images, répondre à tes questions sur une image, générer des images et générer du code.</p><div class="quick-grid"><button class="quick-card suggestion">Explique-moi le théorème de Pythagore</button><button class="quick-card suggestion">Écris-moi un site HTML simple</button><button class="quick-card suggestion">Crée une image d’un chat réaliste</button><button class="quick-card suggestion">Que sais-tu faire ?</button></div>';chat.appendChild(empty);}else history.forEach(item=>{if(item&&typeof item.text==='string'&&(item.type==='user'||item.type==='nexus'))show(item.text,item.type,false);});bindSuggestions();}
 function bindSuggestions(){document.querySelectorAll('.suggestion').forEach(button=>button.addEventListener('click',()=>sendText(button.textContent)));}
 function splitQuestions(text){return String(text).replace(/\r/g,'').split(/\n/).map(x=>x.trim()).map(x=>x.replace(/^[-•*]\s+/,'').replace(/^\d+[.)]\s+/,'').trim()).filter(Boolean);}
-function setBusy(value){send.disabled=value;input.disabled=value;}
+function setBusy(value){send.disabled=value;input.disabled=value;document.getElementById('imageUploadButton')?.toggleAttribute('disabled',value);}
 function isImagePrompt(text){return /\b(cr[ée]e|g[ée]n[èe]re|dessine|fais|produis|fabrique)\b.*\bimage\b/i.test(text)||/\bimage d(?:e|u|des|un|une)\b/i.test(text);}
-
-function showImageLoading(prompt){
-  const row=document.createElement('div'); row.className='message-row nexus';
-  const bubble=document.createElement('div'); bubble.className='bubble nexus image-card';
-  bubble.innerHTML='<strong>🎨 Génération d’image</strong><p>Prompt reçu :</p><div class="image-prompt"></div><div class="image-loading"><span></span><span></span><span></span> Génération en cours…</div>';
-  bubble.querySelector('.image-prompt').textContent=prompt;
-  chat.appendChild(row); row.appendChild(bubble); chat.scrollTop=chat.scrollHeight;
-  return bubble;
-}
-
-function showGeneratedImage(bubble,data,prompt){
-  const loading=bubble.querySelector('.image-loading');
-  if(loading)loading.remove();
-  if(data?.url){
-    const img=document.createElement('img'); img.className='generated-image'; img.src=data.url; img.alt=prompt; img.loading='lazy';
-    bubble.appendChild(img);
-  }else if(data?.b64_json){
-    const img=document.createElement('img'); img.className='generated-image'; img.src=`data:image/png;base64,${data.b64_json}`; img.alt=prompt;
-    bubble.appendChild(img);
-  }
-  const done=document.createElement('p'); done.className='image-status'; done.textContent='✅ Image générée.'; bubble.appendChild(done);
-  history.push({text:`[Image générée] ${prompt}`,type:'nexus',time:Date.now()}); history=history.slice(-150); saveConversation(history);
-  chat.scrollTop=chat.scrollHeight;
-}
-
-async function generateImage(prompt,bubble){
-  try{
-    const response=await fetch('/api/generate-image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,model:'flux'})});
-    const data=await response.json().catch(()=>({}));
-    if(!response.ok)throw new Error(data?.error||'Le moteur d’image est indisponible.');
-    showGeneratedImage(bubble,data,prompt);
-  }catch(error){
-    const loading=bubble.querySelector('.image-loading'); if(loading)loading.remove();
-    const errorBox=document.createElement('p'); errorBox.className='image-error'; errorBox.textContent=`⚠️ ${error.message}`; bubble.appendChild(errorBox);
-  }
-}
-
-async function askAI(message){
-  const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message,history:history.slice(-12)})});
-  const data=await response.json().catch(()=>({}));
-  if(!response.ok)throw new Error(data?.error||`Erreur serveur (${response.status}).`);
-  if(!data?.text)throw new Error('Le moteur IA n’a renvoyé aucune réponse.');
-  return data.text;
-}
-
-async function sendText(text){
-  if(send.disabled)return; const questions=splitQuestions(text); if(!questions.length)return;
-  input.value=''; input.style.height='auto'; setBusy(true);
-  try{
-    questions.forEach(q=>show(q,'user'));
-    for(const q of questions){
-      await new Promise(r=>setTimeout(r,120));
-      if(isImagePrompt(q)){
-        const bubble=showImageLoading(q);
-        await generateImage(q,bubble);
-      }else{
-        try{
-          const answer=await askAI(q);
-          show(answer,'nexus');
-        }catch(error){
-          console.error('Nexus AI server error:',error);
-          show(`⚠️ Le serveur IA n’a pas répondu.\n\n${error.message}\n\nLe mode local n’est pas utilisé afin d’éviter une fausse réponse.`, 'nexus');
-        }
-      }
-    }
-  }catch(error){console.error('Nexus IA error:',error);show('⚠️ Une erreur est survenue. Recharge la page puis réessaie.','nexus');}
-  finally{setBusy(false);input.focus();}
-}
-
+function isEditPrompt(text){return /\b(modifie|modifier|modification|change|changer|remplace|remplacer|enl[èe]ve|enlever|supprime|supprimer|ajoute|ajouter|retouche|retoucher|transforme|transformer|mets|mettre|am[ée]liore|am[ée]liorer)\b/i.test(text);}
+function showImageLoading(prompt,title='🎨 Génération d’image'){const row=document.createElement('div');row.className='message-row nexus';const bubble=document.createElement('div');bubble.className='bubble nexus image-card';bubble.innerHTML=`<strong>${title}</strong><p>Demande :</p><div class="image-prompt"></div><div class="image-loading"><span></span><span></span><span></span> Traitement en cours…</div>`;bubble.querySelector('.image-prompt').textContent=prompt;chat.appendChild(row);row.appendChild(bubble);chat.scrollTop=chat.scrollHeight;return bubble;}
+function showGeneratedImage(bubble,data,prompt,label='Image générée'){const loading=bubble.querySelector('.image-loading');if(loading)loading.remove();if(data?.url){const img=document.createElement('img');img.className='generated-image';img.src=data.url;img.alt=prompt;img.loading='lazy';bubble.appendChild(img);}else if(data?.b64_json){const img=document.createElement('img');img.className='generated-image';img.src=`data:image/png;base64,${data.b64_json}`;img.alt=prompt;bubble.appendChild(img);}const done=document.createElement('p');done.className='image-status';done.textContent=`✅ ${label}.`;bubble.appendChild(done);history.push({text:`[${label}] ${prompt}`,type:'nexus',time:Date.now()});history=history.slice(-150);saveConversation(history);chat.scrollTop=chat.scrollHeight;}
+async function generateImage(prompt,bubble){try{const response=await fetch('/api/generate-image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,model:'flux'})});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data?.error||'Le moteur d’image est indisponible.');showGeneratedImage(bubble,data,prompt);}catch(error){const loading=bubble.querySelector('.image-loading');if(loading)loading.remove();const errorBox=document.createElement('p');errorBox.className='image-error';errorBox.textContent=`⚠️ ${error.message}`;bubble.appendChild(errorBox);}}
+async function editImage(imageData,prompt,bubble){try{const response=await fetch('/api/edit-image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageData,prompt})});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data?.error||'Le moteur de modification d’image est indisponible.');showGeneratedImage(bubble,data,prompt,'Image modifiée');}catch(error){const loading=bubble.querySelector('.image-loading');if(loading)loading.remove();const errorBox=document.createElement('p');errorBox.className='image-error';errorBox.textContent=`⚠️ ${error.message}`;bubble.appendChild(errorBox);}}
+async function askAI(message,imageData=''){const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message,imageData,history:history.slice(-12)})});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data?.error||`Erreur serveur (${response.status}).`);if(!data?.text)throw new Error('Le moteur IA n’a renvoyé aucune réponse.');return data.text;}
+function fileToDataUrl(file){return new Promise((resolve,reject)=>{if(!file.type.startsWith('image/'))return reject(new Error('Choisis un fichier image.'));const reader=new FileReader();reader.onload=()=>{const img=new Image();img.onload=()=>{const max=1400;const scale=Math.min(1,max/Math.max(img.width,img.height));const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);resolve(canvas.toDataURL('image/jpeg',0.82));};img.onerror=()=>reject(new Error('Impossible de lire cette image.'));img.src=reader.result;};reader.onerror=()=>reject(new Error('Impossible de charger cette image.'));reader.readAsDataURL(file);});}
+function setSelectedImage(dataUrl){selectedImageData=dataUrl;const preview=document.getElementById('imagePreview');if(preview){preview.hidden=false;preview.querySelector('img').src=dataUrl;}input.placeholder='Pose une question sur cette image…';}
+function clearSelectedImage(){selectedImageData='';const preview=document.getElementById('imagePreview');if(preview)preview.hidden=true;input.placeholder='Message à Nexus IA...';}
+async function sendText(text){if(send.disabled)return;const questions=splitQuestions(text);if(!questions.length&&!selectedImageData)return;const imageForRequest=selectedImageData;const hadImage=Boolean(imageForRequest);input.value='';input.style.height='auto';setBusy(true);try{if(hadImage)showUserImage(imageForRequest);if(hadImage&&!questions.length)questions.push('Analyse cette image et explique-moi ce que tu observes.');for(const q of questions){await new Promise(r=>setTimeout(r,120));if(hadImage){if(isEditPrompt(q)){const bubble=showImageLoading(q,'🪄 Modification de l’image');await editImage(imageForRequest,q,bubble);}else{try{const answer=await askAI(q,imageForRequest);show(answer,'nexus');}catch(error){console.error('Nexus AI vision error:',error);show(`⚠️ L’analyse de l’image a échoué.\n\n${error.message}`,'nexus');}}}else if(isImagePrompt(q)){const bubble=showImageLoading(q);await generateImage(q,bubble);}else{try{const answer=await askAI(q);show(answer,'nexus');}catch(error){console.error('Nexus AI server error:',error);show(`⚠️ Le serveur IA n’a pas répondu.\n\n${error.message}\n\nLe mode local n’est pas utilisé afin d’éviter une fausse réponse.`,'nexus');}}}}catch(error){console.error('Nexus IA error:',error);show(`⚠️ ${error.message||'Une erreur est survenue.'}`,'nexus');}finally{clearSelectedImage();setBusy(false);input.focus();}}
 function memoryView(){const memory=brain.getMemory();const items=[];if(memory.prenom)items.push(`Prénom : ${memory.prenom}`);if(memory.ville)items.push(`Ville : ${memory.ville}`);if(memory.preferences)Object.entries(memory.preferences).forEach(([k,v])=>items.push(`${k.replaceAll('_',' ')} : ${v}`));return items.length?`🧠 **Mémoire de cet appareil**\n\n${items.join('\n')}\n\n🖥️ Appareil : ${deviceId.slice(0,8)}`:`🧠 **Mémoire de cet appareil**\n\nMa mémoire est encore vide.\n\n🖥️ Appareil : ${deviceId.slice(0,8)}`;}
-
 document.getElementById('memoryButton')?.addEventListener('click',()=>show(memoryView(),'nexus'));
-document.getElementById('helpButton')?.addEventListener('click',()=>show(brain.reply('Que peux-tu faire ?'),'nexus'));
+document.getElementById('helpButton')?.addEventListener('click',()=>show('🧠 **Nexus AI V1.3**\n\nJe peux discuter, générer du code, créer des images et maintenant analyser une image pour répondre à des questions dessus. Je peux aussi essayer de modifier une image selon ton instruction.','nexus'));
 document.getElementById('clearMemoryButton')?.addEventListener('click',()=>{clearMemory();saveMemory(createMemory());show('🧹 La mémoire de **cet appareil** a été effacée.','nexus');});
 document.getElementById('newChatButton')?.addEventListener('click',()=>{history=[];clearConversation();render();input.focus();});
 document.getElementById('imageButton')?.addEventListener('click',()=>{input.value='Crée une image de ';input.focus();});
 document.getElementById('composerImageButton')?.addEventListener('click',()=>{input.value='Crée une image de ';input.focus();});
+document.getElementById('imageUploadButton')?.addEventListener('click',()=>document.getElementById('imageFileInput')?.click());
+document.getElementById('imageFileInput')?.addEventListener('change',async(event)=>{const file=event.target.files?.[0];if(!file)return;try{const dataUrl=await fileToDataUrl(file);setSelectedImage(dataUrl);}catch(error){show(`⚠️ ${error.message}`,'nexus');}finally{event.target.value='';}});
+document.getElementById('removeImageButton')?.addEventListener('click',clearSelectedImage);
 send.addEventListener('click',()=>sendText(input.value));
 input.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendText(input.value);}});
 input.addEventListener('input',()=>{input.style.height='auto';input.style.height=`${Math.min(input.scrollHeight,200)}px`;});
