@@ -76,7 +76,7 @@ async function generateImage(prompt,bubble){
 async function askAI(message){
   const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message,history:history.slice(-12)})});
   const data=await response.json().catch(()=>({}));
-  if(!response.ok)throw new Error(data?.error||'Le moteur IA est indisponible.');
+  if(!response.ok)throw new Error(data?.error||`Erreur serveur (${response.status}).`);
   if(!data?.text)throw new Error('Le moteur IA n’a renvoyé aucune réponse.');
   return data.text;
 }
@@ -97,7 +97,7 @@ async function sendText(text){
           show(answer,'nexus');
         }catch(error){
           console.error('Nexus AI server error:',error);
-          show(brain.reply(q),'nexus');
+          show(`⚠️ Le serveur IA n’a pas répondu.\n\n${error.message}\n\nLe mode local n’est pas utilisé afin d’éviter une fausse réponse.`, 'nexus');
         }
       }
     }
