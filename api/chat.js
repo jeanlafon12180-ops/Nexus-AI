@@ -11,25 +11,28 @@ export default async function handler(req, res) {
   try {
     const body = req.body || {};
     const message = String(body.message || '').trim();
-    const history = Array.isArray(body.history) ? body.history : [];
 
     if (!message) {
       return res.status(400).json({ error: 'Message vide.' });
     }
 
+    const codeRequest = /\b(code|programme|programmer|développe|developpe|développer|developper|html|css|javascript|js|python|site|jeu|snake)\b/i.test(message);
+
+    const systemPrompt = `Tu es Nexus AI, un assistant intelligent francophone.
+Réponds en français sauf si l'utilisateur demande une autre langue.
+
+${codeRequest ? `IMPORTANT : la demande actuelle concerne du développement logiciel. Tu dois répondre avec du VRAI code exploitable, pas avec une définition du langage et pas avec un simple exemple générique.
+- Pour « Crée-moi un jeu Snake complet en HTML, CSS et JavaScript », fournis un jeu réellement jouable.
+- Donne le contenu COMPLET des fichiers nécessaires.
+- Si un seul fichier HTML suffit, donne un seul fichier HTML autonome contenant HTML + CSS + JavaScript.
+- Le code doit être cohérent, exécutable dans un navigateur et inclure les fonctionnalités demandées.
+- Utilise des blocs Markdown avec le langage : \`\`\`html, \`\`\`css, \`\`\`javascript ou \`\`\`python.
+- Ne remplace jamais une demande de code par une explication théorique du langage.` : `Réponds directement et clairement à la demande de l'utilisateur.`}
+
+Pour les questions scolaires, explique avec des exemples. Pour les calculs, vérifie ton résultat. Ne prétends jamais avoir accès à des informations que tu n'as pas.`;
+
     const messages = [
-      {
-        role: 'system',
-        content: `Tu es Nexus AI, un assistant intelligent francophone. Tu réponds en français sauf si l’utilisateur demande une autre langue.
-
-Quand l’utilisateur demande du code, produis du VRAI code exploitable, complet et cohérent avec sa demande. N’invente pas que le code fonctionne : écris le code réellement. Utilise toujours un bloc Markdown avec le langage, par exemple \\`\\`\\`python ou \\`\\`\\`html. Évite les pseudo-codes et les morceaux volontairement incomplets. Si plusieurs fichiers sont nécessaires, indique clairement le nom de chaque fichier et donne son contenu complet. Pour HTML/CSS/JavaScript, privilégie un exemple directement testable. Pour Python, donne un script exécutable. Explique brièvement comment l’utiliser après le code.
-
-Pour les questions scolaires, explique clairement avec des exemples. Pour les calculs simples, vérifie ton résultat. Ne prétends pas avoir accès à des informations que tu n’as pas.`
-      },
-      ...history.slice(-12).map(item => ({
-        role: item.type === 'user' ? 'user' : 'assistant',
-        content: String(item.text || '').slice(0, 12000)
-      })),
+      { role: 'system', content: systemPrompt },
       { role: 'user', content: message }
     ];
 
@@ -40,10 +43,10 @@ Pour les questions scolaires, explique clairement avec des exemples. Pour les ca
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'qwen-coder',
+        model: 'qwen-coder-large',
         messages,
-        temperature: 0.2,
-        max_tokens: 5000
+        temperature: 0.15,
+        max_tokens: 8000
       })
     });
 
