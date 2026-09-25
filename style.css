@@ -102,3 +102,11 @@ body.nexus-live-open { overflow:hidden; }
   .nexus-live-bottom .live-action-button{width:58px;height:58px}
   .nexus-live-bottom .live-main-button{width:86px;height:86px}
 }
+
+/* Nexus IA V2.3 — general UX improvements */
+#sendButton{transition:transform .16s ease,background .16s ease,opacity .16s ease}
+#sendButton:active{transform:scale(.94)}
+#sendButton.stop-generation{background:#7f1d1d;border-color:#ef4444}
+.bubble.nexus h2,.bubble.nexus h3,.bubble.nexus h4{margin:10px 0 6px;line-height:1.25}
+.bubble.nexus code:not(.code-block code){padding:2px 5px;border-radius:5px;background:rgba(255,255,255,.08);font-size:.92em}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
