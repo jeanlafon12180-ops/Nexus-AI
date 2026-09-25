@@ -10,7 +10,7 @@ body{margin:0;background:#090909;color:#eee;font-family:system-ui,-apple-system,
 </style>
 </head>
 <body><main class="wrap">
-<h1>🧠 Nexus IA — Admin V3.1</h1>
+<h1>🧠 Nexus IA — Admin V3.2</h1>
 <p class="muted">Console privée de diagnostic. Le mot de passe n’est jamais stocké dans cette page.</p>
 <div class="card" id="login"><h2>Accès administrateur</h2><div class="row"><input id="password" type="password" placeholder="Mot de passe admin" autocomplete="current-password"><button id="connect">Connexion</button></div><p id="error" class="bad"></p></div>
 <div id="dashboard" hidden>
@@ -36,7 +36,7 @@ $('connect').onclick=async()=>{
   $('github').innerHTML=g.ok
     ? '<div class="card"><strong>Dépôt</strong><br>'+g.repository+'<br><span class="ok">✓ GitHub accessible</span></div><div class="card"><strong>Branche</strong><br>'+g.defaultBranch+'</div><div class="card"><strong>Dernier commit</strong><br>'+(g.lastCommit?.message||'—')+'<br><span class="muted">'+(g.lastCommit?.date||'—')+'</span></div><div class="card"><strong>Issues ouvertes</strong><br>'+g.openIssues+'</div>'
     : '<div class="card"><span class="bad">⚠️ GitHub indisponible</span><br>'+String(g.error||'Erreur inconnue')+'</div>';
-  $('mission').innerHTML='<div class="card"><strong>Engine</strong><br><span class="ok">✓ Nexus Core Mission Engine 3.1</span></div><div class="card"><strong>Orchestration</strong><br>Plan dynamique + vérification</div>';
+  $('mission').innerHTML='<div class="card"><strong>Engine</strong><br><span class="ok">✓ Nexus Core Mission Engine 3.2</span></div><div class="card"><strong>Orchestration</strong><br>Plan → exécution → états → vérification → résultat</div>';
   $('details').textContent=JSON.stringify(d,null,2);
  }catch(e){$('error').textContent='⚠️ '+e.message}
 };
