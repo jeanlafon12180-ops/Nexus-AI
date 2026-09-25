@@ -19,24 +19,66 @@ function authorized(req) {
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
 
+async function getGithubStatus() {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    const [repoResponse, commitsResponse] = await Promise.all([
+      fetch('https://api.github.com/repos/jeanlafon12180-ops/Nexus-AI', {
+        headers: { 'Accept': 'application/vnd.github+json', 'User-Agent': 'Nexus-IA-Admin' },
+        signal: controller.signal
+      }),
+      fetch('https://api.github.com/repos/jeanlafon12180-ops/Nexus-AI/commits?per_page=1', {
+        headers: { 'Accept': 'application/vnd.github+json', 'User-Agent': 'Nexus-IA-Admin' },
+        signal: controller.signal
+      })
+    ]);
+    clearTimeout(timeout);
+    if (!repoResponse.ok || !commitsResponse.ok) throw new Error('GitHub API indisponible');
+    const repo = await repoResponse.json();
+    const commits = await commitsResponse.json();
+    const latest = commits?.[0];
+    return {
+      ok: true,
+      repository: repo.full_name,
+      private: Boolean(repo.private),
+      defaultBranch: repo.default_branch,
+      openIssues: repo.open_issues_count,
+      stars: repo.stargazers_count,
+      forks: repo.forks_count,
+      lastCommit: latest ? {
+        sha: latest.sha,
+        message: latest.commit?.message?.split('\\n')[0] || '',
+        author: latest.commit?.author?.name || latest.author?.login || 'inconnu',
+        date: latest.commit?.author?.date || null
+      } : null,
+      url: repo.html_url
+    };
+  } catch (error) {
+    return { ok: false, error: error.message || 'GitHub indisponible' };
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Méthode non autorisée.' });
   if (!authorized(req)) return process.env.NEXUS_ADMIN_PASSWORD ? unauthorized(res) : res.status(503).json({ error: 'NEXUS_ADMIN_PASSWORD n’est pas configuré côté serveur.' });
 
   return res.status(200).json({
     ok: true,
-    version: '3.0.0',
+    version: '3.1.0',
     name: 'Nexus IA',
     generatedAt: new Date().toISOString(),
     runtime: process.version,
     environment: process.env.VERCEL_ENV || 'unknown',
     checks: {
+      github: true,
       aiEngine: Boolean(process.env.POLLINATIONS_API_KEY),
       imageEngine: Boolean(process.env.POLLINATIONS_API_KEY),
       videoEngine: Boolean(process.env.POLLINATIONS_API_KEY),
       musicEngine: Boolean(process.env.POLLINATIONS_API_KEY),
       adminProtection: true
     },
+    github: await getGithubStatus(),
     privacy: {
       historyStoredByServer: false,
       historyScope: 'browser profile',
