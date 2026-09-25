@@ -27,6 +27,11 @@
   let currentMime = 'audio/webm';
   let voiceAudio = null;
   let voiceObjectUrl = null;
+  let screenStream = null;
+  let screenRecorder = null;
+  let screenChunks = [];
+  let screenRecording = false;
+  let screenMime = '';
 
   const $ = id => document.getElementById(id);
   const chat = () => $('chat');
@@ -41,6 +46,41 @@
     bubble.className = `bubble ${type}`;
     bubble.innerHTML = esc(text).replace(/\n/g,'<br>');
     row.appendChild(bubble); c.appendChild(row); scrollChat();
+  }
+
+  function ensureLivePage() {
+    if ($('nexusLivePage')) return;
+    const page = document.createElement('section');
+    page.id = 'nexusLivePage';
+    page.className = 'nexus-live-page';
+    page.hidden = true;
+    page.innerHTML = `
+      <div class="nexus-live-top">
+        <button id="liveBack" class="live-round-button" type="button" aria-label="Fermer le LIVE">×</button>
+        <div class="nexus-live-brand"><span class="live-brand-dot"></span><strong>Nexus LIVE</strong></div>
+        <button id="liveMore" class="live-round-button" type="button" aria-label="Options">•••</button>
+      </div>
+      <div class="nexus-live-center">
+        <canvas id="liveOrb" width="640" height="640" aria-hidden="true"></canvas>
+        <div class="live-caption" id="liveCaption">Je t’écoute…</div>
+      </div>
+      <div class="nexus-live-bottom">
+        <button id="screenRecordButton" class="live-action-button" type="button"><span>◉</span><small>Écran</small></button>
+        <button id="liveMainButton" class="live-main-button" type="button" aria-label="Arrêter le LIVE"><span></span></button>
+        <button id="liveMicButton" class="live-action-button active" type="button"><span>🎙</span><small>Micro</small></button>
+      </div>
+      <div class="screen-record-status" id="screenRecordStatus" hidden>● Enregistrement de l’écran…</div>`;
+    document.body.appendChild(page);
+    $('liveBack')?.addEventListener('click', stopLive);
+    $('liveMainButton')?.addEventListener('click', stopLive);
+    $('screenRecordButton')?.addEventListener('click', toggleScreenRecording);
+  }
+
+  function setLivePageVisible(value) {
+    ensureLivePage();
+    const page = $('nexusLivePage');
+    if (page) page.hidden = !value;
+    document.body.classList.toggle('nexus-live-open', value);
   }
 
   function ensureUI() {
@@ -69,10 +109,61 @@
   }
 
   function setStatus(text, mode='listen') {
+    const caption = $('liveCaption');
+    if (caption) caption.textContent = text;
+    const page = $('nexusLivePage');
+    if (page) page.dataset.mode = mode;
     const label = $('liveStatusText');
     const bar = $('liveBar');
     if (label) label.textContent = text;
     if (bar) bar.dataset.mode = mode;
+  }
+
+  function drawLiveOrb() {
+    if (!live) return;
+    const canvas = $('liveOrb');
+    if (!canvas) return;
+    const dpr = window.devicePixelRatio || 1;
+    const size = Math.min(640, Math.max(260, Math.floor(canvas.clientWidth * dpr)));
+    canvas.width = size; canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    const w = size, h = size, cx = w / 2, cy = h / 2;
+    const data = analyser ? new Uint8Array(analyser.fftSize) : null;
+    if (data && analyser) analyser.getByteTimeDomainData(data);
+    let sum = 0;
+    if (data) for (const v of data) { const n=(v-128)/128; sum += n*n; }
+    const rms = data ? Math.sqrt(sum / data.length) : 0;
+    const energy = Math.min(1, rms * 8);
+    const t = performance.now() / 1000;
+    ctx.clearRect(0,0,w,h);
+    ctx.globalCompositeOperation = 'lighter';
+    const base = Math.min(w,h) * (0.16 + energy * 0.055);
+    const glow = ctx.createRadialGradient(cx,cy,0,cx,cy,base*2.8);
+    glow.addColorStop(0,'rgba(120,170,255,.42)');
+    glow.addColorStop(.28,'rgba(40,105,255,.25)');
+    glow.addColorStop(.58,'rgba(90,70,255,.10)');
+    glow.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = glow; ctx.fillRect(0,0,w,h);
+    const colors = [[70,125,255],[100,80,255],[0,210,255],[110,150,255],[255,90,190]];
+    for (let i=0;i<260;i++) {
+      const a = i * 2.399 + t * (.18 + (i%9)*.012);
+      const ring = base * (.52 + ((i*17)%100)/100 * .95) * (1 + energy*.35);
+      const wobble = Math.sin(t*1.5 + i)*base*.055;
+      const x = cx + Math.cos(a)* (ring+wobble);
+      const y = cy + Math.sin(a*1.07)*(ring+wobble);
+      const r = (0.7 + (i%5)*.28) * (1+energy*1.8);
+      const col=colors[i%colors.length];
+      ctx.fillStyle=`rgba(${col[0]},${col[1]},${col[2]},${0.08+energy*.28})`;
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+    }
+    const core = ctx.createRadialGradient(cx-base*.12,cy-base*.18,0,cx,cy,base);
+    core.addColorStop(0,'rgba(210,225,255,.9)');
+    core.addColorStop(.18,'rgba(100,160,255,.72)');
+    core.addColorStop(.52,'rgba(55,90,255,.42)');
+    core.addColorStop(1,'rgba(30,45,150,0)');
+    ctx.fillStyle=core; ctx.beginPath(); ctx.arc(cx,cy,base*1.15,0,Math.PI*2); ctx.fill();
+    ctx.globalCompositeOperation='source-over';
+    requestAnimationFrame(drawLiveOrb);
   }
 
   function drawTrail() {
@@ -259,6 +350,56 @@
       audio.addEventListener('ended', done, {once:true});
       audio.addEventListener('error', done, {once:true});
     });
+  }
+
+  async function toggleScreenRecording() {
+    if (screenRecording) { stopScreenRecording(); return; }
+    if (!navigator.mediaDevices?.getDisplayMedia) {
+      alert('L’enregistrement d’écran n’est pas disponible dans ce navigateur.');
+      return;
+    }
+    try {
+      screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+      const preferred = ['video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];
+      screenMime = preferred.find(type => window.MediaRecorder?.isTypeSupported?.(type)) || '';
+      if (!window.MediaRecorder) throw new Error('L’enregistrement vidéo n’est pas disponible.');
+      screenChunks = [];
+      screenRecorder = screenMime ? new MediaRecorder(screenStream,{mimeType:screenMime}) : new MediaRecorder(screenStream);
+      screenRecorder.ondataavailable = e => { if (e.data?.size) screenChunks.push(e.data); };
+      screenRecorder.onstop = () => {
+        const type = screenRecorder?.mimeType || screenMime || 'video/webm';
+        const blob = new Blob(screenChunks,{type});
+        screenChunks = [];
+        if (!blob.size) return;
+        const url = URL.createObjectURL(blob);
+        const a=document.createElement('a');
+        a.href=url;
+        a.download=`nexus-live-${new Date().toISOString().replace(/[:.]/g,'-')}.webm`;
+        a.click();
+        setTimeout(()=>URL.revokeObjectURL(url),1500);
+      };
+      screenStream.getVideoTracks()[0]?.addEventListener('ended',stopScreenRecording,{once:true});
+      screenRecorder.start();
+      screenRecording=true;
+      $('screenRecordButton')?.classList.add('recording');
+      const status=$('screenRecordStatus'); if(status) status.hidden=false;
+    } catch (error) {
+      screenStream?.getTracks().forEach(track=>track.stop());
+      screenStream=null;
+      if (error?.name !== 'NotAllowedError') alert(error?.message || 'Impossible de démarrer l’enregistrement d’écran.');
+    }
+  }
+
+  function stopScreenRecording() {
+    if (screenRecorder && screenRecorder.state !== 'inactive') {
+      try { screenRecorder.stop(); } catch (_) {}
+    }
+    screenRecorder=null;
+    screenStream?.getTracks().forEach(track=>track.stop());
+    screenStream=null;
+    screenRecording=false;
+    $('screenRecordButton')?.classList.remove('recording');
+    const status=$('screenRecordStatus'); if(status) status.hidden=true;
   }
 
   function cleanupMic() {
@@ -506,6 +647,7 @@
       await unlockVoiceAudio();
       live = true;
       const bar = $('liveBar'); if (bar) bar.hidden = false;
+      setLivePageVisible(true);
       const btn = $('liveButton');
       if (btn) {
         btn.textContent='🟢';
@@ -515,6 +657,7 @@
       setStatus('Je t’écoute…','listen');
       if (window.MediaRecorder) {
         drawTrail();
+        drawLiveOrb();
         startRecorder();
       }
       else if (SpeechRecognition) startRecognitionFallback();
@@ -532,6 +675,8 @@
   function stopLive() {
     live = false;
     busy = false;
+    stopScreenRecording();
+    setLivePageVisible(false);
     stopRecognition();
     window.speechSynthesis?.cancel();
     speaking = false;
