@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nexus IA — Admin V3</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>
+body{margin:0;background:#090909;color:#eee;font-family:system-ui,-apple-system,sans-serif}.wrap{max-width:980px;margin:auto;padding:32px 20px}.card{background:#121212;border:1px solid #292929;border-radius:18px;padding:20px;margin:16px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.ok{color:#7dff9a}.bad{color:#ff8585}button,input{font:inherit;border-radius:10px;padding:11px;border:1px solid #333;background:#181818;color:#fff}button{cursor:pointer}.row{display:flex;gap:10px;flex-wrap:wrap}.muted{color:#999}pre{white-space:pre-wrap;overflow:auto}
+</style>
+</head>
+<body><main class="wrap">
+<h1>🧠 Nexus IA — Admin V3</h1>
+<p class="muted">Console privée de diagnostic. Le mot de passe n’est jamais stocké dans cette page.</p>
+<div class="card" id="login"><h2>Accès administrateur</h2><div class="row"><input id="password" type="password" placeholder="Mot de passe admin" autocomplete="current-password"><button id="connect">Connexion</button></div><p id="error" class="bad"></p></div>
+<div id="dashboard" hidden><div class="card"><h2>État de Nexus Core</h2><div id="status" class="grid"></div></div><div class="card"><h2>🔍 Diagnostic</h2><pre id="details"></pre></div></div>
+<script>
+let auth='';
+const $=id=>document.getElementById(id);
+$('connect').onclick=async()=>{
+ const password=$('password').value;
+ auth='Basic '+btoa('admin:'+password);
+ try{
+  const r=await fetch('/api/admin',{headers:{Authorization:auth}});
+  const d=await r.json();
+  if(!r.ok) throw new Error(d.error||'Accès refusé');
+  $('login').hidden=true;$('dashboard').hidden=false;
+  const checks=d.checks||{};
+  $('status').innerHTML=Object.entries(checks).map(([k,v])=>'<div class="card"><strong>'+k+'</strong><br><span class="'+(v?'ok':'bad')+'">'+(v?'✓ OK':'⚠ À configurer')+'</span></div>').join('');
+  $('details').textContent=JSON.stringify(d,null,2);
+ }catch(e){$('error').textContent='⚠️ '+e.message}
+};
+$('password').addEventListener('keydown',e=>{if(e.key==='Enter')$('connect').click()});
+</script></main></body></html>
