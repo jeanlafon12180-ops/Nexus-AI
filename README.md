@@ -6,6 +6,7 @@ Projet d'intelligence artificielle développé progressivement.
 
 | Version | Évolution principale |
 |---|---|
+| **V0** | 🔒 Première page Web de Nexus IA, affichant « Accès fermé ». [Voir la page archivée](v0.html). |
 | **V0.1** | 🧠 Premier prototype local : réponses simples, identité de Nexus et mémorisation du prénom. |
 | **V0.2** | 💬 Amélioration des échanges et de la mémoire locale. |
 | **V0.3** | 🧠 Base de connaissances et réponses plus structurées. |
