@@ -1,8 +1,10 @@
 (() => {
   /*
-   * Nexus IA V1.9.3 — LIVE vocal
+   * Nexus IA V1.9.4 — LIVE vocal
    * Priorité à MediaRecorder + transcription serveur pour fonctionner
    * aussi sur les navigateurs mobiles où SpeechRecognition est limité.
+   * V1.9.4 : fiabilisation iOS/Safari, VAD corrigé, enregistrement sans timeslice,
+   * délai de sécurité plus court et démarrage correct de l’animation.
    */
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   let live = false;
@@ -21,6 +23,7 @@
   let lastVoiceAt = 0;
   let silenceTimer = null;
   let chunkTimer = null;
+  let silenceStartedAt = 0;
   let currentMime = 'audio/webm';
 
   const $ = id => document.getElementById(id);
@@ -137,12 +140,14 @@
 
     if (listening && recorder && recorder.state === 'recording') {
       const now = performance.now();
-      const isVoice = rms > 0.018;
+      const isVoice = rms > 0.012;
       if (isVoice) {
         if (!speechStartedAt) speechStartedAt = now;
         lastVoiceAt = now;
-      } else if (speechStartedAt && lastVoiceAt && now-lastVoiceAt > 700 && now-speechStartedAt > 350) {
-        finishRecording();
+        silenceStartedAt = 0;
+      } else if (speechStartedAt && lastVoiceAt && now - lastVoiceAt > 650) {
+        if (!silenceStartedAt) silenceStartedAt = now;
+        if (now - speechStartedAt > 320 && now - silenceStartedAt > 180) finishRecording();
       }
     }
     raf = requestAnimationFrame(drawTrail);
@@ -172,7 +177,6 @@
     currentMime = preferred.find(type => window.MediaRecorder?.isTypeSupported?.(type)) || '';
     if (!window.MediaRecorder) throw new Error('L’enregistrement audio n’est pas disponible dans ce navigateur.');
     recorder = null;
-    drawTrail();
   }
 
   function cleanupMic() {
@@ -182,6 +186,7 @@
     clearTimeout(chunkTimer);
     silenceTimer = null;
     chunkTimer = null;
+    silenceStartedAt = 0;
     try { recorder?.stop(); } catch (_) {}
     recorder = null;
     if (source) { try { source.disconnect(); } catch (_) {} }
@@ -203,12 +208,16 @@
     recordedChunks = [];
     speechStartedAt = 0;
     lastVoiceAt = 0;
+    silenceStartedAt = 0;
     try {
+      // iOS/Safari is more reliable when MediaRecorder is started without a timeslice.
       recorder = currentMime
         ? new MediaRecorder(stream, { mimeType: currentMime, audioBitsPerSecond: 64000 })
         : new MediaRecorder(stream);
     } catch (_) {
-      recorder = new MediaRecorder(stream);
+      currentMime = '';
+      try { recorder = new MediaRecorder(stream); }
+      catch (error) { setStatus('Enregistrement audio indisponible','error'); return; }
     }
 
     recorder.ondataavailable = event => {
@@ -231,21 +240,21 @@
       }
 
       const blob = new Blob(chunks, { type });
-      if (blob.size < 1800) {
+      if (blob.size < 1200) {
         if (live && !busy && !speaking) setTimeout(startRecorder, 120);
         return;
       }
       await transcribeBlob(blob, type);
     };
 
-    recorder.start(150);
+    recorder.start();
     listening = true;
     setStatus('Je t’écoute…','listen');
 
-    // Safety cap: never keep one recording open forever.
+    // Safety cap: even if VAD cannot detect silence, send the phrase automatically.
     chunkTimer = setTimeout(() => {
       if (recorder?.state === 'recording') finishRecording();
-    }, 12000);
+    }, 8500);
   }
 
   function finishRecording() {
@@ -276,7 +285,10 @@
       const data = await response.json().catch(()=>({}));
       if (!response.ok) throw new Error(data?.error || `Transcription impossible (${response.status}).`);
       const text = String(data?.text || '').trim();
-      if (text && live) await ask(text); else if (live) setStatus('Je n’ai pas entendu de parole…','error');
+      if (text && live) await ask(text); else if (live) {
+        setStatus('Je n’ai pas entendu de parole…','error');
+        await new Promise(resolve => setTimeout(resolve, 350));
+      }
     } catch (error) {
       if (live) {
         addMessage(`⚠️ ${error.message || 'Je n’ai pas réussi à comprendre le son.'}`,'nexus');
@@ -417,7 +429,10 @@
         btn.classList.add('active');
       }
       setStatus('Je t’écoute…','listen');
-      if (window.MediaRecorder) startRecorder();
+      if (window.MediaRecorder) {
+        drawTrail();
+        startRecorder();
+      }
       else if (SpeechRecognition) startRecognitionFallback();
       else throw new Error('Ce navigateur ne possède pas de système de reconnaissance vocale compatible.');
     } catch (error) {
