@@ -8,6 +8,7 @@ const MAX_IMAGES = 20;
 const MAX_HISTORY = 24;
 const MAX_HISTORY_CHARS = 30000;
 const MAX_MEMORY_CHARS = 6000;
+const MAX_CONTEXT_MESSAGE_CHARS = 6000;
 
 function cleanText(value, max = 20000) {
   return String(value || '').replace(/\u0000/g, '').trim().slice(0, max);
@@ -46,12 +47,46 @@ export default async function handler(req, res) {
     const hasDocument = documentText.length > 0;
     const mode = detectMode(message);
 
-    const history = rawHistory
+    const historyItems = rawHistory
       .filter(item => item && (item.type === 'user' || item.type === 'nexus') && typeof item.text === 'string')
-      .slice(-MAX_HISTORY)
-      .map(item => (item.type === 'user' ? 'Utilisateur: ' : 'Nexus AI: ') + cleanText(item.text, 5000))
-      .join('\n\n')
-      .slice(-MAX_HISTORY_CHARS);
+      .slice(-MAX_HISTORY);
+
+    const historyMessages = [];
+    let historyChars = 0;
+    for (const item of historyItems) {
+      const text = cleanText(item.text, MAX_CONTEXT_MESSAGE_CHARS);
+      if (!text) continue;
+      if (historyChars + text.length > MAX_HISTORY_CHARS) break;
+      historyMessages.push({
+        role: item.type === 'user' ? 'user' : 'assistant',
+        content: text
+      });
+      historyChars += text.length;
+    }
+
+    const history = historyMessages
+      .map(item => (item.role === 'user' ? 'Utilisateur: ' : 'Nexus AI: ') + item.content)
+      .join('\n\n');
+
+    const complexitySignals = [
+      message.length > 900,
+      /\b(explique|compare|analyse|pourquoi|comment|détaille|raisonne|conçois|architecture|optimise|diagnostique|debug)\b/i.test(message),
+      mode === 'code' || mode === 'maths',
+      hasImage || hasDocument,
+      historyMessages.length >= 8
+    ].filter(Boolean).length;
+
+    const adaptiveTemperature = mode === 'code' || mode === 'maths'
+      ? 0.10
+      : complexitySignals >= 3
+        ? 0.16
+        : 0.20;
+
+    const adaptiveMaxTokens = complexitySignals >= 3
+      ? 18000
+      : complexitySignals >= 1
+        ? 16000
+        : 12000;
 
     const modeInstructions = {
       general: 'MODE GÉNÉRAL :\n- Réponds naturellement et directement.\n- Adapte la profondeur à la demande : ni trop court, ni artificiellement long.\n- Si plusieurs étapes sont utiles, structure-les clairement.',
@@ -61,7 +96,7 @@ export default async function handler(req, res) {
     }[mode];
 
     const systemPrompt = [
-      'Tu es Nexus AI V2.0, un assistant francophone généraliste de très haut niveau. Tu dois raisonner avec rigueur, conserver le contexte, vérifier mentalement tes conclusions et adapter ton niveau d’explication.',
+      'Tu es Nexus AI V2.3, un assistant francophone généraliste de très haut niveau. Tu dois raisonner avec rigueur, conserver le contexte, vérifier mentalement tes conclusions et adapter ton niveau d’explication.',
       'Ta priorité est d’être FIABLE, COHÉRENT, UTILE et HONNÊTE sur tes capacités.',
       buildNexusIdentity(),
       buildReasoningPolicy(),
@@ -94,7 +129,7 @@ export default async function handler(req, res) {
       history ? 'CONTEXTE DE LA CONVERSATION :\n' + history + '\n\nContinue naturellement cette conversation. Ne demande pas à l’utilisateur de répéter une information déjà présente dans ce contexte.' : '',
       hasImage ? 'IMAGES JOINTES :\nAnalyse réellement les images disponibles avant de répondre.\n- Utilise toutes les images pertinentes.\n- Compare-les si nécessaire.\n- Décris uniquement ce qui est visible ou raisonnablement déductible.\n- Si un détail est illisible ou incertain, précise-le.\n- Ne prétends jamais voir quelque chose qui n’est pas visible.' : '',
       hasDocument ? 'DOCUMENT JOINT :\nLe document « ' + (documentName || 'document') + ' » est fourni sous forme de texte extrait.\n- Base-toi d’abord sur ce contenu.\n- Pour un résumé, hiérarchise les idées importantes.\n- Pour une question précise, reformule uniquement les informations pertinentes.\n- Si la réponse n’est pas dans le document, dis-le clairement.' : '',
-      'Tu es maintenant Nexus AI V2.0. Avant chaque réponse, comprends précisément l’objectif, exploite tout le contexte pertinent, distingue faits et hypothèses, vérifie les calculs et le code, et donne une réponse directement exploitable. Ne prétends jamais avoir utilisé un outil ou vérifié une information externe si ce n’est pas réellement le cas.'
+      'Tu es maintenant Nexus AI V2.3. Avant chaque réponse, comprends précisément l’objectif, exploite tout le contexte pertinent, distingue faits et hypothèses, vérifie les calculs et le code, et donne une réponse directement exploitable. Ne prétends jamais avoir utilisé un outil ou vérifié une information externe si ce n’est pas réellement le cas.'
     ].filter(Boolean).join('\n\n');
 
     const userContent = hasImage
@@ -110,10 +145,11 @@ export default async function handler(req, res) {
         model: hasImage ? 'qwen-vision-pro' : 'gpt-5.6-sol',
         messages: [
           { role: 'system', content: systemPrompt },
+          ...historyMessages,
           { role: 'user', content: userContent }
         ],
-        temperature: mode === 'code' || mode === 'maths' ? 0.12 : 0.2,
-        max_tokens: 16000
+        temperature: adaptiveTemperature,
+        max_tokens: adaptiveMaxTokens
       })
     });
 
@@ -123,9 +159,9 @@ export default async function handler(req, res) {
     const text = data?.choices?.[0]?.message?.content;
     if (!text) throw new Error('Le moteur IA n’a renvoyé aucune réponse.');
 
-    return res.status(200).json({ text, version: '2.0', core: buildFutureEngineContract(), mode, hasImage, hasDocument });
+    return res.status(200).json({ text, version: '2.3', core: buildFutureEngineContract(), mode, hasImage, hasDocument });
   } catch (error) {
-    console.error('Nexus AI V2.0 chat error:', error);
+    console.error('Nexus AI V2.3 chat error:', error);
     return res.status(500).json({ error: error.message || 'Erreur du moteur IA.' });
   }
 }
