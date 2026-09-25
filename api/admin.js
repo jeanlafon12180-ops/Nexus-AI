@@ -1,3 +1,4 @@
+import { getModelRoutingStatus } from './model-router.js';
 import crypto from 'node:crypto';
 
 function unauthorized(res) {
@@ -65,25 +66,26 @@ export default async function handler(req, res) {
 
   return res.status(200).json({
     ok: true,
-    version: '3.2.0',
+    version: '3.3.0',
     name: 'Nexus IA',
     generatedAt: new Date().toISOString(),
     runtime: process.version,
     environment: process.env.VERCEL_ENV || 'unknown',
     checks: {
       github: true,
-      aiEngine: Boolean(process.env.POLLINATIONS_API_KEY),
+      aiEngine: Boolean(process.env.OPENAI_API_KEY || process.env.NEXUS_FALLBACK_API_KEY || process.env.POLLINATIONS_API_KEY),
       imageEngine: Boolean(process.env.POLLINATIONS_API_KEY),
       videoEngine: Boolean(process.env.POLLINATIONS_API_KEY),
       musicEngine: Boolean(process.env.POLLINATIONS_API_KEY),
       adminProtection: true
     },
     github: await getGithubStatus(),
+    modelRouting: getModelRoutingStatus(),
     privacy: {
       historyStoredByServer: false,
       historyScope: 'browser profile',
       sharedLegacyHistoryKey: false
     },
-    note: 'Le tableau de bord affiche des diagnostics serveur en temps réel. Les erreurs détaillées restent dans les Runtime Logs Vercel.'
+    note: 'Le tableau de bord V3.3 affiche des diagnostics serveur en temps réel. Les erreurs détaillées restent dans les Runtime Logs Vercel.'
   });
 }
