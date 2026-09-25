@@ -1,8 +1,8 @@
-const VERSION = '3.1.0';
+const VERSION = '3.2.0';
 
 export function buildNexusIdentity() {
   return [
-    'IDENTITÉ NEXUS CORE V3.1 : tu es le moteur central de Nexus IA.',
+    'IDENTITÉ NEXUS CORE V3.2 : tu es le moteur central de Nexus IA.',
     'Tu analyses l’objectif, les contraintes, le contexte et les outils disponibles avant de choisir une stratégie.',
     'Tu restes honnête : aucune action, vérification, navigation, exécution ou observation ne doit être prétendue si elle n’a pas réellement eu lieu.'
   ].join('\n');
@@ -10,7 +10,7 @@ export function buildNexusIdentity() {
 
 export function buildReasoningPolicy() {
   return [
-    'POLITIQUE NEXUS CORE V3.1 :',
+    'POLITIQUE NEXUS CORE V3.2 :',
     '- Décompose mentalement les tâches complexes en étapes utiles avant de répondre.',
     '- Pour une mission, identifie objectif, sous-objectifs, dépendances, contraintes et critères de réussite.',
     '- Vérifie les résultats importants avant de les présenter.',
@@ -27,7 +27,7 @@ export function buildFutureEngineContract() {
     architecture: 'nexus-core',
     orchestration: true,
     missionMode: true,
-    missionEngine: '3.1',
+    missionEngine: '3.2',
     privacyBoundary: 'session-scoped',
     verification: true,
     multimodalReady: true
@@ -36,6 +36,75 @@ export function buildFutureEngineContract() {
 
 function uniqueSteps(steps) {
   return [...new Set(steps)].slice(0, 6);
+}
+
+export function createMissionExecution(message) {
+  const plan = planMission(message);
+  const now = new Date().toISOString();
+  const steps = plan.steps.map((label, index) => ({
+    id: 'step-' + (index + 1),
+    order: index + 1,
+    label,
+    status: 'pending',
+    startedAt: null,
+    completedAt: null
+  }));
+  return {
+    id: 'mission-' + Date.now().toString(36),
+    status: plan.isMission ? 'pending' : 'completed',
+    priority: plan.priority,
+    type: plan.type,
+    createdAt: now,
+    startedAt: null,
+    completedAt: plan.isMission ? null : now,
+    activeStep: plan.isMission ? steps[0]?.id || null : null,
+    steps
+  };
+}
+
+export function startMissionExecution(mission) {
+  if (!mission?.steps?.length) return mission;
+  const first = mission.steps.find(step => step.status === 'pending');
+  const startedAt = new Date().toISOString();
+  return {
+    ...mission,
+    status: 'running',
+    startedAt: mission.startedAt || startedAt,
+    activeStep: first?.id || null,
+    steps: mission.steps.map(step => step.id === first?.id
+      ? { ...step, status: 'running', startedAt: step.startedAt || startedAt }
+      : step)
+  };
+}
+
+export function completeMissionExecution(mission) {
+  const completedAt = new Date().toISOString();
+  return {
+    ...mission,
+    status: 'completed',
+    activeStep: null,
+    completedAt,
+    steps: mission.steps.map(step => ({
+      ...step,
+      status: 'completed',
+      startedAt: step.startedAt || mission.startedAt || completedAt,
+      completedAt: step.completedAt || completedAt
+    }))
+  };
+}
+
+export function failMissionExecution(mission, errorMessage = '') {
+  const failedAt = new Date().toISOString();
+  return {
+    ...mission,
+    status: 'failed',
+    activeStep: null,
+    completedAt: failedAt,
+    error: String(errorMessage || 'Mission interrompue.').slice(0, 500),
+    steps: mission.steps.map(step => step.status === 'running'
+      ? { ...step, status: 'failed', completedAt: failedAt }
+      : step)
+  };
 }
 
 export function planMission(message) {
