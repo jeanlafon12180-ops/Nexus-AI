@@ -32,6 +32,12 @@
   let screenChunks = [];
   let screenRecording = false;
   let screenMime = '';
+  let cameraStream = null;
+  let cameraFacing = 'environment';
+  let cameraVideo = null;
+  let cameraCanvas = null;
+  let cameraActive = false;
+  let cameraZoom = 1;
 
   const $ = id => document.getElementById(id);
   const chat = () => $('chat');
@@ -65,15 +71,30 @@
         <div class="live-caption" id="liveCaption">Je t’écoute…</div>
       </div>
       <div class="nexus-live-bottom">
+        <button id="cameraButton" class="live-action-button" type="button"><span>📷</span><small>Caméra</small></button>
         <button id="screenRecordButton" class="live-action-button" type="button"><span>◉</span><small>Écran</small></button>
         <button id="liveMainButton" class="live-main-button" type="button" aria-label="Arrêter le LIVE"><span></span></button>
         <button id="liveMicButton" class="live-action-button active" type="button"><span>🎙</span><small>Micro</small></button>
+        <button id="cameraSwitchButton" class="live-action-button" type="button"><span>↻</span><small>Retourner</small></button>
       </div>
-      <div class="screen-record-status" id="screenRecordStatus" hidden>● Enregistrement de l’écran…</div>`;
+      <div class="screen-record-status" id="screenRecordStatus" hidden>● Enregistrement de l’écran…</div>
+      <div class="camera-preview-wrap" id="cameraPreviewWrap" hidden>
+        <video id="liveCameraPreview" class="live-camera-preview" autoplay muted playsinline></video>
+        <div class="camera-controls">
+          <button id="cameraZoomOut" type="button">−</button>
+          <span id="cameraZoomLabel">1×</span>
+          <button id="cameraZoomIn" type="button">+</button>
+        </div>
+        <div class="camera-ai-status">👁 Nexus voit la caméra</div>
+      </div>`;
     document.body.appendChild(page);
     $('liveBack')?.addEventListener('click', stopLive);
     $('liveMainButton')?.addEventListener('click', stopLive);
     $('screenRecordButton')?.addEventListener('click', toggleScreenRecording);
+    $('cameraButton')?.addEventListener('click', toggleCamera);
+    $('cameraSwitchButton')?.addEventListener('click', switchCamera);
+    $('cameraZoomIn')?.addEventListener('click', () => changeCameraZoom(0.5));
+    $('cameraZoomOut')?.addEventListener('click', () => changeCameraZoom(-0.5));
   }
 
   function setLivePageVisible(value) {
@@ -352,6 +373,78 @@
     });
   }
 
+  async function toggleCamera() {
+    if (cameraActive) { stopCamera(); return; }
+    if (!navigator.mediaDevices?.getUserMedia) {
+      alert('La caméra n’est pas disponible dans ce navigateur.');
+      return;
+    }
+    try {
+      cameraStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: cameraFacing }, width:{ideal:1280}, height:{ideal:720} },
+        audio: false
+      });
+      cameraVideo = $('liveCameraPreview');
+      if (!cameraVideo) throw new Error('Aperçu caméra indisponible.');
+      cameraVideo.srcObject = cameraStream;
+      cameraActive = true;
+      cameraZoom = 1;
+      $('cameraButton')?.classList.add('recording');
+      const wrap = $('cameraPreviewWrap'); if (wrap) wrap.hidden = false;
+      updateCameraZoomLabel();
+    } catch (error) {
+      cameraStream?.getTracks().forEach(track=>track.stop());
+      cameraStream = null;
+      if (error?.name !== 'NotAllowedError') alert(error?.message || 'Impossible d’ouvrir la caméra.');
+    }
+  }
+
+  function stopCamera() {
+    cameraStream?.getTracks().forEach(track=>track.stop());
+    cameraStream = null;
+    if (cameraVideo) cameraVideo.srcObject = null;
+    cameraVideo = null;
+    cameraActive = false;
+    cameraZoom = 1;
+    $('cameraButton')?.classList.remove('recording');
+    const wrap = $('cameraPreviewWrap'); if (wrap) wrap.hidden = true;
+  }
+
+  async function switchCamera() {
+    if (!cameraActive) { await toggleCamera(); return; }
+    cameraFacing = cameraFacing === 'environment' ? 'user' : 'environment';
+    stopCamera();
+    await toggleCamera();
+  }
+
+  async function changeCameraZoom(delta) {
+    if (!cameraActive || !cameraStream) return;
+    const track = cameraStream.getVideoTracks()[0];
+    const caps = track?.getCapabilities?.();
+    if (!caps || typeof caps.zoom !== 'object') return;
+    const min = Number.isFinite(caps.zoom.min) ? caps.zoom.min : 1;
+    const max = Number.isFinite(caps.zoom.max) ? caps.zoom.max : 4;
+    cameraZoom = Math.min(max, Math.max(min, cameraZoom + delta));
+    try { await track.applyConstraints({ advanced: [{ zoom: cameraZoom }] }); } catch (_) {}
+    updateCameraZoomLabel();
+  }
+
+  function updateCameraZoomLabel() {
+    const label = $('cameraZoomLabel');
+    if (label) label.textContent = cameraZoom % 1 ? cameraZoom.toFixed(1)+'×' : cameraZoom+'×';
+  }
+
+  async function captureCameraFrame() {
+    if (!cameraActive || !cameraVideo || cameraVideo.readyState < 2) return '';
+    if (!cameraCanvas) cameraCanvas = document.createElement('canvas');
+    const width = Math.min(1280, cameraVideo.videoWidth || 1280);
+    const height = Math.min(720, Math.round(width * (cameraVideo.videoHeight || 720) / (cameraVideo.videoWidth || 1280)));
+    cameraCanvas.width = width; cameraCanvas.height = height;
+    const ctx = cameraCanvas.getContext('2d');
+    ctx.drawImage(cameraVideo,0,0,width,height);
+    return cameraCanvas.toDataURL('image/jpeg',0.72);
+  }
+
   async function toggleScreenRecording() {
     if (screenRecording) { stopScreenRecording(); return; }
     if (!navigator.mediaDevices?.getDisplayMedia) {
@@ -556,7 +649,8 @@
         body:JSON.stringify({
           message:text,
           history:getHistory(),
-          memory:getMemory()
+          memory:getMemory(),
+          imageData: await captureCameraFrame()
         })
       });
       const data = await response.json().catch(()=>({}));
@@ -676,6 +770,7 @@
     live = false;
     busy = false;
     stopScreenRecording();
+    stopCamera();
     setLivePageVisible(false);
     stopRecognition();
     window.speechSynthesis?.cancel();
