@@ -39,12 +39,13 @@ Projet d'intelligence artificielle développé progressivement.
 | **V3.1** | 🎯 **Mission Engine** : plans de mission dynamiques, priorités, orchestration structurée, affichage du plan réel dans l’interface et diagnostics GitHub dans la console privée. Petit bonus : le moteur distingue automatiquement une demande simple d’une mission complexe. |
 | **V3.2** | ⚙️ **Mission Execution Engine** : les missions ont maintenant un identifiant, un cycle de vie et des états `pending`, `running`, `completed`, `failed` et `skipped`. Le backend suit le démarrage et la finalisation d’une mission et l’interface affiche l’état de chaque étape. Petit bonus : chaque étape possède un identifiant et des horodatages pour préparer la reprise et le suivi futur. |
 | **V3.3** | 🛡️ **Nexus Resilience / Fallback Engine** : GPT-5.6 Sol devient le moteur principal direct via OpenAI quand `OPENAI_API_KEY` est configurée. En cas d’indisponibilité, Nexus tente automatiquement un moteur de secours compatible configuré (`NEXUS_FALLBACK_API_URL`, `NEXUS_FALLBACK_API_KEY`, `NEXUS_FALLBACK_MODEL`). Petit bonus : le routage réel et l’activation du secours sont visibles dans les diagnostics Admin et l’interface. |
+| **V3.4** | 🧠 **Verification + Self-Correction Engine** : Nexus vérifie les réponses complexes avant de les finaliser et peut les corriger automatiquement. Nouveau **Context Advisor** : lorsque la demande semble ambiguë ou manque de contexte, Nexus fournit au moteur principal des informations supplémentaires issues du contexte disponible, de l’historique, de la mémoire locale et des documents fournis. Petit bonus : le statut de vérification et du Context Advisor est renvoyé par l’API. |
 
 ## 📌 Version actuelle
 
-**Nexus IA V3.3**
+**Nexus IA V3.4**
 
-La V3.3 est maintenant intégrée au projet.
+La V3.4 est maintenant intégrée au projet.
 
 ## ✨ Capacités actuelles
 
@@ -150,3 +151,16 @@ La V3.3 sépare clairement le cœur Nexus du fournisseur de modèle. Le modèle 
 ### Bonus V3.3
 
 Le routage indique désormais quel moteur a réellement répondu. L’interface signale l’activation du mode secours et la console Admin expose la configuration des moteurs sans afficher les clés secrètes.
+
+
+## V3.4 — Verification + Self-Correction Engine
+
+La V3.4 ajoute une deuxième couche au-dessus du modèle principal : Nexus Core peut préparer le contexte nécessaire avant la génération, puis vérifier le brouillon et demander une correction finale lorsque des problèmes importants sont détectés.
+
+### Context Advisor
+
+Quand une demande présente des signes d’ambiguïté, Nexus rassemble les informations pertinentes déjà disponibles : historique récent, mémoire locale, mode détecté et document fourni. Ces éléments sont transmis au moteur principal comme contexte supplémentaire. Nexus ne prétend pas inventer des connaissances internes inexistantes : il exploite uniquement les informations réellement disponibles.
+
+### Vérification et auto-correction
+
+Pour les tâches complexes ou nécessitant davantage de contexte, Nexus lance une vérification séparée. Si le vérificateur détecte une correction utile, une nouvelle réponse finale est générée à partir du brouillon et des corrections. Le raisonnement privé du vérificateur n’est jamais affiché à l’utilisateur.
