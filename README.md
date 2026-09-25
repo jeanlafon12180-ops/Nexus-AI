@@ -38,12 +38,13 @@ Projet d'intelligence artificielle développé progressivement.
 
 | **V3.1** | 🎯 **Mission Engine** : plans de mission dynamiques, priorités, orchestration structurée, affichage du plan réel dans l’interface et diagnostics GitHub dans la console privée. Petit bonus : le moteur distingue automatiquement une demande simple d’une mission complexe. |
 | **V3.2** | ⚙️ **Mission Execution Engine** : les missions ont maintenant un identifiant, un cycle de vie et des états `pending`, `running`, `completed`, `failed` et `skipped`. Le backend suit le démarrage et la finalisation d’une mission et l’interface affiche l’état de chaque étape. Petit bonus : chaque étape possède un identifiant et des horodatages pour préparer la reprise et le suivi futur. |
+| **V3.3** | 🛡️ **Nexus Resilience / Fallback Engine** : GPT-5.6 Sol devient le moteur principal direct via OpenAI quand `OPENAI_API_KEY` est configurée. En cas d’indisponibilité, Nexus tente automatiquement un moteur de secours compatible configuré (`NEXUS_FALLBACK_API_URL`, `NEXUS_FALLBACK_API_KEY`, `NEXUS_FALLBACK_MODEL`). Petit bonus : le routage réel et l’activation du secours sont visibles dans les diagnostics Admin et l’interface. |
 
 ## 📌 Version actuelle
 
-**Nexus IA V3.2**
+**Nexus IA V3.3**
 
-La V3.2 est maintenant intégrée au projet.
+La V3.3 est maintenant intégrée au projet.
 
 ## ✨ Capacités actuelles
 
@@ -132,3 +133,20 @@ La V3.2 fait évoluer la planification V3.1 vers un cycle de mission suivi côt�
 - `skipped` : étape ignorée
 
 Chaque étape possède un identifiant, un ordre et des horodatages. Cette base prépare l’ajout d’outils et d’actions structurées dans les versions suivantes.
+
+
+## V3.3 — Nexus Resilience / Fallback Engine
+
+La V3.3 sépare clairement le cœur Nexus du fournisseur de modèle. Le modèle principal est **GPT-5.6 Sol** via l’API OpenAI. Si le moteur principal échoue ou devient indisponible pour la requête en cours, Nexus essaie automatiquement le moteur de secours configuré.
+
+### Routage
+
+- Principal : `OPENAI_API_KEY` + `gpt-5.6-sol`
+- Secours configurable : `NEXUS_FALLBACK_API_URL` + `NEXUS_FALLBACK_API_KEY` + `NEXUS_FALLBACK_MODEL`
+- Pont de compatibilité temporaire : `POLLINATIONS_API_KEY`
+- Le pont historique n’est pas présenté comme un modèle interne Nexus.
+- Une résilience persistante entre plusieurs instances nécessitera plus tard un stockage partagé pour un circuit breaker et des métriques de santé.
+
+### Bonus V3.3
+
+Le routage indique désormais quel moteur a réellement répondu. L’interface signale l’activation du mode secours et la console Admin expose la configuration des moteurs sans afficher les clés secrètes.
