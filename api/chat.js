@@ -1,12 +1,23 @@
 export const config = {
-  api: {
-    bodyParser: { sizeLimit: '10mb' }
-  }
+  api: { bodyParser: { sizeLimit: '15mb' } }
 };
 
 const MAX_IMAGES = 20;
-const MAX_HISTORY = 12;
-const MAX_HISTORY_CHARS = 12000;
+const MAX_HISTORY = 16;
+const MAX_HISTORY_CHARS = 18000;
+const MAX_MEMORY_CHARS = 4000;
+
+function cleanText(value, max = 20000) {
+  return String(value || '').replace(/\u0000/g, '').trim().slice(0, max);
+}
+
+function detectMode(message) {
+  const text = message.toLowerCase();
+  if (/\b(code|programme|programmer|développe|developpe|html|css|javascript|typescript|python|react|next\.js|node\.js|sql|api|bug|erreur|corrige|debug|fonction|script|roblox|lua)\b/i.test(text)) return 'code';
+  if (/\b(math|maths|calcul|équation|equation|pythagore|cosinus|sinus|géométrie|geometry)\b/i.test(text)) return 'maths';
+  if (/\b(résume|resume|résumé|document|cours|histoire|géographie|exercice|devoir)\b/i.test(text)) return 'study';
+  return 'general';
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée.' });
@@ -16,96 +27,82 @@ export default async function handler(req, res) {
 
   try {
     const body = req.body || {};
-    const message = String(body.message || '').trim();
+    const message = cleanText(body.message, 12000);
     const imageData = typeof body.imageData === 'string' ? body.imageData.trim() : '';
     const imageDataList = Array.isArray(body.imageDataList)
       ? body.imageDataList.filter(item => typeof item === 'string' && /^data:image\/(png|jpe?g|webp|gif);base64,/i.test(item.trim())).slice(0, MAX_IMAGES)
       : [];
-    const documentText = typeof body.documentText === 'string' ? body.documentText.trim() : '';
-    const documentName = typeof body.documentName === 'string' ? body.documentName.trim() : '';
+    const documentText = cleanText(body.documentText, 60000);
+    const documentName = cleanText(body.documentName, 200);
     const rawHistory = Array.isArray(body.history) ? body.history : [];
+    const memory = cleanText(JSON.stringify(body.memory || {}), MAX_MEMORY_CHARS);
 
     if (!message) return res.status(400).json({ error: 'Message vide.' });
 
     const images = imageDataList.length ? imageDataList : (imageData ? [imageData] : []);
     const hasImage = images.length > 0;
     const hasDocument = documentText.length > 0;
-    const codeRequest = /\b(code|programme|programmer|développe|developpe|développer|developper|html|css|javascript|js|python|site|jeu|snake|typescript|react|next\.js|node\.js|sql|api|bug|erreur|corrige|debug|fonction|script)\b/i.test(message);
+    const mode = detectMode(message);
 
     const history = rawHistory
       .filter(item => item && (item.type === 'user' || item.type === 'nexus') && typeof item.text === 'string')
       .slice(-MAX_HISTORY)
-      .map(item => `${item.type === 'user' ? 'Utilisateur' : 'Nexus AI'}: ${item.text}`)
+      .map(item => (item.type === 'user' ? 'Utilisateur: ' : 'Nexus AI: ') + cleanText(item.text, 5000))
       .join('\n\n')
       .slice(-MAX_HISTORY_CHARS);
 
-    const systemPrompt = `Tu es Nexus AI 1.5, un assistant intelligent francophone polyvalent.
-Réponds en français sauf si l'utilisateur demande une autre langue.
+    const modeInstructions = {
+      general: 'MODE GÉNÉRAL :\n- Réponds naturellement et directement.\n- Adapte la profondeur à la demande : ni trop court, ni artificiellement long.\n- Si plusieurs étapes sont utiles, structure-les clairement.',
+      maths: 'MODE MATHS / SCIENCES :\n- Montre les étapes importantes du raisonnement.\n- Vérifie les unités, signes et résultats.\n- Ne saute pas une étape essentielle quand elle permet de comprendre la méthode.\n- Donne le résultat final clairement.',
+      study: 'MODE ÉTUDES :\n- Explique comme un professeur patient.\n- Adapte le vocabulaire au niveau demandé.\n- Distingue clairement les faits, les explications et les exemples.\n- Pour un document fourni, utilise d’abord le contenu du document.',
+      code: 'MODE DÉVELOPPEMENT :\n- Produis du code réellement exploitable.\n- Respecte exactement les technologies demandées.\n- Vérifie syntaxe, imports, variables, événements, sélecteurs et dépendances.\n- Pour plusieurs fichiers, indique clairement chaque chemin et fournis le contenu complet des fichiers modifiés.\n- Pour une correction, explique brièvement la cause puis donne la correction complète.\n- Ne prétends jamais avoir exécuté ou testé du code si tu ne l’as pas réellement fait.\n- N’invente jamais une API, une bibliothèque ou une fonctionnalité.\n- Utilise des blocs Markdown avec le langage approprié.'
+    }[mode];
 
-RÈGLES GÉNÉRALES :
-- Réponds directement à la question et reste utile.
-- Donne des explications claires, structurées et adaptées au niveau de l'utilisateur.
-- Ne présente jamais une information incertaine comme un fait certain.
-- N'invente jamais une source, une fonctionnalité, un résultat de test ou une information absente du contexte.
-- Pour les calculs, vérifie le résultat avant de répondre.
-- Si une demande est ambiguë mais qu'une interprétation raisonnable est possible, choisis-la et indique brièvement ton choix.
-- Utilise des listes ou des étapes quand cela améliore la compréhension.
-
-${history ? `CONTEXTE DE LA CONVERSATION RÉCENTE :\n${history}\n\nUtilise ce contexte pour éviter de faire répéter l'utilisateur et pour conserver le fil de la discussion.` : ''}
-
-${hasImage ? `IMAGES JOINTES :
-Une ou plusieurs images sont jointes. Analyse réellement toutes les images avant de répondre.
-- Utilise toutes les images pertinentes.
-- Compare-les si la question le demande ou si cela aide naturellement.
-- Décris uniquement ce qui est raisonnablement visible.
-- Si un détail est illisible, incertain ou absent, dis-le clairement.
-- Pour le texte présent dans une image, sois prudent sur les passages difficiles à lire.
-- Ne prétends jamais avoir vu un élément qui n'est pas visible.` : ''}
-
-${hasDocument ? `DOCUMENT JOINT :
-Un document nommé « ${documentName || 'document'} » est joint et son texte extrait est fourni dans la demande.
-- Base-toi d'abord sur ce contenu pour les questions concernant le document.
-- Pour un résumé, structure les idées principales.
-- Pour une question précise, reformule les passages utiles sans inventer.
-- Si l'information demandée n'est pas présente, dis-le clairement.` : ''}
-
-${codeRequest ? `MODE DÉVELOPPEMENT :
-La demande concerne du développement logiciel.
-- Produis du VRAI code exploitable.
-- Donne le code COMPLET nécessaire, sans « ... » à la place de parties importantes.
-- Respecte exactement les technologies et fonctionnalités demandées.
-- Vérifie mentalement syntaxe, imports, variables, fonctions, événements, sélecteurs et dépendances.
-- N'invente pas d'API, de fonction ou de bibliothèque.
-- Si plusieurs fichiers sont nécessaires, indique clairement le nom de chaque fichier.
-- Si un seul fichier suffit, donne un fichier autonome complet.
-- Pour HTML/CSS/JavaScript, vérifie que les sélecteurs, événements et fonctions correspondent.
-- Pour Python, vérifie les imports et la logique d'exécution.
-- Pour une correction de bug, explique brièvement la cause puis donne la correction complète.
-- Ne prétends jamais avoir exécuté le code si tu ne l'as pas réellement exécuté.
-- Utilise les blocs Markdown avec le langage approprié.` : ''}
-
-Tu es Nexus AI V1.5 : privilégie la fiabilité, la cohérence, la continuité de conversation et une réponse réellement utile plutôt qu'une réponse artificiellement longue.`;
+    const systemPrompt = [
+      'Tu es Nexus AI V1.9, un assistant francophone polyvalent construit par l’utilisateur.',
+      'Ta priorité est d’être FIABLE, COHÉRENT, UTILE et HONNÊTE sur tes capacités.',
+      '',
+      'RÈGLES DE QUALITÉ :',
+      '- Réponds en français sauf demande contraire.',
+      '- Comprends la demande avant de répondre et ne change pas arbitrairement de sujet.',
+      '- Utilise le contexte récent pour conserver le fil de la conversation.',
+      '- Si l’utilisateur corrige une information, utilise sa correction.',
+      '- Si une information est incertaine ou manque, dis-le au lieu de l’inventer.',
+      '- Ne fabrique jamais de source, citation, résultat de test, fichier ou action externe.',
+      '- Ne dis pas que tu as accès à un site, GitHub, Vercel, un fichier ou un outil si ce n’est pas fourni dans la requête ou réellement accessible.',
+      '- Pour les demandes ambiguës, choisis l’interprétation la plus raisonnable et indique-la brièvement si nécessaire.',
+      '- Évite les répétitions et les introductions inutiles.',
+      '- Utilise Markdown de façon lisible : titres courts, listes, tableaux ou code quand cela aide.',
+      '- Pour une demande complexe, commence par une réponse utile puis détaille progressivement.',
+      '- Pour une erreur technique, donne d’abord le diagnostic le plus probable, puis les étapes concrètes.',
+      '- N’affirme jamais avoir effectué une action que tu n’as pas réellement effectuée.',
+      '',
+      modeInstructions,
+      '',
+      memory && memory !== '{}' ? 'MÉMOIRE LOCALE FOURNIE PAR L’APPLICATION :\n' + memory + '\nUtilise-la uniquement lorsqu’elle est pertinente. Ne révèle pas inutilement des informations mémorisées.' : '',
+      history ? 'CONTEXTE DE LA CONVERSATION :\n' + history + '\n\nContinue naturellement cette conversation. Ne demande pas à l’utilisateur de répéter une information déjà présente dans ce contexte.' : '',
+      hasImage ? 'IMAGES JOINTES :\nAnalyse réellement les images disponibles avant de répondre.\n- Utilise toutes les images pertinentes.\n- Compare-les si nécessaire.\n- Décris uniquement ce qui est visible ou raisonnablement déductible.\n- Si un détail est illisible ou incertain, précise-le.\n- Ne prétends jamais voir quelque chose qui n’est pas visible.' : '',
+      hasDocument ? 'DOCUMENT JOINT :\nLe document « ' + (documentName || 'document') + ' » est fourni sous forme de texte extrait.\n- Base-toi d’abord sur ce contenu.\n- Pour un résumé, hiérarchise les idées importantes.\n- Pour une question précise, reformule uniquement les informations pertinentes.\n- Si la réponse n’est pas dans le document, dis-le clairement.' : '',
+      'Tu es maintenant Nexus AI V1.9. Cherche systématiquement à fournir une réponse plus précise, plus cohérente et plus utile qu’une réponse générique.'
+    ].filter(Boolean).join('\n\n');
 
     const userContent = hasImage
-      ? [
-          { type: 'text', text: message },
-          ...images.map(url => ({ type: 'image_url', image_url: { url } }))
-        ]
+      ? [{ type: 'text', text: message }, ...images.map(url => ({ type: 'image_url', image_url: { url } }))]
       : hasDocument
-        ? `${message}\n\n--- CONTENU DU DOCUMENT : ${documentName || 'document'} ---\n${documentText}\n--- FIN DU DOCUMENT ---`
+        ? message + '\n\n--- CONTENU DU DOCUMENT : ' + (documentName || 'document') + ' ---\n' + documentText + '\n--- FIN DU DOCUMENT ---'
         : message;
 
     const response = await fetch('https://gen.pollinations.ai/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      headers: { 'Authorization': 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: hasImage ? 'qwen-vision' : 'qwen-coder',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userContent }
         ],
-        temperature: 0.1,
-        max_tokens: 10000
+        temperature: mode === 'code' || mode === 'maths' ? 0.15 : 0.25,
+        max_tokens: 12000
       })
     });
 
@@ -115,9 +112,9 @@ Tu es Nexus AI V1.5 : privilégie la fiabilité, la cohérence, la continuité d
     const text = data?.choices?.[0]?.message?.content;
     if (!text) throw new Error('Le moteur IA n’a renvoyé aucune réponse.');
 
-    return res.status(200).json({ text });
+    return res.status(200).json({ text, version: '1.9', mode, hasImage, hasDocument });
   } catch (error) {
-    console.error('Nexus AI chat error:', error);
+    console.error('Nexus AI V1.9 chat error:', error);
     return res.status(500).json({ error: error.message || 'Erreur du moteur IA.' });
   }
 }
