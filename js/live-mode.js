@@ -690,6 +690,10 @@
     }
   }
 
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && live) stopLive();
+  });
+  
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',ensureUI);
   else ensureUI();
 })();
