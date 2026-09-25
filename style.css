@@ -121,3 +121,11 @@ body.nexus-live-open { overflow:hidden; }
 .music-loading span:nth-child(2){animation-delay:.14s}.music-loading span:nth-child(3){animation-delay:.28s}
 @keyframes v27Pulse{0%,80%,100%{transform:scale(.65);opacity:.35}40%{transform:scale(1);opacity:1}}
 .generated-audio{display:block;width:min(620px,100%);margin-top:8px}
+
+
+/* Nexus IA V2.9 — confort général */
+.nexus-generating .chat{scroll-behavior:smooth}
+.nexus-generating #sendButton{transform:scale(1.04)}
+.focus-mode{background:#0a0a0a!important}
+.focus-mode .sidebar,.focus-mode .topbar .status,.focus-mode .topbar .version,.focus-mode .composer-area .hint{opacity:.35}
+.focus-mode .chat{max-width:920px;margin-inline:auto}
