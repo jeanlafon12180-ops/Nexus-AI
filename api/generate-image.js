@@ -37,9 +37,9 @@ export default async function handler(req, res) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'flux',
+          model: 'gpt-image-2',
           prompt: enhancedPrompt,
-          size: '1024x1024'
+          size: '1536x1024'
         }),
         signal: controller.signal
       });
@@ -68,7 +68,7 @@ export default async function handler(req, res) {
       prompt: cleanPrompt
     });
   } catch (error) {
-    console.error('Nexus image error:', error);
+    console.error('Nexus V2 image error:', error);
     if (error?.name === 'AbortError') {
       return res.status(504).json({ error: 'La génération de l’image a pris trop de temps. Réessaie.' });
     }
