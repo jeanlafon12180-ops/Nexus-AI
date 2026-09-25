@@ -40,12 +40,28 @@ Projet d'intelligence artificielle développé progressivement.
 | **V3.2** | ⚙️ **Mission Execution Engine** : les missions ont maintenant un identifiant, un cycle de vie et des états `pending`, `running`, `completed`, `failed` et `skipped`. Le backend suit le démarrage et la finalisation d’une mission et l’interface affiche l’état de chaque étape. Petit bonus : chaque étape possède un identifiant et des horodatages pour préparer la reprise et le suivi futur. |
 | **V3.3** | 🛡️ **Nexus Resilience / Fallback Engine** : GPT-5.6 Sol devient le moteur principal direct via OpenAI quand `OPENAI_API_KEY` est configurée. En cas d’indisponibilité, Nexus tente automatiquement un moteur de secours compatible configuré (`NEXUS_FALLBACK_API_URL`, `NEXUS_FALLBACK_API_KEY`, `NEXUS_FALLBACK_MODEL`). Petit bonus : le routage réel et l’activation du secours sont visibles dans les diagnostics Admin et l’interface. |
 | **V3.4** | 🧠 **Verification + Self-Correction Engine** : Nexus vérifie les réponses complexes avant de les finaliser et peut les corriger automatiquement. Nouveau **Context Advisor** : lorsque la demande semble ambiguë ou manque de contexte, Nexus fournit au moteur principal des informations supplémentaires issues du contexte disponible, de l’historique, de la mémoire locale et des documents fournis. Petit bonus : le statut de vérification et du Context Advisor est renvoyé par l’API. |
+| **V3.5** | 🧠 **Relevant Memory** : sélection des souvenirs locaux les plus pertinents pour la demande actuelle, avec priorité au contexte récent et gestion des contradictions. |
+| **V3.6** | 🤖 **Specialized Agents** : Nexus sélectionne automatiquement un agent spécialisé pour le code, les sciences, les études, l’analyse ou les demandes générales, sous le contrôle du Nexus Core. |
+| **V3.7** | 🌌 **Autonomous Nexus Core** : orchestration adaptative, choix automatique de stratégie, planification selon la complexité, agents spécialisés et vérification/correction intégrés dans une boucle de décision contrôlée. |
 
 ## 📌 Version actuelle
 
-**Nexus IA V3.4**
+**Nexus IA V3.7**
 
-La V3.4 est maintenant intégrée au projet.
+La V3.7 est maintenant intégrée au projet.
+
+## V3.7 — Nexus Core autonome
+
+La V3.7 finalise l’orchestration du cœur Nexus : le backend choisit automatiquement une stratégie adaptée à la complexité, active un agent spécialisé lorsque cela apporte une valeur réelle, puis vérifie et corrige les réponses complexes si nécessaire. Le modèle reste interchangeable : le cœur Nexus conserve les règles d’orchestration indépendamment du fournisseur.
+
+### Orchestration V3.7
+- 🧭 Stratégie adaptative selon la complexité
+- 🤖 Sélection automatique d’un agent spécialisé
+- 🎯 Planification et missions multi-étapes
+- 🔍 Vérification interne des tâches complexes
+- 🛠️ Correction automatique lorsque le contrôle détecte un problème utile à corriger
+- 🛡️ Routage principal + moteur de secours conservé
+- 🔒 Aucun outil ou accès externe n’est prétendu sans exécution réelle
 
 ## ✨ Capacités actuelles
 
