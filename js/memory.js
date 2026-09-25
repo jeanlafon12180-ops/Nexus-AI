@@ -24,3 +24,15 @@ export function loadConversation(){const value=read(CHAT_KEY,[]);return Array.is
 export function saveConversation(conversation){try{localStorage.setItem(CHAT_KEY,JSON.stringify(conversation.slice(-150)));}catch{}}
 export function clearConversation(){try{localStorage.removeItem(CHAT_KEY);}catch{}}
 export function clearMemory(){try{localStorage.removeItem(MEMORY_KEY);}catch{}}
+
+
+export function buildMemoryContext(memory, history, message) {
+  const source=memory&&typeof memory==='object'?memory:{};
+  const notes=Array.isArray(source.notes)?source.notes:[];
+  const query=String(message||'').toLowerCase();
+  const tokens=new Set(query.split(/\W+/).filter(token=>token.length>2));
+  const selected=notes.map((note,index)=>{const value=typeof note==='string'?note:JSON.stringify(note);const score=[...tokens].filter(token=>value.toLowerCase().includes(token)).length;return{index,value,score};}).sort((a,b)=>b.score-a.score||b.index-a.index).slice(0,18).map(item=>item.value);
+  return {profile:{prenom:source.prenom||'',ville:source.ville||''},preferences:source.preferences||{},notes:selected,recentHistory:Array.isArray(history)?history.slice(-8):[]};
+}
+
+export function buildMemoryInstruction(){return 'MÉMOIRE AVANCÉE V3.5 : utilise uniquement les souvenirs fournis par l’application, privilégie ceux qui sont pertinents pour la demande actuelle, traite les préférences comme des indications et ne transforme jamais une supposition en souvenir certain. En cas de contradiction, privilégie l’information la plus récente ou demande une clarification.';}
