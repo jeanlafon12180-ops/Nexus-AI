@@ -32,12 +32,13 @@ Projet d'intelligence artificielle développé progressivement.
 | **V2.4** | 🛠️ **Amélioration générale** : raisonnement adaptatif, contrôle des générations, continuité conversationnelle renforcée et fiabilité globale améliorée. |
 | **V2.5** | 🧠 **Intelligence renforcée** : vérification interne en deux passes, contrôle plus strict des faits, calculs, code et sciences, réponses complexes plus profondes et température abaissée pour privilégier la précision. Petit bonus : meilleure détection des incertitudes pour éviter les inventions. |
 | **V2.6** | 🚀 **Amélioration générale** : moteur plus robuste, profondeur adaptative mieux utilisée, délai réseau contrôlé, rendu Markdown amélioré, interface/version actualisées et meilleure continuité globale. Petit bonus : les titres Markdown sont maintenant correctement affichés dans les réponses. |
+| **V2.7** | 🎵 **Création musicale IA** : Nexus peut maintenant composer de la musique à partir d’une description, générer un fichier audio et l’écouter directement dans la conversation. Petit bonus : ajout d’un bouton dédié « Création musicale » dans le menu 📎. |
 
 ## 📌 Version actuelle
 
-**Nexus IA V2.6**
+**Nexus IA V2.7**
 
-La V2.6 est maintenant intégrée au projet.
+La V2.7 est maintenant intégrée au projet.
 
 ## ✨ Capacités actuelles
 
@@ -45,6 +46,7 @@ La V2.6 est maintenant intégrée au projet.
 - 🧠 Mémoire locale et contexte conversationnel
 - 💻 Génération de code
 - 🎨 Génération d'images
+- 🎵 Création de musique par IA
 - 🖼️ Analyse d'images
 - ✏️ Modification d'images par instructions
 - 📄 Lecture de PDF, Word, LibreOffice et fichiers texte
