@@ -15,7 +15,7 @@ export default async function handler(req, res) {
 
     const form = new FormData();
     form.append('file', new Blob([bytes], { type: mimeType }), filename);
-    form.append('model', 'whisper-1');
+    form.append('model', 'whisper');
     form.append('language', 'fr');
 
     const response = await fetch('https://gen.pollinations.ai/v1/audio/transcriptions', {
