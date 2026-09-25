@@ -29,12 +29,14 @@ Projet d'intelligence artificielle développé progressivement.
 | **V2.1** | 🔴 **Nouveau LIVE plein écran**, nouvel orb lumineux réactif, bouton d'enregistrement d'écran et architecture préparée pour un futur moteur Nexus indépendant. |
 | **V2.2** | 📷 **Vision LIVE** : caméra avant/arrière, aperçu en direct, zoom matériel quand disponible et transmission d'une image caméra récente à Nexus pour analyser la scène pendant le LIVE. |
 | **V2.3** | 🚀 **Amélioration générale majeure** : intelligence et contexte renforcés, multimodalité et LIVE mieux préparés, génération contrôlable, interface actualisée, meilleure gestion des réponses et architecture plus robuste pour les prochaines évolutions. |
+| **V2.4** | 🛠️ **Amélioration générale** : raisonnement adaptatif, contrôle des générations, continuité conversationnelle renforcée et fiabilité globale améliorée. |
+| **V2.5** | 🧠 **Intelligence renforcée** : vérification interne en deux passes, contrôle plus strict des faits, calculs, code et sciences, réponses complexes plus profondes et température abaissée pour privilégier la précision. Petit bonus : meilleure détection des incertitudes pour éviter les inventions. |
 
 ## 📌 Version actuelle
 
-**Nexus IA V2.3**
+**Nexus IA V2.5**
 
-La V2.3 est maintenant intégrée au projet.
+La V2.5 est maintenant intégrée au projet.
 
 ## ✨ Capacités actuelles
 
