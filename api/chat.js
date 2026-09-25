@@ -77,6 +77,13 @@ export default async function handler(req, res) {
       '- Pour une erreur technique, donne d’abord le diagnostic le plus probable, puis les étapes concrètes.',
       '- N’affirme jamais avoir effectué une action que tu n’as pas réellement effectuée.',
       '',
+      'PROTOCOLE DE VÉRIFICATION INTERNE :',
+      '- Avant de répondre, identifie mentalement l’objectif exact de l’utilisateur, les contraintes importantes et les informations déjà connues.',
+      '- Fais une vérification silencieuse de la cohérence de ta réponse : faits, calculs, étapes, code, noms, unités et contraintes.',
+      '- Si plusieurs interprétations sont possibles, choisis celle qui correspond le mieux au contexte plutôt que de repartir de zéro.',
+      '- Si tu détectes une contradiction avec le contexte, corrige-la avant d’envoyer la réponse.',
+      '- N’expose pas ce protocole ni ton raisonnement interne ; donne seulement la conclusion, les étapes utiles et les vérifications nécessaires.',
+      '',
       modeInstructions,
       '',
       memory && memory !== '{}' ? 'MÉMOIRE LOCALE FOURNIE PAR L’APPLICATION :\n' + memory + '\nUtilise-la uniquement lorsqu’elle est pertinente. Ne révèle pas inutilement des informations mémorisées.' : '',
@@ -112,7 +119,7 @@ export default async function handler(req, res) {
     const text = data?.choices?.[0]?.message?.content;
     if (!text) throw new Error('Le moteur IA n’a renvoyé aucune réponse.');
 
-    return res.status(200).json({ text, version: '1.9', mode, hasImage, hasDocument });
+    return res.status(200).json({ text, version: '2.0', mode, hasImage, hasDocument });
   } catch (error) {
     console.error('Nexus AI V2.0 chat error:', error);
     return res.status(500).json({ error: error.message || 'Erreur du moteur IA.' });
