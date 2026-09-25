@@ -129,3 +129,4 @@ body.nexus-live-open { overflow:hidden; }
 .focus-mode{background:#0a0a0a!important}
 .focus-mode .sidebar,.focus-mode .topbar .status,.focus-mode .topbar .version,.focus-mode .composer-area .hint{opacity:.35}
 .focus-mode .chat{max-width:920px;margin-inline:auto}
+\n/* Nexus IA V3.0 — Nexus Core mission UI */\n.mission-card{border:1px solid #333;border-radius:18px;padding:16px;background:linear-gradient(145deg,#171717,#0e0e0e);box-shadow:0 14px 45px rgba(0,0,0,.22)}\n.mission-card>strong{display:block;font-size:15px;margin-bottom:6px}.mission-card>p{margin:0 0 14px;color:#aaa;line-height:1.5;font-size:12px}.mission-steps{display:grid;gap:7px}.mission-steps div{padding:9px 11px;border-radius:10px;background:#1b1b1b;color:#ddd;font-size:12px}\n
