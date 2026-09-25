@@ -65,7 +65,7 @@ export default async function handler(req, res) {
 
   return res.status(200).json({
     ok: true,
-    version: '3.1.0',
+    version: '3.2.0',
     name: 'Nexus IA',
     generatedAt: new Date().toISOString(),
     runtime: process.version,
