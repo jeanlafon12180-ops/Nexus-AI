@@ -28,7 +28,7 @@ Projet d'intelligence artificielle développé progressivement.
 | **V2.0** | 🧠 Nouveau moteur de raisonnement, meilleur contexte, modèles plus performants, génération d'images et création vidéo. |
 | **V2.1** | 🔴 **Nouveau LIVE plein écran**, nouvel orb lumineux réactif, bouton d'enregistrement d'écran et architecture préparée pour un futur moteur Nexus indépendant. |
 | **V2.2** | 📷 **Vision LIVE** : caméra avant/arrière, aperçu en direct, zoom matériel quand disponible et transmission d'une image caméra récente à Nexus pour analyser la scène pendant le LIVE. |
-| **V2.3** | 🧠 **Amélioration générale de l'intelligence** : historique transmis comme vrais messages conversationnels, contexte récent mieux conservé et profondeur de réponse adaptée automatiquement à la complexité de la demande. |
+| **V2.3** | 🚀 **Amélioration générale majeure** : intelligence et contexte renforcés, multimodalité et LIVE mieux préparés, génération contrôlable, interface actualisée, meilleure gestion des réponses et architecture plus robuste pour les prochaines évolutions. |
 
 ## 📌 Version actuelle
 
