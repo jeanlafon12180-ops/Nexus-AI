@@ -37,12 +37,13 @@ Projet d'intelligence artificielle développé progressivement.
 | **V3.0** | 🌌 **Nexus Core** : nouvelle architecture d’orchestration, mode Mission, planification multi-étapes, vérification, contrat de moteur indépendant, console privée de diagnostics et isolation renforcée des historiques par profil navigateur. Petit bonus : mode concentration fonctionnel et console Admin protégée par mot de passe serveur. |
 
 | **V3.1** | 🎯 **Mission Engine** : plans de mission dynamiques, priorités, orchestration structurée, affichage du plan réel dans l’interface et diagnostics GitHub dans la console privée. Petit bonus : le moteur distingue automatiquement une demande simple d’une mission complexe. |
+| **V3.2** | ⚙️ **Mission Execution Engine** : les missions ont maintenant un identifiant, un cycle de vie et des états `pending`, `running`, `completed`, `failed` et `skipped`. Le backend suit le démarrage et la finalisation d’une mission et l’interface affiche l’état de chaque étape. Petit bonus : chaque étape possède un identifiant et des horodatages pour préparer la reprise et le suivi futur. |
 
 ## 📌 Version actuelle
 
-**Nexus IA V3.1**
+**Nexus IA V3.2**
 
-La V3.1 est maintenant intégrée au projet.
+La V3.2 est maintenant intégrée au projet.
 
 ## ✨ Capacités actuelles
 
@@ -117,3 +118,17 @@ Nexus IA évolue progressivement : chaque nouvelle version ajoute une capacité 
 - Mode concentration ajouté pour réduire les distractions pendant une session.
 - 🎁 Bonus : le mode concentration recentre automatiquement la zone de discussion.
 \n\n## V3.0 — Nexus Core\n\nLa V3.0 inaugure une nouvelle architecture : Nexus n’est plus seulement une interface de chat, il dispose d’un cœur d’orchestration préparé pour gérer des missions complexes, vérifier ses résultats et évoluer vers un moteur Nexus indépendant.\n\n### 🔐 Confidentialité des conversations\nLes conversations locales sont maintenant isolées par un identifiant de profil navigateur. La migration V3 ne réutilise plus l’ancienne clé globale qui pouvait mélanger des historiques entre profils. Le serveur ne stocke pas l’historique envoyé au moteur : l’application transmet uniquement le contexte nécessaire à la requête.\n\n### 🛡️ Console privée\nUne console `/admin.html` est disponible pour le propriétaire du projet. Elle utilise `NEXUS_ADMIN_PASSWORD` côté serveur et affiche l’état des moteurs, l’environnement et les diagnostics. Le mot de passe ne doit jamais être placé dans le code source.\n\n> Pour activer la console, ajouter `NEXUS_ADMIN_PASSWORD` dans les variables d’environnement Vercel puis redéployer. Vercel recommande de conserver les secrets dans les variables d’environnement plutôt que dans le dépôt.\n
+
+## V3.2 — Mission Execution Engine
+
+La V3.2 fait évoluer la planification V3.1 vers un cycle de mission suivi côté Nexus Core : création, démarrage, suivi des étapes et finalisation. Les états restent honnêtes : Nexus ne prétend pas avoir effectué une action externe si aucun outil ne l’a réellement exécutée.
+
+### États d’une mission
+
+- `pending` : étape en attente
+- `running` : étape active
+- `completed` : étape terminée
+- `failed` : étape interrompue
+- `skipped` : étape ignorée
+
+Chaque étape possède un identifiant, un ordre et des horodatages. Cette base prépare l’ajout d’outils et d’actions structurées dans les versions suivantes.
