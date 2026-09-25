@@ -97,3 +97,10 @@ Le projet peut être publié sur GitHub Pages pour la partie statique et sur Ver
 ## 🏗️ Principe du projet
 
 Nexus IA évolue progressivement : chaque nouvelle version ajoute une capacité importante sans supprimer les fonctions déjà disponibles.
+
+
+## V2.8 — amélioration générale
+- Interface et cohérence de version mises à jour.
+- Ajout de l’export d’une conversation en fichier texte depuis le menu Outils.
+- Ajout du bouton de création vidéo dans le menu de pièces jointes.
+- Bonus : raccourci d’export disponible aussi dans le menu mobile.
