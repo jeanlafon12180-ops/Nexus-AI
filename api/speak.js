@@ -3,7 +3,7 @@ export const config = { api: { bodyParser: { sizeLimit: '2mb' } } };
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée.' });
   try {
-    const { text, voice = 'nova', model = 'gpt-tts' } = req.body || {};
+    const { text, voice = 'nova', model = 'qwen-tts' } = req.body || {};
     const input = String(text || '').trim().slice(0, 5000);
     if (!input) return res.status(400).json({ error: 'Texte vocal manquant.' });
     if (!process.env.POLLINATIONS_API_KEY) return res.status(500).json({ error: 'Clé vocale non configurée sur le serveur.' });
