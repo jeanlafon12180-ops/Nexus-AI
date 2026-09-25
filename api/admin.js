@@ -66,7 +66,7 @@ export default async function handler(req, res) {
 
   return res.status(200).json({
     ok: true,
-    version: '3.3.0',
+    version: '3.4.0',
     name: 'Nexus IA',
     generatedAt: new Date().toISOString(),
     runtime: process.version,
@@ -86,6 +86,6 @@ export default async function handler(req, res) {
       historyScope: 'browser profile',
       sharedLegacyHistoryKey: false
     },
-    note: 'Le tableau de bord V3.3 affiche des diagnostics serveur en temps réel. Les erreurs détaillées restent dans les Runtime Logs Vercel.'
+    note: 'Le tableau de bord V3.4 affiche des diagnostics serveur en temps réel. Les erreurs détaillées restent dans les Runtime Logs Vercel.'
   });
 }
