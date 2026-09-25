@@ -1,6 +1,6 @@
 (() => {
   /*
-   * Nexus IA V1.9.4 — LIVE vocal
+   * Nexus IA V1.9.5 — LIVE vocal
    * Priorité à MediaRecorder + transcription serveur pour fonctionner
    * aussi sur les navigateurs mobiles où SpeechRecognition est limité.
    * V1.9.4 : fiabilisation iOS/Safari, VAD corrigé, enregistrement sans timeslice,
@@ -25,6 +25,8 @@
   let chunkTimer = null;
   let silenceStartedAt = 0;
   let currentMime = 'audio/webm';
+  let voiceAudio = null;
+  let voiceObjectUrl = null;
 
   const $ = id => document.getElementById(id);
   const chat = () => $('chat');
@@ -177,6 +179,55 @@
     currentMime = preferred.find(type => window.MediaRecorder?.isTypeSupported?.(type)) || '';
     if (!window.MediaRecorder) throw new Error('L’enregistrement audio n’est pas disponible dans ce navigateur.');
     recorder = null;
+  }
+
+  function ensureVoiceAudio() {
+    if (!voiceAudio) {
+      voiceAudio = document.createElement('audio');
+      voiceAudio.id = 'nexusLiveVoice';
+      voiceAudio.autoplay = false;
+      voiceAudio.playsInline = true;
+      voiceAudio.setAttribute('playsinline','');
+      voiceAudio.preload = 'auto';
+      voiceAudio.style.display = 'none';
+      document.body.appendChild(voiceAudio);
+    }
+    return voiceAudio;
+  }
+
+  function cleanupVoiceAudio() {
+    if (voiceAudio) {
+      try { voiceAudio.pause(); } catch (_) {}
+      voiceAudio.removeAttribute('src');
+      voiceAudio.load();
+    }
+    if (voiceObjectUrl) URL.revokeObjectURL(voiceObjectUrl);
+    voiceObjectUrl = null;
+  }
+
+  async function speakWithServerVoice(text) {
+    const audio = ensureVoiceAudio();
+    const response = await fetch('/api/speak', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ text, voice:'nova', model:'gpt-tts' })
+    });
+    if (!response.ok) {
+      const data = await response.json().catch(()=>({}));
+      throw new Error(data?.error || 'La voix de Nexus est indisponible.');
+    }
+    const blob = await response.blob();
+    if (!blob.size) throw new Error('Audio vocal vide.');
+    cleanupVoiceAudio();
+    voiceObjectUrl = URL.createObjectURL(blob);
+    audio.src = voiceObjectUrl;
+    audio.currentTime = 0;
+    await audio.play();
+    await new Promise(resolve => {
+      const done = () => { audio.removeEventListener('ended', done); audio.removeEventListener('error', done); resolve(); };
+      audio.addEventListener('ended', done, {once:true});
+      audio.addEventListener('error', done, {once:true});
+    });
   }
 
   function cleanupMic() {
@@ -350,35 +401,36 @@
     }
   }
 
-  function speak(text) {
-    if (!('speechSynthesis' in window)) {
-      setStatus('Je t’écoute…','listen');
-      return Promise.resolve();
+  async function speak(text) {
+    speaking = true;
+    setStatus('Nexus parle…','speak');
+    try {
+      // Server TTS is the primary voice path: unlike speechSynthesis, it produces
+      // a real audio file and works much more consistently on iPhone/Safari.
+      await speakWithServerVoice(text);
+    } catch (serverError) {
+      // Keep a browser fallback for environments where the server voice is unavailable.
+      if ('speechSynthesis' in window) {
+        await new Promise(resolve => {
+          try {
+            window.speechSynthesis.cancel();
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'fr-FR';
+            utter.rate = 1;
+            utter.pitch = 1;
+            utter.volume = 1;
+            utter.onend = resolve;
+            utter.onerror = resolve;
+            window.speechSynthesis.speak(utter);
+          } catch (_) { resolve(); }
+        });
+      } else {
+        addMessage('⚠️ Je peux répondre, mais la sortie vocale est indisponible.', 'nexus');
+      }
+    } finally {
+      speaking = false;
+      if (live) startRecorder();
     }
-    return new Promise(resolve => {
-      speaking = true;
-      setStatus('Nexus parle…','speak');
-      window.speechSynthesis.cancel();
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = 'fr-FR';
-      utter.rate = 1;
-      utter.pitch = 1;
-      utter.volume = 1;
-      const voices = window.speechSynthesis.getVoices?.() || [];
-      const french = voices.find(v => /^fr(-|_)/i.test(v.lang));
-      if (french) utter.voice = french;
-      utter.onend = () => {
-        speaking = false;
-        if (live) startRecorder();
-        resolve();
-      };
-      utter.onerror = () => {
-        speaking = false;
-        if (live) startRecorder();
-        resolve();
-      };
-      window.speechSynthesis.speak(utter);
-    });
   }
 
   function stopRecognition() {
