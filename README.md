@@ -33,10 +33,11 @@ Projet d'intelligence artificielle développé progressivement.
 | **V2.5** | 🧠 **Intelligence renforcée** : vérification interne en deux passes, contrôle plus strict des faits, calculs, code et sciences, réponses complexes plus profondes et température abaissée pour privilégier la précision. Petit bonus : meilleure détection des incertitudes pour éviter les inventions. |
 | **V2.6** | 🚀 **Amélioration générale** : moteur plus robuste, profondeur adaptative mieux utilisée, délai réseau contrôlé, rendu Markdown amélioré, interface/version actualisées et meilleure continuité globale. Petit bonus : les titres Markdown sont maintenant correctement affichés dans les réponses. |
 | **V2.7** | 🎵 **Création musicale IA** : Nexus peut maintenant composer de la musique à partir d’une description, générer un fichier audio et l’écouter directement dans la conversation. Petit bonus : ajout d’un bouton dédié « Création musicale » dans le menu 📎. |
+| **V3.0** | 🌌 **Nexus Core** : nouvelle architecture d’orchestration, mode Mission, planification multi-étapes, vérification, contrat de moteur indépendant, console privée de diagnostics et isolation renforcée des historiques par profil navigateur. Petit bonus : mode concentration fonctionnel et console Admin protégée par mot de passe serveur. |
 
 ## 📌 Version actuelle
 
-**Nexus IA V2.7**
+**Nexus IA V3.0**
 
 La V2.7 est maintenant intégrée au projet.
 
@@ -71,7 +72,7 @@ La V2.7 est maintenant intégrée au projet.
 - 🔍 Zoom de caméra lorsque le navigateur/appareil l'autorise
 - 👁️ Nexus peut analyser une image récente de la caméra lors d'une question vocale
 - 🧠 Historique conversationnel transmis avec les rôles utilisateur/assistant pour une meilleure continuité
-- ⚙️ Profondeur de réponse adaptative selon la complexité de la demande
+- ⚙️ Profondeur de réponse adaptative selon la complexité de la demande\n- 🌌 Nexus Core et planification de missions multi-étapes\n- 🔐 Historique isolé par profil navigateur, sans clé historique globale héritée\n- 🛡️ Console Admin privée avec diagnostics serveur protégés par mot de passe
 
 ## 🔴 V2.1 — LIVE
 
@@ -112,3 +113,4 @@ Nexus IA évolue progressivement : chaque nouvelle version ajoute une capacité 
 - Interface de génération plus réactive visuellement.
 - Mode concentration ajouté pour réduire les distractions pendant une session.
 - 🎁 Bonus : le mode concentration recentre automatiquement la zone de discussion.
+\n\n## V3.0 — Nexus Core\n\nLa V3.0 inaugure une nouvelle architecture : Nexus n’est plus seulement une interface de chat, il dispose d’un cœur d’orchestration préparé pour gérer des missions complexes, vérifier ses résultats et évoluer vers un moteur Nexus indépendant.\n\n### 🔐 Confidentialité des conversations\nLes conversations locales sont maintenant isolées par un identifiant de profil navigateur. La migration V3 ne réutilise plus l’ancienne clé globale qui pouvait mélanger des historiques entre profils. Le serveur ne stocke pas l’historique envoyé au moteur : l’application transmet uniquement le contexte nécessaire à la requête.\n\n### 🛡️ Console privée\nUne console `/admin.html` est disponible pour le propriétaire du projet. Elle utilise `NEXUS_ADMIN_PASSWORD` côté serveur et affiche l’état des moteurs, l’environnement et les diagnostics. Le mot de passe ne doit jamais être placé dans le code source.\n\n> Pour activer la console, ajouter `NEXUS_ADMIN_PASSWORD` dans les variables d’environnement Vercel puis redéployer. Vercel recommande de conserver les secrets dans les variables d’environnement plutôt que dans le dépôt.\n
