@@ -35,11 +35,13 @@ Projet d'intelligence artificielle développé progressivement.
 | **V2.7** | 🎵 **Création musicale IA** : Nexus peut maintenant composer de la musique à partir d’une description, générer un fichier audio et l’écouter directement dans la conversation. Petit bonus : ajout d’un bouton dédié « Création musicale » dans le menu 📎. |
 | **V3.0** | 🌌 **Nexus Core** : nouvelle architecture d’orchestration, mode Mission, planification multi-étapes, vérification, contrat de moteur indépendant, console privée de diagnostics et isolation renforcée des historiques par profil navigateur. Petit bonus : mode concentration fonctionnel et console Admin protégée par mot de passe serveur. |
 
+| **V3.1** | 🎯 **Mission Engine** : plans de mission dynamiques, priorités, orchestration structurée, affichage du plan réel dans l’interface et diagnostics GitHub dans la console privée. Petit bonus : le moteur distingue automatiquement une demande simple d’une mission complexe. |
+
 ## 📌 Version actuelle
 
-**Nexus IA V3.0**
+**Nexus IA V3.1**
 
-La V2.7 est maintenant intégrée au projet.
+La V3.1 est maintenant intégrée au projet.
 
 ## ✨ Capacités actuelles
 
