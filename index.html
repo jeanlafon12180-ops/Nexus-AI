@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="description" content="Nexus IA V3.1 — Nexus Core : orchestration de missions, multimodalité, vérification, mémoire privée par profil et outils créatifs.">
-<title>Nexus IA V3.1</title>
+<meta name="description" content="Nexus IA V3.2 — Nexus Core : orchestration de missions, multimodalité, vérification, mémoire privée par profil et outils créatifs.">
+<title>Nexus IA V3.2</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="style.css?v=3.1">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<link rel="stylesheet" href="style.css?v=3.2">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.21.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.9.0/mammoth.browser.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.20.1/dist/jszip.min.js"></script>
 </head>
 <body>
 <div class="app">
@@ -20,7 +20,7 @@
 <button class="side-button" id="memoryButton">🧠 Mémoire</button>
 <button class="side-button" id="helpButton">❓ Capacités</button><button class="side-button" id="exportChatButton">📥 Exporter la discussion</button>
 <button class="side-button" id="clearMemoryButton">🗑️ Effacer la mémoire</button>
-<div class="side-spacer"></div><div class="side-version">Nexus IA <strong>V3.1</strong><br><span>Nexus Core · missions · mémoire privée · Mission Engine · diagnostics</span></div>
+<div class="side-spacer"></div><div class="side-version">Nexus IA <strong>V3.2</strong><br><span>Nexus Core · missions · mémoire privée · Mission Engine · diagnostics</span></div>
 </aside>
 <div class="mobile-drawer-backdrop" id="mobileDrawerBackdrop" hidden></div>
 <aside class="mobile-drawer" id="mobileDrawer" aria-label="Menu mobile" aria-hidden="true">
@@ -30,10 +30,10 @@
 <button class="side-button mobile-tool" data-action="memory">🧠 Mémoire</button>
 <button class="side-button mobile-tool" data-action="help">❓ Capacités</button><button class="side-button mobile-tool" id="mobileExportChatButton">📥 Exporter la discussion</button>
 <button class="side-button mobile-tool" data-action="clear-memory">🗑️ Effacer la mémoire</button>
-<div class="side-spacer"></div><div class="side-version">Nexus IA <strong>V3.1</strong><br><span>Menu optimisé pour téléphone · V3</span></div>
+<div class="side-spacer"></div><div class="side-version">Nexus IA <strong>V3.2</strong><br><span>Menu optimisé pour téléphone · V3</span></div>
 </aside>
 <main class="main">
-<header class="topbar"><button class="mobile-menu-button" id="mobileMenuButton" aria-label="Ouvrir le menu" title="Menu">☰</button><div class="mobile-brand"><span class="mobile-logo">N</span><strong>Nexus IA</strong></div><div class="status"><span class="dot"></span> En ligne</div><div class="version">V3.1</div></header>
+<header class="topbar"><button class="mobile-menu-button" id="mobileMenuButton" aria-label="Ouvrir le menu" title="Menu">☰</button><div class="mobile-brand"><span class="mobile-logo">N</span><strong>Nexus IA</strong></div><div class="status"><span class="dot"></span> En ligne</div><div class="version">V3.2</div></header>
 <section id="chat" class="chat" aria-live="polite"><div class="empty-state"><div class="empty-logo">N</div><h2>Que puis-je faire pour toi ?</h2><p>Je peux raisonner, analyser des images et des documents, générer du code, des images, des vidéos et de la musique, utiliser la caméra en LIVE et conserver le contexte de tes discussions.</p><div class="quick-grid"><button class="quick-card suggestion">Explique-moi le théorème de Pythagore</button><button class="quick-card suggestion">Écris-moi un site HTML simple</button><button class="quick-card suggestion">Crée une image d’un chat réaliste</button><button class="quick-card suggestion">Crée une vidéo d’un coucher de soleil sur la mer</button><button class="quick-card suggestion">Que sais-tu faire ?</button></div></div></section>
 <div class="composer-area">
 <div id="filePreview" class="file-preview" hidden><div class="file-icon">📎</div><div class="file-info"><strong id="fileName"></strong><span id="fileMeta"></span></div><button id="removeFileButton" type="button" aria-label="Retirer le fichier">×</button></div>
@@ -44,8 +44,8 @@
 <input id="imageFileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm,video/ogg,.mov,.m4v,.pdf,.docx,.odt,.txt,.md,.csv,.json,audio/mpeg,audio/mp3,audio/wav,audio/x-wav,audio/ogg,audio/webm,audio/mp4,audio/x-m4a,.mp3,.wav,.m4a,.aac,.flac" multiple hidden>
 <textarea id="messageInput" placeholder="Message à Nexus IA..." rows="1"></textarea><button id="sendButton" aria-label="Envoyer" title="Envoyer">↑</button>
 </div>
-<div class="hint">📎 Menu : code, image, vidéo, musique, audio et fichiers · 🎯 Mission Engine Nexus Core · 🎙️ enregistrement · 🔴 LIVE vocal · Nexus IA V3.1</div>
+<div class="hint">📎 Menu : code, image, vidéo, musique, audio et fichiers · 🎯 Mission Engine Nexus Core · 🎙️ enregistrement · 🔴 LIVE vocal · Nexus IA V3.2</div>
 </div></main></div>
 <noscript><div class="noscript-warning">⚠️ JavaScript est désactivé. Nexus IA a besoin de JavaScript.</div></noscript>
-<script src="js/thinking-star.js?v=3.1"></script><script src="js/multi-upload.js?v=3.1"></script><script src="js/audio-recording.js?v=3.1"></script><script src="js/audio-upload.js?v=3.1"></script><script src="js/live-mode.js?v=3.1"></script><script src="js/mobile-menu.js?v=3.1"></script><script type="module" src="js/app.js?v=3.1"></script>
+<script src="js/thinking-star.js?v=3.2"></script><script src="js/multi-upload.js?v=3.2"></script><script src="js/audio-recording.js?v=3.2"></script><script src="js/audio-upload.js?v=3.2"></script><script src="js/live-mode.js?v=3.2"></script><script src="js/mobile-menu.js?v=3.2"></script><script type="module" src="js/app.js?v=3.2"></script>
 </body></html>
