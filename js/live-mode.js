@@ -1,6 +1,6 @@
 (() => {
   /*
-   * Nexus IA V1.9.2 — LIVE vocal
+   * Nexus IA V1.9.3 — LIVE vocal
    * Priorité à MediaRecorder + transcription serveur pour fonctionner
    * aussi sur les navigateurs mobiles où SpeechRecognition est limité.
    */
@@ -71,47 +71,77 @@
   }
 
   function drawTrail() {
-    if (!analyser || !live) return;
+    if (!live) return;
     const canvas = $('liveTrail'); if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const data = new Uint8Array(analyser.fftSize);
-    analyser.getByteTimeDomainData(data);
-    let sum = 0;
-    for (const value of data) {
-      const normalized = (value - 128) / 128;
-      sum += normalized * normalized;
-    }
-    const rms = Math.sqrt(sum / data.length);
-    const energy = Math.min(1, rms * 5.5);
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    const t = performance.now()/1000;
-    const mid = canvas.height/2;
-    const step = canvas.width/80;
-    ctx.lineWidth = 3;
-    ctx.lineCap = 'round';
-    const gradient = ctx.createLinearGradient(0,0,canvas.width,0);
-    gradient.addColorStop(0,'#ff2d55');
-    gradient.addColorStop(.25,'#ffcc00');
-    gradient.addColorStop(.5,'#34c759');
-    gradient.addColorStop(.75,'#00c7ff');
-    gradient.addColorStop(1,'#5856d6');
-    ctx.strokeStyle = gradient;
-    ctx.beginPath();
-    for (let i=0;i<80;i++) {
-      const y = mid + Math.sin(i*.33+t*5)*2 + Math.sin(i*.13+t*2.2)*(4 + energy*22);
-      if (i===0) ctx.moveTo(i*step,y); else ctx.lineTo(i*step,y);
-    }
-    ctx.stroke();
+    const w = canvas.width = Math.max(260, Math.floor(canvas.clientWidth * (window.devicePixelRatio || 1)));
+    const h = canvas.height = Math.max(46, Math.floor(canvas.clientHeight * (window.devicePixelRatio || 1)));
+    const data = analyser ? new Uint8Array(analyser.fftSize) : null;
+    if (data && analyser) analyser.getByteTimeDomainData(data);
 
-    // Voice activity detection: RMS is intentionally conservative to avoid
-    // triggering on normal room noise.
+    let sum = 0;
+    if (data) {
+      for (const value of data) {
+        const normalized = (value - 128) / 128;
+        sum += normalized * normalized;
+      }
+    }
+    const rms = data ? Math.sqrt(sum / data.length) : 0;
+    const energy = Math.min(1, rms * 7.5);
+    const t = performance.now() / 1000;
+
+    ctx.clearRect(0, 0, w, h);
+    ctx.globalCompositeOperation = 'lighter';
+
+    // Gemini-inspired multicolor dust: many tiny luminous particles rise,
+    // drift and gather around the center instead of drawing a simple wave.
+    const colors = [
+      [255, 55, 95], [255, 196, 0], [52, 199, 89],
+      [0, 199, 255], [88, 86, 214], [255, 90, 200]
+    ];
+    const count = Math.floor(70 + energy * 120);
+    const cx = w * 0.5;
+    const cy = h * 0.57;
+
+    for (let i = 0; i < count; i++) {
+      const seed = i * 17.731;
+      const phase = seed + t * (0.45 + (i % 7) * 0.035);
+      const spread = (0.18 + ((i * 37) % 100) / 100 * 0.82) * w * (0.18 + energy * 0.35);
+      const x = cx + Math.sin(phase * 0.83) * spread + Math.sin(phase * 1.7) * w * 0.035;
+      const lift = ((t * (9 + (i % 5) * 2) + i * 3.7) % (h * 1.45));
+      const y = cy + h * 0.62 - lift + Math.sin(phase * 1.3) * (4 + energy * 12);
+      if (y < -8 || y > h + 8) continue;
+
+      const size = (0.7 + ((i * 13) % 10) / 10 * 1.7) * (0.8 + energy * 1.7);
+      const color = colors[i % colors.length];
+      const alpha = Math.min(0.9, 0.12 + energy * 0.62 + 0.18 * Math.sin(phase));
+
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(${color[0]},${color[1]},${color[2]},${Math.max(0.04, alpha)})`;
+      ctx.shadowBlur = 7 + energy * 12;
+      ctx.shadowColor = ctx.fillStyle;
+      ctx.arc(x, y, size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Soft luminous core.
+    const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(24, w * 0.24));
+    glow.addColorStop(0, `rgba(255,255,255,${0.07 + energy * 0.22})`);
+    glow.addColorStop(0.3, `rgba(0,199,255,${0.035 + energy * 0.09})`);
+    glow.addColorStop(0.65, 'rgba(255,70,180,0.018)');
+    glow.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, w, h);
+    ctx.shadowBlur = 0;
+    ctx.globalCompositeOperation = 'source-over';
+
     if (listening && recorder && recorder.state === 'recording') {
       const now = performance.now();
-      const isVoice = rms > 0.028;
+      const isVoice = rms > 0.018;
       if (isVoice) {
         if (!speechStartedAt) speechStartedAt = now;
         lastVoiceAt = now;
-      } else if (speechStartedAt && lastVoiceAt && now-lastVoiceAt > 900 && now-speechStartedAt > 450) {
+      } else if (speechStartedAt && lastVoiceAt && now-lastVoiceAt > 700 && now-speechStartedAt > 350) {
         finishRecording();
       }
     }
@@ -246,7 +276,7 @@
       const data = await response.json().catch(()=>({}));
       if (!response.ok) throw new Error(data?.error || `Transcription impossible (${response.status}).`);
       const text = String(data?.text || '').trim();
-      if (text && live) await ask(text);
+      if (text && live) await ask(text); else if (live) setStatus('Je n’ai pas entendu de parole…','error');
     } catch (error) {
       if (live) {
         addMessage(`⚠️ ${error.message || 'Je n’ai pas réussi à comprendre le son.'}`,'nexus');
@@ -301,7 +331,7 @@
       addMessage(answer,'nexus');
       await speak(answer);
     } catch (error) {
-      addMessage(`⚠️ ${error.message || 'Le mode LIVE a rencontré une erreur.'`,'nexus');
+      addMessage(`⚠️ ${error.message || 'Le mode LIVE a rencontré une erreur.'}`,'nexus');
       await speak('Désolé, je rencontre un problème pour répondre.');
     } finally {
       if (live && !speaking) startRecorder();
