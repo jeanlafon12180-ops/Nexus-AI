@@ -46,6 +46,7 @@ export default async function handler(req, res) {
     const hasImage = images.length > 0;
     const hasDocument = documentText.length > 0;
     const mode = detectMode(message);
+    const isDeepTask = complexitySignalsPlaceholder;
 
     const historyItems = rawHistory
       .filter(item => item && (item.type === 'user' || item.type === 'nexus') && typeof item.text === 'string')
@@ -69,14 +70,6 @@ export default async function handler(req, res) {
       .map(item => (item.role === 'user' ? 'Utilisateur: ' : 'Nexus AI: ') + item.content)
       .join('\n\n');
 
-    const complexitySignals = [
-      message.length > 900,
-      /\b(explique|compare|analyse|pourquoi|comment|détaille|raisonne|conçois|architecture|optimise|diagnostique|debug)\b/i.test(message),
-      mode === 'code' || mode === 'maths',
-      hasImage || hasDocument,
-      historyMessages.length >= 8
-    ].filter(Boolean).length;
-
     const adaptiveTemperature = mode === 'code' || mode === 'maths'
       ? 0.10
       : complexitySignals >= 3
@@ -97,7 +90,7 @@ export default async function handler(req, res) {
     }[mode];
 
     const systemPrompt = [
-      'Tu es Nexus AI V2.3, un assistant francophone généraliste de très haut niveau. Tu dois raisonner avec rigueur, conserver le contexte, vérifier mentalement tes conclusions et adapter ton niveau d’explication.',
+      'Tu es Nexus AI V2.4, un assistant francophone généraliste de très haut niveau. Tu dois raisonner avec rigueur, conserver le contexte, vérifier mentalement tes conclusions et adapter ton niveau d’explication.',
       'Ta priorité est d’être FIABLE, COHÉRENT, UTILE et HONNÊTE sur tes capacités.',
       buildNexusIdentity(),
       buildReasoningPolicy(),
@@ -115,7 +108,10 @@ export default async function handler(req, res) {
       '- Utilise Markdown de façon lisible : titres courts, listes, tableaux ou code quand cela aide.',
       '- Pour une demande complexe, commence par une réponse utile puis détaille progressivement.',
       '- Pour une erreur technique, donne d’abord le diagnostic le plus probable, puis les étapes concrètes.',
-      '- N’affirme jamais avoir effectué une action que tu n’as pas réellement effectuée.',
+      '- N’affirme jamais avoir effectué une action que tu n’as pas réellement effectuée.
+- Si la demande est simple, réponds efficacement ; si elle est complexe, prends davantage de temps conceptuel et vérifie davantage d’éléments.
+- Pour les réponses longues, évite le remplissage : chaque section doit apporter une information utile.
+- Si l’utilisateur demande une procédure, donne un ordre d’exécution concret et signale les prérequis importants.',
       '',
       'PROTOCOLE DE VÉRIFICATION INTERNE :',
       '- Avant de répondre, identifie mentalement l’objectif exact de l’utilisateur, les contraintes importantes et les informations déjà connues.',
@@ -130,7 +126,7 @@ export default async function handler(req, res) {
       history ? 'CONTEXTE DE LA CONVERSATION :\n' + history + '\n\nContinue naturellement cette conversation. Ne demande pas à l’utilisateur de répéter une information déjà présente dans ce contexte.' : '',
       hasImage ? 'IMAGES JOINTES :\nAnalyse réellement les images disponibles avant de répondre.\n- Utilise toutes les images pertinentes.\n- Compare-les si nécessaire.\n- Décris uniquement ce qui est visible ou raisonnablement déductible.\n- Si un détail est illisible ou incertain, précise-le.\n- Ne prétends jamais voir quelque chose qui n’est pas visible.' : '',
       hasDocument ? 'DOCUMENT JOINT :\nLe document « ' + (documentName || 'document') + ' » est fourni sous forme de texte extrait.\n- Base-toi d’abord sur ce contenu.\n- Pour un résumé, hiérarchise les idées importantes.\n- Pour une question précise, reformule uniquement les informations pertinentes.\n- Si la réponse n’est pas dans le document, dis-le clairement.' : '',
-      'Tu es maintenant Nexus AI V2.3. Avant chaque réponse, comprends précisément l’objectif, exploite tout le contexte pertinent, distingue faits et hypothèses, vérifie les calculs et le code, et donne une réponse directement exploitable. Ne prétends jamais avoir utilisé un outil ou vérifié une information externe si ce n’est pas réellement le cas.'
+      'Tu es maintenant Nexus AI V2.4. Avant chaque réponse, comprends précisément l’objectif, exploite tout le contexte pertinent, distingue faits et hypothèses, vérifie les calculs et le code, et donne une réponse directement exploitable. Ne prétends jamais avoir utilisé un outil ou vérifié une information externe si ce n’est pas réellement le cas.'
     ].filter(Boolean).join('\n\n');
 
     const userContent = hasImage
@@ -160,9 +156,9 @@ export default async function handler(req, res) {
     const text = data?.choices?.[0]?.message?.content;
     if (!text) throw new Error('Le moteur IA n’a renvoyé aucune réponse.');
 
-    return res.status(200).json({ text, version: '2.3', core: buildFutureEngineContract(), mode, hasImage, hasDocument });
+    return res.status(200).json({ text, version: '2.4', core: buildFutureEngineContract(), mode, hasImage, hasDocument });
   } catch (error) {
-    console.error('Nexus AI V2.3 chat error:', error);
+    console.error('Nexus AI V2.4 chat error:', error);
     return res.status(500).json({ error: error.message || 'Erreur du moteur IA.' });
   }
 }
