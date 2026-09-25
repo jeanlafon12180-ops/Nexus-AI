@@ -24,12 +24,15 @@ Projet d'intelligence artificielle développé progressivement.
 | **V1.6** | 🎥 Prise en charge des vidéos, avec analyse par extraction d'images. Jusqu'à 5 vidéos ou 20 photos. Ajout de l'étoile multicolore animée pendant la réflexion. |
 | **V1.7** | 🎙️ Prise en charge de l'audio : enregistrement depuis le micro, fichiers audio et transcription. |
 | **V1.8** | 🔴 **LIVE** : conversation vocale en direct, écoute continue, traitement automatique des phrases, réponse vocale et traînée multicolore réactive au son du micro. |
+| **V1.9–V1.9.7** | 📱 Améliorations mobiles, LIVE, audio serveur et compatibilité iPhone/Safari. |
+| **V2.0** | 🧠 Nouveau moteur de raisonnement, meilleur contexte, modèles plus performants, génération d'images et création vidéo. |
+| **V2.1** | 🔴 **Nouveau LIVE plein écran**, nouvel orb lumineux réactif, bouton d'enregistrement d'écran et architecture préparée pour un futur moteur Nexus indépendant. |
 
 ## 📌 Version actuelle
 
-**Nexus IA V1.8**
+**Nexus IA V2.1**
 
-La V1.8 est maintenant intégrée au projet.
+La V2.1 est maintenant intégrée au projet.
 
 ## ✨ Capacités actuelles
 
@@ -52,10 +55,15 @@ La V1.8 est maintenant intégrée au projet.
 - 🌈 Traînée multicolore animée réactive au volume du micro
 - ⏹️ Arrêt immédiat du mode LIVE
 - 📱 Interface LIVE adaptée au mobile et au bureau
+- 🌐 LIVE plein écran avec nouvelle interface
+- ✨ Orb lumineux réactif au son
+- 📹 Enregistrement d'écran depuis le LIVE quand le navigateur le permet
+- 🧠 Nexus Core indépendant du moteur IA externe
+- ⌨️ Touche Échap pour quitter rapidement le LIVE sur ordinateur
 
-## 🔴 V1.8 — LIVE
+## 🔴 V2.1 — LIVE
 
-La V1.8 transforme Nexus IA en assistant vocal en direct.
+La V2.1 transforme le LIVE de Nexus IA en une interface vocale plein écran.
 
 - 🔴 Activation/désactivation du LIVE
 - 🎙️ Reconnaissance vocale française continue
@@ -68,7 +76,7 @@ La V1.8 transforme Nexus IA en assistant vocal en direct.
 - 💬 Les messages restent visibles dans la conversation
 - 📱 Contrôles responsive pour ordinateur et mobile
 
-> Cet historique doit être complété à chaque sortie de nouvelle version. Les nouvelles versions seront ajoutées ici au fur et à mesure de leur développement.
+> Cet historique doit être complété à chaque sortie de nouvelle version. Chaque mise à jour doit aussi apporter au moins une petite amélioration supplémentaire, même si elle n'était pas demandée initialement.
 
 ## 🌐 Publication
 
