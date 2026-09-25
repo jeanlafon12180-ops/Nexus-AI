@@ -29,7 +29,7 @@ export function buildContextSupport({ message, mode, history = [], memory = '', 
 
 export function buildVerificationPrompt({ userMessage, draft, mode }) {
   return [
-    'Tu es le vérificateur interne de Nexus Core V3.4.',
+    'Tu es le vérificateur interne de Nexus Core V3.7.',
     'Ne révèle jamais de raisonnement privé. Analyse uniquement la qualité du brouillon ci-dessous.',
     'Signale seulement les erreurs factuelles, contradictions avec la demande, oublis importants ou corrections nécessaires.',
     'Si le brouillon est correct, réponds exactement : OK.',
@@ -42,7 +42,7 @@ export function buildVerificationPrompt({ userMessage, draft, mode }) {
 
 export function buildCorrectionPrompt({ userMessage, draft, review }) {
   return [
-    'Tu es Nexus AI V3.4 en phase de correction finale.',
+    'Tu es Nexus AI V3.7 en phase de correction finale.',
     'Corrige uniquement les problèmes signalés par le vérificateur. Conserve les éléments corrects du brouillon.',
     'Réponds directement à l’utilisateur. Ne parle pas du processus interne de vérification.',
     'Demande :\n' + clean(userMessage, 8000),
