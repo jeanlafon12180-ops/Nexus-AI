@@ -56,3 +56,21 @@ export function isUsefulReview(review) {
   if (!value || /^OK[.!]?$/i.test(value)) return false;
   return !/^aucune correction|pas de correction|rien à corriger/i.test(value);
 }
+
+
+export function selectSpecializedAgent(message, mode = 'general') {
+  const text = String(message || '').toLowerCase();
+  if (mode === 'code' || /\b(cod(e|er)|javascript|typescript|python|html|css|react|next\.js|api|bug|debug|github|roblox|lua)\b/i.test(text)) {
+    return { id: 'code', name: 'Nexus Code Agent', instruction: 'Spécialiste développement : produire du code exploitable, vérifier architecture, syntaxe, imports et cohérence.' };
+  }
+  if (mode === 'maths' || /\b(math|maths|calcul|équation|pythagore|cosinus|sinus|géométrie|physique|chimie)\b/i.test(text)) {
+    return { id: 'science', name: 'Nexus Science Agent', instruction: 'Spécialiste sciences : raisonner étape par étape, vérifier calculs, unités et résultats.' };
+  }
+  if (/\b(cours|devoir|exercice|histoire|géographie|français|anglais|révision|révise|école|collège)\b/i.test(text)) {
+    return { id: 'study', name: 'Nexus Study Agent', instruction: 'Spécialiste études : expliquer clairement, adapter le niveau et distinguer faits, méthode et exemple.' };
+  }
+  if (/\b(analyse|compare|comparaison|document|résume|résumé|rapport)\b/i.test(text)) {
+    return { id: 'analysis', name: 'Nexus Analysis Agent', instruction: 'Spécialiste analyse : extraire les informations utiles, structurer les éléments et signaler les incertitudes.' };
+  }
+  return { id: 'general', name: 'Nexus General Agent', instruction: 'Assistant généraliste : répondre directement et choisir la méthode la plus adaptée à la demande.' };
+}
