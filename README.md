@@ -31,12 +31,13 @@ Projet d'intelligence artificielle développé progressivement.
 | **V2.3** | 🚀 **Amélioration générale majeure** : intelligence et contexte renforcés, multimodalité et LIVE mieux préparés, génération contrôlable, interface actualisée, meilleure gestion des réponses et architecture plus robuste pour les prochaines évolutions. |
 | **V2.4** | 🛠️ **Amélioration générale** : raisonnement adaptatif, contrôle des générations, continuité conversationnelle renforcée et fiabilité globale améliorée. |
 | **V2.5** | 🧠 **Intelligence renforcée** : vérification interne en deux passes, contrôle plus strict des faits, calculs, code et sciences, réponses complexes plus profondes et température abaissée pour privilégier la précision. Petit bonus : meilleure détection des incertitudes pour éviter les inventions. |
+| **V2.6** | 🚀 **Amélioration générale** : moteur plus robuste, profondeur adaptative mieux utilisée, délai réseau contrôlé, rendu Markdown amélioré, interface/version actualisées et meilleure continuité globale. Petit bonus : les titres Markdown sont maintenant correctement affichés dans les réponses. |
 
 ## 📌 Version actuelle
 
-**Nexus IA V2.5**
+**Nexus IA V2.6**
 
-La V2.5 est maintenant intégrée au projet.
+La V2.6 est maintenant intégrée au projet.
 
 ## ✨ Capacités actuelles
 
