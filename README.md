@@ -27,12 +27,13 @@ Projet d'intelligence artificielle développé progressivement.
 | **V1.9–V1.9.7** | 📱 Améliorations mobiles, LIVE, audio serveur et compatibilité iPhone/Safari. |
 | **V2.0** | 🧠 Nouveau moteur de raisonnement, meilleur contexte, modèles plus performants, génération d'images et création vidéo. |
 | **V2.1** | 🔴 **Nouveau LIVE plein écran**, nouvel orb lumineux réactif, bouton d'enregistrement d'écran et architecture préparée pour un futur moteur Nexus indépendant. |
+| **V2.2** | 📷 **Vision LIVE** : caméra avant/arrière, aperçu en direct, zoom matériel quand disponible et transmission d'une image caméra récente à Nexus pour analyser la scène pendant le LIVE. |
 
 ## 📌 Version actuelle
 
-**Nexus IA V2.1**
+**Nexus IA V2.2**
 
-La V2.1 est maintenant intégrée au projet.
+La V2.2 est maintenant intégrée au projet.
 
 ## ✨ Capacités actuelles
 
@@ -60,6 +61,9 @@ La V2.1 est maintenant intégrée au projet.
 - 📹 Enregistrement d'écran depuis le LIVE quand le navigateur le permet
 - 🧠 Nexus Core indépendant du moteur IA externe
 - ⌨️ Touche Échap pour quitter rapidement le LIVE sur ordinateur
+- 📷 Caméra avant et arrière dans le LIVE
+- 🔍 Zoom de caméra lorsque le navigateur/appareil l'autorise
+- 👁️ Nexus peut analyser une image récente de la caméra lors d'une question vocale
 
 ## 🔴 V2.1 — LIVE
 
