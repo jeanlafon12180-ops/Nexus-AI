@@ -69,6 +69,14 @@ export default async function handler(req, res) {
     const history = historyMessages
       .map(item => (item.role === 'user' ? 'Utilisateur: ' : 'Nexus AI: ') + item.content)
       .join('\n\n');
+    const complexitySignals = [
+      message.length > 900,
+      /\b(explique|compare|analyse|pourquoi|comment|détaille|raisonne|conçois|architecture|optimise|diagnostique|debug|planifie|vérifie)\b/i.test(message),
+      mode === 'code' || mode === 'maths',
+      hasImage || hasDocument,
+      historyMessages.length >= 8
+    ].filter(Boolean).length;
+    const isDeepTask = complexitySignals >= 2;
 
     const adaptiveTemperature = mode === 'code' || mode === 'maths'
       ? 0.10
