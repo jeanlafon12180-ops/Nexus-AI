@@ -104,3 +104,11 @@ Nexus IA évolue progressivement : chaque nouvelle version ajoute une capacité 
 - Ajout de l’export d’une conversation en fichier texte depuis le menu Outils.
 - Ajout du bouton de création vidéo dans le menu de pièces jointes.
 - Bonus : raccourci d’export disponible aussi dans le menu mobile.
+
+
+## V2.9 — amélioration générale
+- Version globale et cache des scripts mis à jour.
+- Export des conversations enrichi avec l’horodatage de chaque message.
+- Interface de génération plus réactive visuellement.
+- Mode concentration ajouté pour réduire les distractions pendant une session.
+- 🎁 Bonus : le mode concentration recentre automatiquement la zone de discussion.
