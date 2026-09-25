@@ -46,8 +46,6 @@ export default async function handler(req, res) {
     const hasImage = images.length > 0;
     const hasDocument = documentText.length > 0;
     const mode = detectMode(message);
-    const isDeepTask = complexitySignalsPlaceholder;
-
     const historyItems = rawHistory
       .filter(item => item && (item.type === 'user' || item.type === 'nexus') && typeof item.text === 'string')
       .slice(-MAX_HISTORY);
@@ -84,7 +82,7 @@ export default async function handler(req, res) {
         ? 0.10
         : 0.12;
 
-    const adaptiveMaxTokens = complexitySignals >= 3
+    const adaptiveMaxTokens = isDeepTask
       ? 20000
       : complexitySignals >= 1
         ? 16000
@@ -98,7 +96,7 @@ export default async function handler(req, res) {
     }[mode];
 
     const systemPrompt = [
-      'Tu es Nexus AI V2.5, un assistant francophone généraliste de très haut niveau. Tu dois raisonner avec rigueur, conserver le contexte, vérifier mentalement tes conclusions et adapter ton niveau d’explication.',
+      'Tu es Nexus AI V2.6, un assistant francophone généraliste de très haut niveau. Tu dois raisonner avec rigueur, conserver le contexte, vérifier mentalement tes conclusions et adapter ton niveau d’explication.',
       'Ta priorité est d’être FIABLE, COHÉRENT, UTILE et HONNÊTE sur tes capacités.',
       buildNexusIdentity(),
       buildReasoningPolicy(),
@@ -136,7 +134,7 @@ export default async function handler(req, res) {
       history ? 'CONTEXTE DE LA CONVERSATION :\n' + history + '\n\nContinue naturellement cette conversation. Ne demande pas à l’utilisateur de répéter une information déjà présente dans ce contexte.' : '',
       hasImage ? 'IMAGES JOINTES :\nAnalyse réellement les images disponibles avant de répondre.\n- Utilise toutes les images pertinentes.\n- Compare-les si nécessaire.\n- Décris uniquement ce qui est visible ou raisonnablement déductible.\n- Si un détail est illisible ou incertain, précise-le.\n- Ne prétends jamais voir quelque chose qui n’est pas visible.' : '',
       hasDocument ? 'DOCUMENT JOINT :\nLe document « ' + (documentName || 'document') + ' » est fourni sous forme de texte extrait.\n- Base-toi d’abord sur ce contenu.\n- Pour un résumé, hiérarchise les idées importantes.\n- Pour une question précise, reformule uniquement les informations pertinentes.\n- Si la réponse n’est pas dans le document, dis-le clairement.' : '',
-      'Tu es maintenant Nexus AI V2.5. Avant chaque réponse, comprends précisément l’objectif, exploite tout le contexte pertinent, distingue faits et hypothèses, vérifie les calculs et le code, et donne une réponse directement exploitable. Ne prétends jamais avoir utilisé un outil ou vérifié une information externe si ce n’est pas réellement le cas.'
+      'Tu es maintenant Nexus AI V2.6. Avant chaque réponse, comprends précisément l’objectif, exploite tout le contexte pertinent, distingue faits et hypothèses, vérifie les calculs et le code, et donne une réponse directement exploitable. Ne prétends jamais avoir utilisé un outil ou vérifié une information externe si ce n’est pas réellement le cas.'
     ].filter(Boolean).join('\n\n');
 
     const userContent = hasImage
@@ -145,6 +143,8 @@ export default async function handler(req, res) {
         ? message + '\n\n--- CONTENU DU DOCUMENT : ' + (documentName || 'document') + ' ---\n' + documentText + '\n--- FIN DU DOCUMENT ---'
         : message;
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 60000);
     const response = await fetch('https://gen.pollinations.ai/v1/chat/completions', {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
@@ -157,8 +157,10 @@ export default async function handler(req, res) {
         ],
         temperature: adaptiveTemperature,
         max_tokens: adaptiveMaxTokens
-      })
+      }),
+      signal: controller.signal
     });
+    clearTimeout(timeout);
 
     const data = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(data?.error?.message || data?.error || 'Le moteur IA a refusé la demande.');
@@ -166,9 +168,9 @@ export default async function handler(req, res) {
     const text = data?.choices?.[0]?.message?.content;
     if (!text) throw new Error('Le moteur IA n’a renvoyé aucune réponse.');
 
-    return res.status(200).json({ text, version: '2.5', core: buildFutureEngineContract(), mode, hasImage, hasDocument });
+    return res.status(200).json({ text, version: '2.6', core: buildFutureEngineContract(), mode, hasImage, hasDocument });
   } catch (error) {
-    console.error('Nexus AI V2.5 chat error:', error);
+    console.error('Nexus AI V2.6 chat error:', error);
     return res.status(500).json({ error: error.message || 'Erreur du moteur IA.' });
   }
 }
