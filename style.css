@@ -110,3 +110,14 @@ body.nexus-live-open { overflow:hidden; }
 .bubble.nexus h2,.bubble.nexus h3,.bubble.nexus h4{margin:10px 0 6px;line-height:1.25}
 .bubble.nexus code:not(.code-block code){padding:2px 5px;border-radius:5px;background:rgba(255,255,255,.08);font-size:.92em}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+
+/* Nexus IA V2.7 — génération musicale */
+.music-card{border:1px solid #343434;border-radius:16px;padding:14px;background:linear-gradient(145deg,#151515,#101010);box-shadow:0 12px 40px rgba(0,0,0,.18)}
+.music-card>strong{display:block;font-size:14px;margin-bottom:7px}
+.music-prompt{color:#aaa;font-size:12px;line-height:1.5;margin:0 0 12px}
+.music-loading{display:flex;align-items:center;gap:7px;color:#aaa;font-size:12px;padding:12px 0}
+.music-loading span{width:7px;height:7px;border-radius:50%;background:#ddd;animation:v27Pulse 1s infinite ease-in-out}
+.music-loading span:nth-child(2){animation-delay:.14s}.music-loading span:nth-child(3){animation-delay:.28s}
+@keyframes v27Pulse{0%,80%,100%{transform:scale(.65);opacity:.35}40%{transform:scale(1);opacity:1}}
+.generated-audio{display:block;width:min(620px,100%);margin-top:8px}
