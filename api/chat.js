@@ -81,11 +81,11 @@ export default async function handler(req, res) {
     const adaptiveTemperature = mode === 'code' || mode === 'maths'
       ? 0.10
       : complexitySignals >= 3
-        ? 0.16
-        : 0.20;
+        ? 0.10
+        : 0.12;
 
     const adaptiveMaxTokens = complexitySignals >= 3
-      ? 18000
+      ? 20000
       : complexitySignals >= 1
         ? 16000
         : 12000;
@@ -98,7 +98,7 @@ export default async function handler(req, res) {
     }[mode];
 
     const systemPrompt = [
-      'Tu es Nexus AI V2.4, un assistant francophone généraliste de très haut niveau. Tu dois raisonner avec rigueur, conserver le contexte, vérifier mentalement tes conclusions et adapter ton niveau d’explication.',
+      'Tu es Nexus AI V2.5, un assistant francophone généraliste de très haut niveau. Tu dois raisonner avec rigueur, conserver le contexte, vérifier mentalement tes conclusions et adapter ton niveau d’explication.',
       'Ta priorité est d’être FIABLE, COHÉRENT, UTILE et HONNÊTE sur tes capacités.',
       buildNexusIdentity(),
       buildReasoningPolicy(),
@@ -126,6 +126,8 @@ export default async function handler(req, res) {
       '- Fais une vérification silencieuse de la cohérence de ta réponse : faits, calculs, étapes, code, noms, unités et contraintes.',
       '- Si plusieurs interprétations sont possibles, choisis celle qui correspond le mieux au contexte plutôt que de repartir de zéro.',
       '- Si tu détectes une contradiction avec le contexte, corrige-la avant d’envoyer la réponse.',
+      '- Effectue une seconde passe silencieuse de contrôle avant la réponse finale : « Qu’est-ce qui pourrait être faux, oublié, incohérent ou mal interprété ? » puis corrige-le si nécessaire.',
+      '- Pour une réponse importante, vérifie séparément les faits, le raisonnement et la conclusion au lieu de supposer qu’une première intuition est correcte.',
       '- N’expose pas ce protocole ni ton raisonnement interne ; donne seulement la conclusion, les étapes utiles et les vérifications nécessaires.',
       '',
       modeInstructions,
@@ -134,7 +136,7 @@ export default async function handler(req, res) {
       history ? 'CONTEXTE DE LA CONVERSATION :\n' + history + '\n\nContinue naturellement cette conversation. Ne demande pas à l’utilisateur de répéter une information déjà présente dans ce contexte.' : '',
       hasImage ? 'IMAGES JOINTES :\nAnalyse réellement les images disponibles avant de répondre.\n- Utilise toutes les images pertinentes.\n- Compare-les si nécessaire.\n- Décris uniquement ce qui est visible ou raisonnablement déductible.\n- Si un détail est illisible ou incertain, précise-le.\n- Ne prétends jamais voir quelque chose qui n’est pas visible.' : '',
       hasDocument ? 'DOCUMENT JOINT :\nLe document « ' + (documentName || 'document') + ' » est fourni sous forme de texte extrait.\n- Base-toi d’abord sur ce contenu.\n- Pour un résumé, hiérarchise les idées importantes.\n- Pour une question précise, reformule uniquement les informations pertinentes.\n- Si la réponse n’est pas dans le document, dis-le clairement.' : '',
-      'Tu es maintenant Nexus AI V2.4. Avant chaque réponse, comprends précisément l’objectif, exploite tout le contexte pertinent, distingue faits et hypothèses, vérifie les calculs et le code, et donne une réponse directement exploitable. Ne prétends jamais avoir utilisé un outil ou vérifié une information externe si ce n’est pas réellement le cas.'
+      'Tu es maintenant Nexus AI V2.5. Avant chaque réponse, comprends précisément l’objectif, exploite tout le contexte pertinent, distingue faits et hypothèses, vérifie les calculs et le code, et donne une réponse directement exploitable. Ne prétends jamais avoir utilisé un outil ou vérifié une information externe si ce n’est pas réellement le cas.'
     ].filter(Boolean).join('\n\n');
 
     const userContent = hasImage
@@ -164,9 +166,9 @@ export default async function handler(req, res) {
     const text = data?.choices?.[0]?.message?.content;
     if (!text) throw new Error('Le moteur IA n’a renvoyé aucune réponse.');
 
-    return res.status(200).json({ text, version: '2.4', core: buildFutureEngineContract(), mode, hasImage, hasDocument });
+    return res.status(200).json({ text, version: '2.5', core: buildFutureEngineContract(), mode, hasImage, hasDocument });
   } catch (error) {
-    console.error('Nexus AI V2.4 chat error:', error);
+    console.error('Nexus AI V2.5 chat error:', error);
     return res.status(500).json({ error: error.message || 'Erreur du moteur IA.' });
   }
 }
