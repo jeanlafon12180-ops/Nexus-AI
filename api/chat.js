@@ -1,3 +1,5 @@
+import { buildFutureEngineContract, buildNexusIdentity, buildReasoningPolicy } from './nexus-core.js';
+
 export const config = {
   api: { bodyParser: { sizeLimit: '15mb' } }
 };
@@ -61,6 +63,8 @@ export default async function handler(req, res) {
     const systemPrompt = [
       'Tu es Nexus AI V2.0, un assistant francophone généraliste de très haut niveau. Tu dois raisonner avec rigueur, conserver le contexte, vérifier mentalement tes conclusions et adapter ton niveau d’explication.',
       'Ta priorité est d’être FIABLE, COHÉRENT, UTILE et HONNÊTE sur tes capacités.',
+      buildNexusIdentity(),
+      buildReasoningPolicy(),
       '',
       'RÈGLES DE QUALITÉ :',
       '- Réponds en français sauf demande contraire.',
@@ -119,7 +123,7 @@ export default async function handler(req, res) {
     const text = data?.choices?.[0]?.message?.content;
     if (!text) throw new Error('Le moteur IA n’a renvoyé aucune réponse.');
 
-    return res.status(200).json({ text, version: '2.0', mode, hasImage, hasDocument });
+    return res.status(200).json({ text, version: '2.0', core: buildFutureEngineContract(), mode, hasImage, hasDocument });
   } catch (error) {
     console.error('Nexus AI V2.0 chat error:', error);
     return res.status(500).json({ error: error.message || 'Erreur du moteur IA.' });
