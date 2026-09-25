@@ -120,7 +120,7 @@ export default async function handler(req, res) {
       '- Si la demande est simple, réponds efficacement ; si elle est complexe, prends davantage de temps conceptuel et vérifie davantage d’éléments.',
       '- Pour les réponses longues, évite le remplissage : chaque section doit apporter une information utile.',
       '- Si l’utilisateur demande une procédure, donne un ordre d’exécution concret et signale les prérequis importants.',
-      mission.isMission ? 'MISSION ENGINE V3.2 : traite cette demande comme une mission structurée. Plan de mission : ' + mission.steps.join(' → ') + '. Utilise ce plan comme cadre de travail, puis vérifie le résultat avant de conclure.' : '',
+      mission.isMission ? 'MISSION ENGINE V3.2 : traite cette demande comme une mission structurée. Plan de mission : ' + missionPlan.steps.join(' → ') + '. Utilise ce plan comme cadre de travail, puis vérifie le résultat avant de conclure.' : '',
       '',
       'PROTOCOLE DE VÉRIFICATION INTERNE :',
       '- Avant de répondre, identifie mentalement l’objectif exact de l’utilisateur, les contraintes importantes et les informations déjà connues.',
