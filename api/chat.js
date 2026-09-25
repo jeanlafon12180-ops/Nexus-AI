@@ -53,11 +53,12 @@ export default async function handler(req, res) {
 
     const historyMessages = [];
     let historyChars = 0;
-    for (const item of historyItems) {
+    for (let i = historyItems.length - 1; i >= 0; i--) {
+      const item = historyItems[i];
       const text = cleanText(item.text, MAX_CONTEXT_MESSAGE_CHARS);
       if (!text) continue;
       if (historyChars + text.length > MAX_HISTORY_CHARS) break;
-      historyMessages.push({
+      historyMessages.unshift({
         role: item.type === 'user' ? 'user' : 'assistant',
         content: text
       });
