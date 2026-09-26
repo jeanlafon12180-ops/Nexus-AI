@@ -180,3 +180,19 @@ Quand une demande présente des signes d’ambiguïté, Nexus rassemble les info
 ### Vérification et auto-correction
 
 Pour les tâches complexes ou nécessitant davantage de contexte, Nexus lance une vérification séparée. Si le vérificateur détecte une correction utile, une nouvelle réponse finale est générée à partir du brouillon et des corrections. Le raisonnement privé du vérificateur n’est jamais affiché à l’utilisateur.
+
+## V3.5 — Relevant Memory
+
+La V3.5 améliore l’utilisation de la mémoire locale. Nexus sélectionne les souvenirs les plus pertinents pour la demande actuelle afin de mieux exploiter le contexte déjà enregistré.
+
+- Priorité aux souvenirs utiles à la demande et au contexte récent.
+- Prise en compte des contradictions entre les souvenirs.
+- Conservation de la mémoire locale existante.
+
+## V3.6 — Specialized Agents
+
+La V3.6 ajoute des agents spécialisés, choisis automatiquement par Nexus Core selon la demande.
+
+- Spécialités disponibles : code, sciences, études, analyse et demandes générales.
+- Le Nexus Core garde le contrôle de l’orchestration.
+- L’agent retenu se concentre sur la tâche correspondant le mieux à son domaine.
