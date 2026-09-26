@@ -1,7 +1,17 @@
 import { createBrain } from './brain.js';
 import { loadConversation, saveConversation, clearConversation, clearMemory, createMemory, saveMemory, getDeviceId } from './memory.js';
 const brain=createBrain();const chat=document.getElementById('chat');const input=document.getElementById('messageInput');const send=document.getElementById('sendButton');const fileInput=document.getElementById('imageFileInput');const filePreview=document.getElementById('filePreview');const attachMenu=document.getElementById('attachMenu');const deviceId=getDeviceId();let history=loadConversation();let selectedFile=null;let selectedImageData='';let selectedDocumentText='';const MAX_DOCUMENT_CHARS=60000;let activeController=null;
-function html(text){let safe=String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');safe=safe.replace(/```([a-z0-9_-]+)?\n([\s\S]*?)```/gi,(_,lang,code)=>`<pre class="code-block"><code>${code.trim()}</code><button class="copy-code" type="button">Copier</button></pre>`);safe=safe.replace(/(^|\n)\s*#{1,6}\s+([^\n]+)/gm,'$1<h4>$2</h4>');return safe.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\n/g,'<br>');}
+function html(text){let safe=String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');safe=safe.replace(/```([a-z0-9_-]+)?\n([\s\S]*?)```/gi,(_,lang,code)=>`<pre class="code-block"><code>${code.trim()}</code><button class="copy-code" type="button">Copier</button></pre>`);safe=safe.replace(/(^|\n)\s*#{1,6}\s+([^\n]+)/gm,'$1<h4>$2</h4>');return safe.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\\[ \t]*\r?\n/g,'\n');}
+let mathTypesetQueue=Promise.resolve();
+function typesetMath(element){
+ if(!/(?:\\\(|\\\[|\$\$)/.test(String(element.textContent||'')))return;
+ const run=()=>{
+  if(!window.MathJax?.typesetPromise)return;
+  mathTypesetQueue=mathTypesetQueue.then(()=>window.MathJax.typesetPromise([element])).catch(error=>console.error('Échec du rendu mathématique :',error));
+ };
+ if(window.MathJax?.typesetPromise)run();
+ else window.addEventListener('nexus-mathjax-ready',run,{once:true});
+}
 function show(text,type,persist=true){
  const row=document.createElement('div');row.className=`message-row ${type}`;
  const bubble=document.createElement('div');bubble.className=`bubble ${type}`;bubble.innerHTML=html(text);row.appendChild(bubble);chat.appendChild(row);
@@ -13,12 +23,12 @@ function show(text,type,persist=true){
    copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(String(text));copy.textContent='Copié';setTimeout(()=>copy.textContent='Copier',1200);}catch{copy.textContent='Erreur';}});
    actions.appendChild(copy);bubble.appendChild(actions);
  }
- chat.scrollTop=chat.scrollHeight;
+ typesetMath(bubble); chat.scrollTop=chat.scrollHeight;
 }
 function showUserImage(dataUrl){const row=document.createElement('div');row.className='message-row user';const bubble=document.createElement('div');bubble.className='bubble user image-user-card';const img=document.createElement('img');img.className='attached-image';img.src=dataUrl;img.alt='Image jointe à Nexus AI';bubble.appendChild(img);chat.appendChild(row);row.appendChild(bubble);chat.scrollTop=chat.scrollHeight;}
 function escapeHtml(text){return String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
 function showUserDocument(file,chars){const row=document.createElement('div');row.className='message-row user';const bubble=document.createElement('div');bubble.className='bubble user document-user-card';bubble.innerHTML=`<div class="document-title">📄 ${escapeHtml(file.name)}</div><div class="document-meta">${escapeHtml(file.type||'Document')} · ${chars.toLocaleString('fr-FR')} caractères extraits</div>`;chat.appendChild(row);row.appendChild(bubble);chat.scrollTop=chat.scrollHeight;}
-function render(){chat.innerHTML='';if(!history.length){const empty=document.createElement('div');empty.className='empty-state';empty.innerHTML='<div class="empty-logo">N</div><h2>Que puis-je faire pour toi ?</h2><p>Je peux discuter, analyser des images et des documents, répondre à tes questions, générer des images et du code.</p><div class="quick-grid"><button class="quick-card suggestion">Explique-moi le théorème de Pythagore</button><button class="quick-card suggestion">Écris-moi un site HTML simple</button><button class="quick-card suggestion">Crée une image d’un chat réaliste</button><button class="quick-card suggestion">Que sais-tu faire ?</button></div>';chat.appendChild(empty);}else history.forEach(item=>{if(item&&typeof item.text==='string'&&(item.type==='user'||item.type==='nexus'))show(item.text,item.type,false);});bindSuggestions();}
+function render(){if(window.MathJax?.typesetClear)window.MathJax.typesetClear([chat]);chat.innerHTML='';if(!history.length){const empty=document.createElement('div');empty.className='empty-state';empty.innerHTML='<div class="empty-logo">N</div><h2>Que puis-je faire pour toi ?</h2><p>Je peux discuter, analyser des images et des documents, répondre à tes questions, générer des images et du code.</p><div class="quick-grid"><button class="quick-card suggestion">Explique-moi le théorème de Pythagore</button><button class="quick-card suggestion">Écris-moi un site HTML simple</button><button class="quick-card suggestion">Crée une image d’un chat réaliste</button><button class="quick-card suggestion">Que sais-tu faire ?</button></div>';chat.appendChild(empty);}else history.forEach(item=>{if(item&&typeof item.text==='string'&&(item.type==='user'||item.type==='nexus'))show(item.text,item.type,false);});bindSuggestions();}
 function bindSuggestions(){document.querySelectorAll('.suggestion').forEach(button=>button.addEventListener('click',()=>sendText(button.textContent)));}
 function splitQuestions(text){return String(text).replace(/\r/g,'').split(/\n/).map(x=>x.trim()).map(x=>x.replace(/^[-•*]\s+/,'').replace(/^\d+[.)]\s+/,'').trim()).filter(Boolean);}
 function setBusy(value){send.disabled=false;input.disabled=value;document.getElementById('imageUploadButton')?.toggleAttribute('disabled',value);send.textContent=value?'×':'↑';send.setAttribute('aria-label',value?'Arrêter la génération':'Envoyer');document.body.classList.toggle('nexus-generating',value);}function stopGeneration(){activeController?.abort();activeController=null;setBusy(false);}

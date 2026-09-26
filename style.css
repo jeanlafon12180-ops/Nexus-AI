@@ -133,3 +133,5 @@ body.nexus-live-open { overflow:hidden; }
 /* Nexus IA V3.2 — Mission Execution Engine */
 .mission-card{border:1px solid #333;border-radius:18px;padding:16px;background:linear-gradient(145deg,#171717,#0e0e0e);box-shadow:0 14px 45px rgba(0,0,0,.22)}
 .mission-card>strong{display:block;font-size:15px;margin-bottom:6px}.mission-card>p{margin:0 0 14px;color:#aaa;line-height:1.5;font-size:12px}.mission-status{display:inline-flex;margin:0 0 12px;padding:5px 9px;border-radius:999px;background:#1b1b1b;color:#ddd;font-size:11px}.mission-steps{display:grid;gap:7px}.mission-step{display:flex;align-items:flex-start;gap:8px;padding:9px 11px;border-radius:10px;background:#1b1b1b;color:#ddd;font-size:12px}.mission-step-running{outline:1px solid #666;background:#202020}.mission-step-failed{outline:1px solid #7a3b3b}.mission-step-skipped{opacity:.65}
+
+.bubble mjx-container[display="true"]{max-width:100%;overflow-x:auto;overflow-y:hidden;padding:.15em 0}
