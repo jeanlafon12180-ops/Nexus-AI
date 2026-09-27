@@ -1,7 +1,7 @@
 {
   "appId": "com.nexusai.app",
   "appName": "Nexus IA",
-  "webDir": ".",
+  "webDir": "www",
   "server": {
     "androidScheme": "https"
   },
