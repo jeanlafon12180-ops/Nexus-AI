@@ -8,6 +8,7 @@ export function getDeviceId(){try{let id=localStorage.getItem(DEVICE_KEY);if(!id
 const profileId=getDeviceId();
 export const MEMORY_KEY=MEMORY_PREFIX+profileId;
 export const CHAT_KEY=CHAT_PREFIX+profileId;
+export const CHATS_KEY='nexus_ia_chats_v12_'+profileId;
 function migratePrivateLegacyData(){try{
   const oldId=localStorage.getItem('nexus_ia_device_id_v10')||localStorage.getItem('nexus_ia_device_id_v08')||localStorage.getItem('nexus_ia_device_id_v07');
   if(!oldId)return;
@@ -23,6 +24,13 @@ export function saveMemory(memory){try{localStorage.setItem(MEMORY_KEY,JSON.stri
 export function loadConversation(){const value=read(CHAT_KEY,[]);return Array.isArray(value)?value:[];}
 export function saveConversation(conversation){try{localStorage.setItem(CHAT_KEY,JSON.stringify(conversation.slice(-150)));}catch{}}
 export function clearConversation(){try{localStorage.removeItem(CHAT_KEY);}catch{}}
+export function createConversation(title='Nouvelle discussion'){return{id:'chat-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8),title,createdAt:Date.now(),updatedAt:Date.now(),messages:[]};}
+export function loadConversations(){const value=read(CHATS_KEY,[]);return Array.isArray(value)?value:[];}
+export function saveConversations(items){try{localStorage.setItem(CHATS_KEY,JSON.stringify(items.slice(0,50)));}catch{}}
+export function upsertConversation(conversation){const items=loadConversations().filter(item=>item.id!==conversation.id);items.unshift({...conversation,updatedAt:Date.now()});saveConversations(items);return items;}
+export function getConversation(id){return loadConversations().find(item=>item.id===id)||null;}
+export function deleteConversation(id){saveConversations(loadConversations().filter(item=>item.id!==id));}
+export function renameConversation(id,title){const items=loadConversations().map(item=>item.id===id?{...item,title,updatedAt:Date.now()}:item);saveConversations(items);}
 export function clearMemory(){try{localStorage.removeItem(MEMORY_KEY);}catch{}}
 
 
