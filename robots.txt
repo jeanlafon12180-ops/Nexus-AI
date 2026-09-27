@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nexus-ai-beryl-three.vercel.app/sitemap.xml
