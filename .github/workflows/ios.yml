@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: 22
       - name: Install dependencies
-        run: npm install
+        run: npm install --verbose
       - name: Check Capacitor
         run: npx cap --version
       - name: Generate iOS project
