@@ -190,3 +190,8 @@ body.nexus-live-open { overflow:hidden; }
 .topbar{display:none!important}
 .chat{padding-top:74px}
 }
+
+
+/* Nexus IA V3.8 — conversation list */
+.conversation-list{display:flex;flex-direction:column;gap:4px;margin:4px 0 14px;max-height:220px;overflow:auto}.conversation-item{display:block;width:100%;padding:9px 10px;border:1px solid transparent;border-radius:10px;background:transparent;color:#bbb;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;font:inherit}.conversation-item:hover{background:#191919;color:#fff}.conversation-item.active{background:#202020;border-color:#333;color:#fff}.mobile-drawer .conversation-list{max-height:180px}
+@media(max-width:820px){.conversation-item{min-height:42px;padding:10px 12px}.mobile-drawer .conversation-list{max-height:190px}}
