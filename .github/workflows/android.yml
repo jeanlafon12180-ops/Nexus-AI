@@ -22,8 +22,10 @@ jobs:
           java-version: '21'
       - name: Install dependencies
         run: npm install
+      - name: Check Capacitor
+        run: npx cap --version
       - name: Generate Android project
-        run: npx cap add android
+        run: npx cap add android --verbose
       - name: Sync Capacitor
         run: npx cap sync android
       - name: Build debug APK
