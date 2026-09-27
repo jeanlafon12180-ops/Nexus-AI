@@ -39,14 +39,14 @@ window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]'],['$',
 <div class="brand"><div class="logo">N</div><div><h1>Nexus IA</h1><span>Assistant intelligent · nouvelle génération</span></div></div>
 <button class="new-chat" id="newChatButton">＋ Nouvelle discussion</button>
 <div class="side-title">Conversations</div><div class="conversation-list" aria-label="Conversations récentes"></div><div class="side-title">Outils</div>
-<button class="side-button" id="memoryButton">🧠 Mémoire</button><button class="side-button" id="helpButton">❓ Capacités</button><button class="side-button" id="exportChatButton">📥 Exporter la discussion</button><button class="side-button" id="clearMemoryButton">🗑️ Effacer la mémoire</button>
+<button class="side-button" id="subscriptionButton">💳 Abonnement</button><button class="side-button" id="memoryButton">🧠 Mémoire</button><button class="side-button" id="helpButton">❓ Capacités</button><button class="side-button" id="exportChatButton">📥 Exporter la discussion</button><button class="side-button" id="clearMemoryButton">🗑️ Effacer la mémoire</button>
 <div class="side-spacer"></div><div class="side-version">Nexus IA <strong>V3.9</strong><br><span>Voix · vision · caméra · mémoire · fichiers · création</span></div>
 </aside>
 <div class="mobile-drawer-backdrop" id="mobileDrawerBackdrop" hidden></div>
 <aside class="mobile-drawer" id="mobileDrawer" aria-label="Menu mobile" aria-hidden="true">
 <div class="mobile-drawer-head"><strong>Nexus IA</strong><button id="closeMobileMenu" aria-label="Fermer le menu">×</button></div><button class="new-chat" id="mobileNewChatButton">＋ Nouvelle discussion</button>
 <div class="side-title">Conversations</div><div class="conversation-list" aria-label="Conversations récentes"></div><div class="side-title">Outils</div>
-<button class="side-button mobile-tool" data-action="memory">🧠 Mémoire</button><button class="side-button mobile-tool" data-action="help">❓ Capacités</button><button class="side-button mobile-tool" id="mobileExportChatButton">📥 Exporter la discussion</button><button class="side-button mobile-tool" data-action="clear-memory">🗑️ Effacer la mémoire</button>
+<button class="side-button mobile-tool" id="mobileSubscriptionButton">💳 Abonnement</button><button class="side-button mobile-tool" data-action="memory">🧠 Mémoire</button><button class="side-button mobile-tool" data-action="help">❓ Capacités</button><button class="side-button mobile-tool" id="mobileExportChatButton">📥 Exporter la discussion</button><button class="side-button mobile-tool" data-action="clear-memory">🗑️ Effacer la mémoire</button>
 <div class="side-spacer"></div><div class="side-version">Nexus IA <strong>V3.9</strong><br><span>Voix · vision · caméra · création</span></div>
 </aside>
 <main class="main">
@@ -67,7 +67,19 @@ window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]'],['$',
 </div></main></div>
 <noscript><div class="noscript-warning">⚠️ JavaScript est désactivé. Nexus IA a besoin de JavaScript.</div></noscript>
 <script src="js/thinking-star.js?v=3.9"></script><script src="js/multi-upload.js?v=3.9"></script><script src="js/audio-recording.js?v=3.9"></script><script src="js/audio-upload.js?v=3.9"></script><script src="js/live-mode.js?v=3.9"></script><script src="js/mobile-menu.js?v=3.9"></script><script type="module" src="js/app.js?v=3.9"></script>
-<script src="js/camera-capture.js?v=3.9"></script><script src="pwa.js?v=2"></script>
+<div id="subscriptionModal" class="subscription-modal" hidden aria-hidden="true">
+  <div class="subscription-backdrop" data-close-subscription></div>
+  <section class="subscription-panel" role="dialog" aria-modal="true" aria-labelledby="subscriptionTitle">
+    <button class="subscription-close" type="button" aria-label="Fermer" data-close-subscription>×</button>
+    <div class="subscription-head">
+      <span class="subscription-icon">N</span>
+      <div><h2 id="subscriptionTitle">Abonnement Nexus IA</h2><p>Choisis ton niveau d’accès. Les paiements réels seront activés plus tard.</p></div>
+    </div>
+    <div id="subscriptionPlans" class="subscription-plans"></div>
+    <div class="subscription-note">💳 Paiement bientôt disponible · Les prix affichés sont mensuels.</div>
+  </section>
+</div>
+<script src="js/subscriptions.js?v=3.9"></script><script src="js/camera-capture.js?v=3.9"></script><script src="pwa.js?v=2"></script>
 <script>
 (()=>{const menu=document.getElementById('mobileAppMenu'),newBtn=document.getElementById('mobileAppNew');menu?.addEventListener('click',()=>document.getElementById('mobileMenuButton')?.click());newBtn?.addEventListener('click',()=>document.getElementById('newChatButton')?.click());})();
 </script>
