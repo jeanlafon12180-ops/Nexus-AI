@@ -15,8 +15,25 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Diagnose npm environment
+        run: |
+          node --version
+          npm --version
+          npm config get registry
+          npm view @capacitor/core@8.5.2 version
+          npm view @capacitor/cli@8.5.2 version
+          npm view @capacitor/ios@8.5.2 version
       - name: Install dependencies
-        run: npm install --verbose
+        shell: bash
+        run: |
+          set -o pipefail
+          npm install --verbose --no-audit --no-fund 2>&1 | tee npm-install.log
+      - name: Upload npm diagnostic log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-ia-npm-install-log
+          path: npm-install.log
       - name: Check Capacitor
         run: npx cap --version
       - name: Generate iOS project
