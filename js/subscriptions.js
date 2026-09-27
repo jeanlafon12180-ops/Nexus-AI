@@ -106,7 +106,7 @@ function closeSubscriptionModal() {
   document.body.classList.remove('subscription-open');
 }
 
-window.NexusSubscription = { plans: NEXUS_PLANS, getCurrentPlan, open: openSubscriptionModal, close: closeSubscriptionModal };
+window.NexusSubscription = { plans: NEXUS_PLANS, getCurrentPlan, getUsage, getPlanLimit, canUseFeature, recordUsage, open: openSubscriptionModal, close: closeSubscriptionModal };
 
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('subscriptionButton')?.addEventListener('click', openSubscriptionModal);
@@ -114,3 +114,48 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-close-subscription]').forEach(element => element.addEventListener('click', closeSubscriptionModal));
   document.addEventListener('keydown', event => { if (event.key === 'Escape') closeSubscriptionModal(); });
 });
+
+const PLAN_LIMITS = {
+  free: { chat: 50, image: 5, video: 0, music: 0, documents: 5 },
+  go: { chat: 300, image: 30, video: 3, music: 3, documents: 30 },
+  plus: { chat: 1000, image: 100, video: 15, music: 15, documents: 100 },
+  pro: { chat: 5000, image: 500, video: 50, music: 50, documents: 500 },
+  admin: { chat: Infinity, image: Infinity, video: Infinity, music: Infinity, documents: Infinity }
+};
+const USAGE_KEY = 'nexus_ia_subscription_usage_v1';
+
+function usageKey() {
+  return new Date().toISOString().slice(0, 7);
+}
+function readUsage() {
+  try {
+    const data = JSON.parse(localStorage.getItem(USAGE_KEY) || '{}');
+    return data.month === usageKey() ? data.counts || {} : {};
+  } catch { return {}; }
+}
+function writeUsage(counts) {
+  try { localStorage.setItem(USAGE_KEY, JSON.stringify({month: usageKey(), counts})); } catch {}
+}
+export function getUsage(feature) {
+  return readUsage()[feature] || 0;
+}
+export function getPlanLimit(feature) {
+  const plan = getCurrentPlan();
+  return PLAN_LIMITS[plan.id]?.[feature] ?? 0;
+}
+export function canUseFeature(feature) {
+  const limit = getPlanLimit(feature);
+  return limit === Infinity || getUsage(feature) < limit;
+}
+export function recordUsage(feature) {
+  if (!canUseFeature(feature)) return false;
+  const counts = readUsage();
+  counts[feature] = (counts[feature] || 0) + 1;
+  writeUsage(counts);
+  return true;
+}
+export function planLimitMessage(feature) {
+  const limit = getPlanLimit(feature);
+  if (limit === 0) return 'Cette fonctionnalité n’est pas incluse dans ton abonnement. Choisis un plan supérieur pour y accéder.';
+  return 'Tu as atteint la limite mensuelle de cette fonctionnalité (' + limit + ').';
+}
