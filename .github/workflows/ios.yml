@@ -17,8 +17,10 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install
+      - name: Check Capacitor
+        run: npx cap --version
       - name: Generate iOS project
-        run: npx cap add ios
+        run: npx cap add ios --packagemanager SPM --verbose
       - name: Sync Capacitor
         run: npx cap sync ios
       - name: Verify Xcode project
