@@ -1,0 +1,31 @@
+name: Prepare Nexus IA iOS
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [mobile-app]
+
+jobs:
+  ios:
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm install
+      - name: Generate iOS project
+        run: npx cap add ios
+      - name: Sync Capacitor
+        run: npx cap sync ios
+      - name: Verify Xcode project
+        run: xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build CODE_SIGNING_ALLOWED=NO build
+      - name: Upload iOS project
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-ia-ios-project
+          path: ios
