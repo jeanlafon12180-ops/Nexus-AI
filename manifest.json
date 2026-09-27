@@ -1,0 +1,20 @@
+{
+  "name": "Nexus IA",
+  "short_name": "Nexus IA",
+  "description": "Nexus IA — assistant intelligent nouvelle génération.",
+  "lang": "fr-FR",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0b0c",
+  "theme_color": "#0b0b0c",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "64x64",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
