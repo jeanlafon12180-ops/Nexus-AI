@@ -42,7 +42,16 @@ jobs:
       - name: Check Capacitor
         run: npx cap --version
       - name: Generate Android project
-        run: npx cap add android --verbose
+        shell: bash
+        run: |
+          set -o pipefail
+          npx cap add android --verbose 2>&1 | tee capacitor-add-android.log
+      - name: Upload Android diagnostic log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-ia-capacitor-android-log
+          path: capacitor-add-android.log
       - name: Sync Capacitor
         run: npx cap sync android
       - name: Build debug APK
