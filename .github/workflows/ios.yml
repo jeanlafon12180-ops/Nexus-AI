@@ -37,7 +37,7 @@ jobs:
       - name: Check Capacitor
         run: npx cap --version
       - name: Generate iOS project
-        run: npx cap add ios --packagemanager SPM --verbose
+        run: npx cap add ios --packagemanager SPM
       - name: Sync Capacitor
         run: npx cap sync ios
       - name: Verify Xcode project
