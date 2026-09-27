@@ -10,9 +10,7 @@
     "cap:ios": "npx cap open ios"
   },
   "dependencies": {
-    "@capacitor/core": "8.5.2",
-    "@capacitor/status-bar": "8.0.3",
-    "@capacitor/splash-screen": "8.0.2"
+    "@capacitor/core": "8.5.2"
   },
   "devDependencies": {
     "@capacitor/cli": "8.5.2",
