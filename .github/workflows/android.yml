@@ -41,6 +41,11 @@ jobs:
           path: npm-install.log
       - name: Check Capacitor
         run: npx cap --version
+      - name: Prepare mobile web directory
+        run: |
+          rm -rf www
+          mkdir -p www
+          rsync -a --exclude 'android' --exclude 'ios' --exclude 'www' --exclude 'node_modules' --exclude '.git' ./ ./www/
       - name: Generate Android project
         shell: bash
         run: |
