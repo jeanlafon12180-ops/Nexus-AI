@@ -59,9 +59,84 @@ function escapeHtml(value) {
   return String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+const USAGE_FEATURES = [
+  { id: 'chat', label: 'Messages' },
+  { id: 'image', label: 'Images' },
+  { id: 'video', label: 'Vidéos' },
+  { id: 'music', label: 'Musiques' },
+  { id: 'documents', label: 'Documents' }
+];
+
+function formatPlanPrice(price) {
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: 'EUR',
+    maximumFractionDigits: 2
+  }).format(price);
+}
+
+function renderOverview() {
+  const target = document.getElementById('subscriptionOverview');
+  if (!target) return;
+
+  const plan = getCurrentPlan();
+  const features = USAGE_FEATURES.map(feature => {
+    const used = getUsage(feature.id);
+    const limit = getPlanLimit(feature.id);
+    const value = limit === Infinity
+      ? 'Illimité'
+      : limit === 0
+        ? 'Non inclus'
+        : used.toLocaleString('fr-FR') + ' / ' + limit.toLocaleString('fr-FR');
+
+    const progress = limit > 0 && limit !== Infinity
+      ? Math.min(100, Math.round((used / limit) * 100))
+      : 0;
+    const progressBar = limit > 0 && limit !== Infinity
+      ? '<div class="subscription-progress" role="progressbar" aria-label="' +
+        escapeHtml(feature.label) + ' utilisés ce mois-ci" aria-valuemin="0" aria-valuemax="' +
+        limit + '" aria-valuenow="' + Math.min(Math.max(0, used), limit) + '">' +
+        '<span style="--quota-progress:' + progress + '%"></span></div>'
+      : '';
+
+    return '<article class="subscription-usage-item">' +
+      '<div class="subscription-usage-name">' + escapeHtml(feature.label) + '</div>' +
+      '<div class="subscription-usage-count' + (limit === 0 ? ' not-included' : '') + '">' +
+      value + (limit > 0 && limit !== Infinity ? ' ce mois' : '') + '</div>' +
+      progressBar + '</article>';
+  }).join('');
+
+  target.innerHTML =
+    '<div class="subscription-overview-head">' +
+      '<div><p class="subscription-overview-label">Formule sélectionnée sur cet appareil</p>' +
+      '<div class="subscription-overview-plan">' + escapeHtml(plan.name) +
+      '<span class="subscription-overview-price">' + formatPlanPrice(plan.price) + ' / mois</span></div></div>' +
+      '<span class="subscription-local-badge">Stockage local</span>' +
+    '</div>' +
+    '<div class="subscription-usage-grid">' + features + '</div>' +
+    '<p class="subscription-overview-cycle">Les quotas se réinitialisent chaque mois. Les compteurs sont enregistrés dans ce navigateur.</p>';
+}
+
+function renderPlanQuotas(plan) {
+  const limits = PLAN_LIMITS[plan.id] || {};
+  const entries = USAGE_FEATURES.map(feature => {
+    const limit = limits[feature.id] ?? 0;
+    const value = limit === Infinity
+      ? 'Illimité'
+      : limit === 0
+        ? 'Non inclus'
+        : limit.toLocaleString('fr-FR') + ' / mois';
+    return '<li><span>' + escapeHtml(feature.label) + '</span><span>' + value + '</span></li>';
+  }).join('');
+
+  return '<div class="subscription-plan-quotas"><strong>Quotas mensuels</strong><ul>' +
+    entries + '</ul></div>';
+}
+
 function renderPlans() {
   const target = document.getElementById('subscriptionPlans');
   if (!target) return;
+  renderOverview();
   const current = getCurrentPlan().id;
   target.innerHTML = Object.values(NEXUS_PLANS).map(plan => {
     const currentClass = plan.id === current ? ' current' : '';
@@ -72,6 +147,7 @@ function renderPlans() {
       '<div class="subscription-price">'+price+' <small>/ mois</small></div>' +
       '<div class="subscription-description">'+escapeHtml(plan.description)+'</div>' +
       '<ul class="subscription-features">'+plan.features.map(feature => '<li>'+escapeHtml(feature)+'</li>').join('')+'</ul>' +
+      renderPlanQuotas(plan) +
       '<button class="subscription-select" type="button" data-plan="'+plan.id+'">'+(plan.id === current ? 'Plan actuel' : 'Choisir')+'</button>' +
       '</article>';
   }).join('');
@@ -113,6 +189,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('mobileSubscriptionButton')?.addEventListener('click', openSubscriptionModal);
   document.querySelectorAll('[data-close-subscription]').forEach(element => element.addEventListener('click', closeSubscriptionModal));
   document.addEventListener('keydown', event => { if (event.key === 'Escape') closeSubscriptionModal(); });
+  window.addEventListener('storage', event => {
+    if (event.key === PLAN_KEY || event.key === USAGE_KEY) renderPlans();
+  });
+  window.addEventListener('nexus:subscription-updated', renderPlans);
 });
 
 const PLAN_LIMITS = {
@@ -152,6 +232,7 @@ export function recordUsage(feature) {
   const counts = readUsage();
   counts[feature] = (counts[feature] || 0) + 1;
   writeUsage(counts);
+  window.dispatchEvent(new Event('nexus:subscription-updated'));
   return true;
 }
 export function planLimitMessage(feature) {

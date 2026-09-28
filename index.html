@@ -13,7 +13,7 @@
 <meta name="description" content="Nexus IA V3.9 — assistant multimodal avec voix, caméra, vision, mémoire, fichiers et création.">
 <title>Nexus IA V3.9 — Assistant IA nouvelle génération</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="style.css?v=3.9.0">
+<link rel="stylesheet" href="style.css?v=3.9.1">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.21.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.9.0/mammoth.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.20.1/dist/jszip.min.js"></script>
@@ -73,13 +73,14 @@ window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]'],['$',
     <button class="subscription-close" type="button" aria-label="Fermer" data-close-subscription>×</button>
     <div class="subscription-head">
       <span class="subscription-icon">N</span>
-      <div><h2 id="subscriptionTitle">Abonnement Nexus IA</h2><p>Choisis ton niveau d’accès. Les paiements réels seront activés plus tard.</p></div>
+      <div><h2 id="subscriptionTitle">Abonnement Nexus IA</h2><p>Compare les formules et consulte les quotas mensuels.</p></div>
     </div>
+    <div id="subscriptionOverview" class="subscription-overview" aria-live="polite" aria-label="Abonnement actuel et quotas"></div>
     <div id="subscriptionPlans" class="subscription-plans"></div>
-    <div class="subscription-note">💳 Paiement bientôt disponible · Les prix affichés sont mensuels.</div>
+    <div class="subscription-note">Simulation locale : le choix et les compteurs restent dans ce navigateur. Aucun paiement réel ni contrôle d’abonnement côté serveur.</div>
   </section>
 </div>
-<script src="js/subscriptions.js?v=3.9"></script><script src="js/camera-capture.js?v=3.9"></script><script src="pwa.js?v=2"></script>
+<script src="js/subscriptions.js?v=3.9.1"></script><script src="js/camera-capture.js?v=3.9"></script><script src="pwa.js?v=2"></script>
 <script>
 (()=>{const menu=document.getElementById('mobileAppMenu'),newBtn=document.getElementById('mobileAppNew');menu?.addEventListener('click',()=>document.getElementById('mobileMenuButton')?.click());newBtn?.addEventListener('click',()=>document.getElementById('newChatButton')?.click());})();
 </script>
