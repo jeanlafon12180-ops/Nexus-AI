@@ -4,16 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0b0b0c">
+<meta name="application-name" content="Nexus IA">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Nexus IA">
 <link rel="manifest" href="/manifest.json">
-<link rel="apple-touch-icon" href="/favicon.svg">
-<meta name="description" content="Nexus IA V3.9 — assistant multimodal avec voix, caméra, vision, mémoire, fichiers et création.">
-<title>Nexus IA V3.9 — Assistant IA nouvelle génération</title>
+<link rel="apple-touch-icon" href="/icon-192.svg">
+<meta name="description" content="Nexus IA — assistant IA en français pour discuter, créer, analyser des images et des documents. Disponible sur le Web et installable en PWA.">
+<title>Nexus IA V4.0 — assistant IA en français, installable sur mobile</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="style.css?v=3.9.1">
+<link rel="stylesheet" href="style.css?v=4.0">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.21.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.9.0/mammoth.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.20.1/dist/jszip.min.js"></script>
@@ -24,33 +25,33 @@ window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]'],['$',
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://nexus-ai-beryl-three.vercel.app/">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Nexus IA V3.9 — Assistant IA nouvelle génération">
-<meta property="og:description" content="Nexus IA V3.9 : voix, caméra, vision, mémoire, fichiers et création.">
+<meta property="og:title" content="Nexus IA V4.0 — Assistant IA nouvelle génération">
+<meta property="og:description" content="Nexus IA : assistant francophone pour le chat, les images, les documents et la voix.">
 <meta property="og:url" content="https://nexus-ai-beryl-three.vercel.app/">
 <meta property="og:site_name" content="Nexus IA">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Nexus IA V3.9">
-<meta name="twitter:description" content="Assistant IA multimodal nouvelle génération.">
+<meta name="twitter:title" content="Nexus IA V4.0">
+<meta name="twitter:description" content="Assistant IA francophone pour discuter, analyser des fichiers et créer.">
 </head>
 <body>
-<div id="mobileAppShell" aria-label="Nexus IA"><header class="mobile-app-header"><button id="mobileAppMenu" class="mobile-app-icon" type="button" aria-label="Ouvrir le menu">☰</button><div class="mobile-app-title"><span class="mobile-app-dot">N</span><strong>Nexus IA</strong><small>V3.9</small></div><button id="mobileAppNew" class="mobile-app-icon" type="button" aria-label="Nouvelle discussion">＋</button></header></div>
+<div id="mobileAppShell" aria-label="Nexus IA"><header class="mobile-app-header"><button id="mobileAppMenu" class="mobile-app-icon" type="button" aria-label="Ouvrir le menu">☰</button><div class="mobile-app-title"><span class="mobile-app-dot">N</span><strong>Nexus IA</strong><small>V4.0</small></div><button id="mobileAppNew" class="mobile-app-icon" type="button" aria-label="Nouvelle discussion">＋</button></header></div>
 <div class="app">
 <aside class="sidebar" aria-label="Navigation">
 <div class="brand"><div class="logo">N</div><div><h1>Nexus IA</h1><span>Assistant intelligent · nouvelle génération</span></div></div>
 <button class="new-chat" id="newChatButton">＋ Nouvelle discussion</button>
 <div class="side-title">Conversations</div><div class="conversation-list" aria-label="Conversations récentes"></div><div class="side-title">Outils</div>
 <button class="side-button" id="subscriptionButton">💳 Abonnement</button><button class="side-button" id="memoryButton">🧠 Mémoire</button><button class="side-button" id="helpButton">❓ Capacités</button><button class="side-button" id="exportChatButton">📥 Exporter la discussion</button><button class="side-button" id="clearMemoryButton">🗑️ Effacer la mémoire</button>
-<div class="side-spacer"></div><div class="side-version">Nexus IA <strong>V3.9</strong><br><span>Voix · vision · caméra · mémoire · fichiers · création</span></div>
+<a class="side-button side-link" href="/decouvrir.html">🌐 Découvrir Nexus IA</a><button class="side-button" type="button" data-pwa-install hidden>📲 Installer Nexus IA</button><button class="side-button" type="button" data-pwa-share>↗️ Partager Nexus IA</button><div class="side-spacer"></div><div class="side-version">Nexus IA <strong>V4.0</strong><br><span>Voix · vision · caméra · mémoire · fichiers · création</span></div>
 </aside>
 <div class="mobile-drawer-backdrop" id="mobileDrawerBackdrop" hidden></div>
 <aside class="mobile-drawer" id="mobileDrawer" aria-label="Menu mobile" aria-hidden="true">
 <div class="mobile-drawer-head"><strong>Nexus IA</strong><button id="closeMobileMenu" aria-label="Fermer le menu">×</button></div><button class="new-chat" id="mobileNewChatButton">＋ Nouvelle discussion</button>
 <div class="side-title">Conversations</div><div class="conversation-list" aria-label="Conversations récentes"></div><div class="side-title">Outils</div>
 <button class="side-button mobile-tool" id="mobileSubscriptionButton">💳 Abonnement</button><button class="side-button mobile-tool" data-action="memory">🧠 Mémoire</button><button class="side-button mobile-tool" data-action="help">❓ Capacités</button><button class="side-button mobile-tool" id="mobileExportChatButton">📥 Exporter la discussion</button><button class="side-button mobile-tool" data-action="clear-memory">🗑️ Effacer la mémoire</button>
-<div class="side-spacer"></div><div class="side-version">Nexus IA <strong>V3.9</strong><br><span>Voix · vision · caméra · création</span></div>
+<a class="side-button side-link" href="/decouvrir.html">🌐 Découvrir Nexus IA</a><button class="side-button" type="button" data-pwa-install hidden>📲 Installer Nexus IA</button><button class="side-button" type="button" data-pwa-share>↗️ Partager Nexus IA</button><div class="side-spacer"></div><div class="side-version">Nexus IA <strong>V4.0</strong><br><span>Voix · vision · caméra · création</span></div>
 </aside>
 <main class="main">
-<header class="topbar"><button class="mobile-menu-button" id="mobileMenuButton" aria-label="Ouvrir le menu" title="Menu">☰</button><div class="mobile-brand"><span class="mobile-logo">N</span><strong>Nexus IA</strong></div><div class="status"><span class="dot"></span> En ligne</div><div class="version">V3.9</div></header>
+<header class="topbar"><button class="mobile-menu-button" id="mobileMenuButton" aria-label="Ouvrir le menu" title="Menu">☰</button><div class="mobile-brand"><span class="mobile-logo">N</span><strong>Nexus IA</strong></div><div class="status"><span class="dot"></span> En ligne</div><div class="version">V4.0</div></header>
 <section id="chat" class="chat" aria-live="polite"><div class="empty-state"><div class="empty-logo">N</div><h2>Que puis-je faire pour toi ?</h2><p>Je peux raisonner, analyser des images et des documents, utiliser la caméra, parler avec toi en vocal, mémoriser le contexte de tes discussions et créer du code, des images, des vidéos et de la musique.</p><div class="quick-grid"><button class="quick-card suggestion">Explique-moi le théorème de Pythagore</button><button class="quick-card suggestion">Écris-moi un site HTML simple</button><button class="quick-card suggestion">Crée une image d’un chat réaliste</button><button class="quick-card suggestion">Crée une vidéo d’un coucher de soleil sur la mer</button><button class="quick-card suggestion">Que sais-tu faire ?</button></div></div></section>
 <div class="composer-area">
 <div id="filePreview" class="file-preview" hidden><div class="file-icon">📎</div><div class="file-info"><strong id="fileName"></strong><span id="fileMeta"></span></div><button id="removeFileButton" type="button" aria-label="Retirer le fichier">×</button></div>
@@ -63,10 +64,10 @@ window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]'],['$',
 <input id="cameraFileInput" type="file" accept="image/*" capture="environment" hidden>
 <textarea id="messageInput" placeholder="Message à Nexus IA..." rows="1"></textarea><button id="sendButton" aria-label="Envoyer" title="Envoyer">↑</button>
 </div>
-<div class="hint">📷 caméra · 🎙️ enregistrement · 🔴 LIVE vocal · 🧠 mémoire · 📎 fichiers · 🎨 image · 🎬 vidéo · 🎵 musique · V3.9</div>
+<div class="hint">📷 caméra · 🎙️ enregistrement · 🔴 LIVE vocal · 🧠 mémoire · 📎 fichiers · 🎨 image · 🎬 vidéo · 🎵 musique · V4.0</div>
 </div></main></div>
 <noscript><div class="noscript-warning">⚠️ JavaScript est désactivé. Nexus IA a besoin de JavaScript.</div></noscript>
-<script src="js/thinking-star.js?v=3.9"></script><script src="js/multi-upload.js?v=3.9"></script><script src="js/audio-recording.js?v=3.9"></script><script src="js/audio-upload.js?v=3.9"></script><script src="js/live-mode.js?v=3.9"></script><script src="js/mobile-menu.js?v=3.9"></script><script type="module" src="js/app.js?v=3.9"></script>
+<script src="js/thinking-star.js?v=4.0"></script><script src="js/multi-upload.js?v=4.0"></script><script src="js/audio-recording.js?v=4.0"></script><script src="js/audio-upload.js?v=4.0"></script><script src="js/live-mode.js?v=4.0"></script><script src="js/mobile-menu.js?v=4.0"></script><script type="module" src="js/app.js?v=4.0"></script>
 <div id="subscriptionModal" class="subscription-modal" hidden aria-hidden="true">
   <div class="subscription-backdrop" data-close-subscription></div>
   <section class="subscription-panel" role="dialog" aria-modal="true" aria-labelledby="subscriptionTitle">
@@ -80,7 +81,7 @@ window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]'],['$',
     <div class="subscription-note">Simulation locale : le choix et les compteurs restent dans ce navigateur. Aucun paiement réel ni contrôle d’abonnement côté serveur.</div>
   </section>
 </div>
-<script src="js/subscriptions.js?v=3.9.1"></script><script src="js/camera-capture.js?v=3.9"></script><script src="pwa.js?v=2"></script>
+<script src="js/subscriptions.js?v=4.0"></script><script src="js/camera-capture.js?v=4.0"></script><script src="pwa.js?v=2"></script>
 <script>
 (()=>{const menu=document.getElementById('mobileAppMenu'),newBtn=document.getElementById('mobileAppNew');menu?.addEventListener('click',()=>document.getElementById('mobileMenuButton')?.click());newBtn?.addEventListener('click',()=>document.getElementById('newChatButton')?.click());})();
 </script>

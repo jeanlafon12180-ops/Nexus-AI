@@ -1,6 +1,20 @@
 {
-  "name":"nexus-ai-mobile","version":"3.9.0","private":true,"description":"Nexus IA — application mobile V3.9",
-  "scripts":{"web":"echo Nexus IA web interface","cap:sync":"npx cap sync","cap:android":"npx cap open android","cap:ios":"npx cap open ios"},
-  "dependencies":{"@capacitor/core":"8.5.2"},
-  "devDependencies":{"@capacitor/cli":"8.5.2","@capacitor/android":"8.5.2","@capacitor/ios":"8.5.2"}
+  "name": "nexus-ai-mobile",
+  "version": "4.0.0",
+  "private": true,
+  "description": "Nexus IA — application Web installable PWA V4.0",
+  "scripts": {
+    "web": "echo Nexus IA web interface",
+    "cap:sync": "npx cap sync",
+    "cap:android": "npx cap open android",
+    "cap:ios": "npx cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/core": "8.5.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.2",
+    "@capacitor/android": "8.5.2",
+    "@capacitor/ios": "8.5.2"
+  }
 }

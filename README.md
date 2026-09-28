@@ -196,3 +196,18 @@ La V3.6 ajoute des agents spécialisés, choisis automatiquement par Nexus Core 
 - Spécialités disponibles : code, sciences, études, analyse et demandes générales.
 - Le Nexus Core garde le contrôle de l’orchestration.
 - L’agent retenu se concentre sur la tâche correspondant le mieux à son domaine.
+
+
+## V3.9 — Abonnements et quotas visibles
+
+- Affichage des formules Free, Go, Plus, Pro et Admin avec leurs quotas mensuels.
+- Présentation de l'usage local et des compteurs dans le navigateur.
+- Aucun paiement ni contrôle serveur n'est activé.
+
+## V4.0 — Application Web installable
+
+- Installation PWA depuis les navigateurs compatibles, avec consignes iPhone et Android.
+- Cache hors connexion limité aux fichiers statiques de l'application.
+- Partage du lien via la fonction native du téléphone ou du navigateur.
+- Page de présentation structurée pour l'indexation et les liens sociaux.
+- Stripe restera désactivé tant qu'un compte utilisateur et un stockage serveur sécurisé ne seront pas prêts.
