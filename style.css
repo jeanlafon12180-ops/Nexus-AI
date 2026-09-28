@@ -199,49 +199,5 @@ body.nexus-live-open { overflow:hidden; }
 .conversation-search-wrap{padding:0 2px 6px}.conversation-search{width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid #303030;border-radius:9px;background:#111;color:#eee;outline:none}.conversation-search:focus{border-color:#555}.conversation-items{display:flex;flex-direction:column;gap:3px}.conversation-row{display:flex;gap:3px;align-items:center}.conversation-row .conversation-item{flex:1;min-width:0}.conversation-more{width:34px;height:36px;border:0;border-radius:9px;background:transparent;color:#888;font-size:18px;cursor:pointer}.conversation-more:hover{background:#191919;color:#fff}.mobile-drawer .conversation-search{font-size:16px}
 
 
-/* Nexus IA V3.9 — abonnements */
-.subscription-modal{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px}
-.subscription-modal[hidden]{display:none!important}
-.subscription-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-.subscription-panel{position:relative;z-index:1;width:min(920px,100%);max-height:min(88dvh,820px);overflow:auto;background:#141414;border:1px solid #343434;border-radius:24px;padding:24px;box-shadow:0 25px 80px rgba(0,0,0,.55)}
-.subscription-close{position:absolute;right:14px;top:14px;width:38px;height:38px;border:1px solid #333;border-radius:11px;background:#202020;color:#ddd;font-size:24px;cursor:pointer}
-.subscription-head{display:flex;gap:13px;align-items:center;padding-right:45px;margin-bottom:22px}
-.subscription-icon{width:46px;height:46px;border-radius:14px;background:#f1f1f1;color:#111;display:grid;place-items:center;font-weight:800;font-size:21px}
-.subscription-head h2{margin:0;font-size:22px}.subscription-head p{margin:4px 0 0;color:#999;font-size:12px;line-height:1.5}
-.subscription-plans{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
-.subscription-plan{display:flex;flex-direction:column;min-height:245px;padding:16px;border:1px solid #333;border-radius:17px;background:#191919}
-.subscription-plan.current{border-color:#777;box-shadow:0 0 0 1px #555 inset}
-.subscription-plan.admin{border-style:dashed}
-.subscription-plan h3{margin:0 0 7px;font-size:16px}.subscription-price{font-size:24px;font-weight:800;margin-bottom:12px}.subscription-price small{font-size:11px;font-weight:500;color:#888}
-.subscription-description{font-size:11px;line-height:1.5;color:#999;min-height:36px}.subscription-features{margin:10px 0 16px;padding-left:17px;color:#ccc;font-size:11px;line-height:1.7;flex:1}.subscription-select{border:1px solid #3b3b3b;background:#222;color:#fff;border-radius:10px;padding:9px;cursor:pointer}.subscription-select:hover{background:#2b2b2b}.subscription-plan.current .subscription-select{background:#f1f1f1;color:#111}
-.subscription-note{margin-top:15px;color:#777;font-size:10px;text-align:center}
-@media(max-width:820px){.subscription-modal{padding:10px}.subscription-panel{padding:18px;border-radius:20px;max-height:92dvh}.subscription-plans{grid-template-columns:1fr 1fr}.subscription-plan{min-height:220px}.subscription-plan:last-child{grid-column:1/-1}}
-@media(max-width:430px){.subscription-plans{grid-template-columns:1fr}.subscription-plan:last-child{grid-column:auto}}
-
-/* Nexus IA V3.9.1 — aperçu de l’abonnement et des quotas locaux */
-.subscription-overview{margin:0 0 16px;padding:15px;border:1px solid #303030;border-radius:16px;background:#191919}
-.subscription-overview-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
-.subscription-overview-label{margin:0 0 4px;color:#999;font-size:10px;letter-spacing:.06em;text-transform:uppercase}
-.subscription-overview-plan{color:#f4f4f4;font-size:17px;font-weight:750}
-.subscription-overview-price{margin-left:5px;color:#b6b6b6;font-size:12px;font-weight:500}
-.subscription-local-badge{flex:none;padding:5px 8px;border:1px solid #383838;border-radius:999px;color:#c4c4c4;font-size:10px}
-.subscription-usage-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
-.subscription-usage-item{min-width:0;padding:10px;border-radius:12px;background:#121212}
-.subscription-usage-name{color:#aaa;font-size:10px}
-.subscription-usage-count{margin-top:5px;color:#eee;font-size:12px;font-weight:650}
-.subscription-usage-count.not-included{color:#999;font-weight:500}
-.subscription-progress{height:5px;margin-top:8px;overflow:hidden;border-radius:999px;background:#292929}
-.subscription-progress>span{display:block;width:var(--quota-progress,0%);height:100%;border-radius:inherit;background:#bdbdbd}
-.subscription-overview-cycle{margin:10px 0 0;color:#858585;font-size:10px;line-height:1.5}
-@media(max-width:820px){.subscription-usage-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:430px){.subscription-overview{padding:12px}.subscription-usage-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.subscription-local-badge{font-size:9px}}
-
-.subscription-plan-quotas{margin:0 0 14px;padding:8px;border-radius:9px;background:#131313;color:#aaa;font-size:9px;line-height:1.5}
-.subscription-plan-quotas strong{display:block;margin-bottom:4px;color:#ddd;font-size:9px}
-.subscription-plan-quotas ul{display:grid;gap:2px;margin:0;padding:0;list-style:none}
-.subscription-plan-quotas li{display:flex;justify-content:space-between;gap:6px}
-.subscription-plan-quotas li span:last-child{color:#ddd;text-align:right}
-
-
 /* Nexus IA V4.0 — actions PWA */
 .side-link{color:inherit;text-decoration:none}.side-link:hover{text-decoration:none}

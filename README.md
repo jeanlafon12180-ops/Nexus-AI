@@ -46,9 +46,9 @@ Projet d'intelligence artificielle développé progressivement.
 
 ## 📌 Version actuelle
 
-**Nexus IA V3.7**
+**Nexus IA V4.0**
 
-La V3.7 est maintenant intégrée au projet.
+La V4.0 ajoute l’installation PWA et une page de présentation à Nexus Core V3.7.
 
 ## V3.7 — Nexus Core autonome
 
@@ -204,10 +204,12 @@ La V3.6 ajoute des agents spécialisés, choisis automatiquement par Nexus Core 
 - Présentation de l'usage local et des compteurs dans le navigateur.
 - Aucun paiement ni contrôle serveur n'est activé.
 
-## V4.0 — Application Web installable
+## V4.0 — Application Web installable et sans quotas d’abonnement
 
 - Installation PWA depuis les navigateurs compatibles, avec consignes iPhone et Android.
 - Cache hors connexion limité aux fichiers statiques de l'application.
 - Partage du lien via la fonction native du téléphone ou du navigateur.
 - Page de présentation structurée pour l'indexation et les liens sociaux.
-- Stripe restera désactivé tant qu'un compte utilisateur et un stockage serveur sécurisé ne seront pas prêts.
+- Retrait provisoire des abonnements simulés et des quotas mensuels de formule jusqu’à la préparation de Stripe.
+- Les garde-fous techniques (par exemple la taille maximale des documents) restent en place.
+- Stripe ne sera activé qu’après préparation d’un compte professionnel et d’un stockage serveur sécurisé.
