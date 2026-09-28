@@ -1,5 +1,5 @@
 const CACHE="nexus-ia-pwa-v4";
-const SHELL=["/","/index.html","/decouvrir.html","/offline.html","/style.css","/manifest.json","/favicon.svg","/icon-192.svg","/icon-512.svg","/pwa.js","/js/app.js","/js/audio-recording.js","/js/audio-upload.js","/js/brain.js","/js/camera-capture.js","/js/knowledge.js","/js/live-mode.js","/js/memory.js","/js/mobile-menu.js","/js/multi-upload.js","/js/subscriptions.js","/js/thinking-star.js"];
+const SHELL=["/","/index.html","/decouvrir.html","/offline.html","/style.css","/manifest.json","/favicon.svg","/icon-192.png","/icon-512.png","/apple-touch-icon.png","/pwa.js","/js/app.js","/js/audio-recording.js","/js/audio-upload.js","/js/brain.js","/js/camera-capture.js","/js/knowledge.js","/js/live-mode.js","/js/memory.js","/js/mobile-menu.js","/js/multi-upload.js","/js/subscriptions.js","/js/thinking-star.js"];
 const ALLOWED=new Set(SHELL);
 self.addEventListener("install",event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting())));
 self.addEventListener("activate",event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith("nexus-ia-pwa-")&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
