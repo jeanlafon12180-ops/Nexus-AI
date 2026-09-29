@@ -210,6 +210,13 @@ La V3.6 ajoute des agents spécialisés, choisis automatiquement par Nexus Core 
 - Cache hors connexion limité aux fichiers statiques de l'application.
 - Partage du lien via la fonction native du téléphone ou du navigateur.
 - Page de présentation structurée pour l'indexation et les liens sociaux.
-- Retrait provisoire des abonnements simulés et des quotas mensuels de formule jusqu’à la préparation de Stripe.
+- Retrait des abonnements simulés et des quotas mensuels de formule : aucune formule d’abonnement n’est active dans Nexus IA.
 - Les garde-fous techniques (par exemple la taille maximale des documents) restent en place.
-- Stripe ne sera activé qu’après préparation d’un compte professionnel et d’un stockage serveur sécurisé.
+- Aucun paiement Stripe n’est actif.
+
+## V4.1 — Installation PWA guidée et cache réparé
+
+- Ajout de `/installer.html`, une page dédiée avec les étapes d’installation sur iPhone/iPad, Android et ordinateur.
+- Ajout d’un accès direct à cette page depuis l’application et la page de présentation.
+- Mise en cache hors connexion de la page d’installation et suppression de la référence au script d’abonnement supprimé, qui empêchait le cache complet de s’installer.
+- Les abonnements et quotas mensuels restent absents. Les limites techniques de taille, de format et de contexte nécessaires aux fichiers et aux requêtes IA restent en place.
