@@ -2,7 +2,7 @@
   "id": "/",
   "name": "Nexus IA",
   "short_name": "Nexus IA",
-  "description": "Assistant IA en français pour discuter, créer et analyser des images et des documents.",
+  "description": "Assistant IA en français, installable sur mobile et ordinateur depuis un navigateur compatible.",
   "lang": "fr-FR",
   "start_url": "/",
   "scope": "/",
@@ -33,6 +33,11 @@
       "name": "Découvrir Nexus IA",
       "short_name": "Présentation",
       "url": "/decouvrir.html"
+    },
+    {
+      "name": "Installer Nexus IA",
+      "short_name": "Installer",
+      "url": "/installer.html"
     }
   ]
 }
