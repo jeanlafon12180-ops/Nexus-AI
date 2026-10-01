@@ -1,4 +1,4 @@
-import { buildFutureEngineContract, buildNexusIdentity, buildReasoningPolicy, planMission, createMissionExecution, startMissionExecution, completeMissionExecution, recoverMissionExecution, resumeMissionExecution, getMissionProgress, analyzeIntent, buildAdaptiveResponseProfile } from './nexus-core.js';
+import { buildFutureEngineContract, buildNexusIdentity, buildReasoningPolicy, planMission, createMissionExecution, startMissionExecution, completeMissionExecution, recoverMissionExecution, resumeMissionExecution, getMissionProgress, analyzeIntent, buildAdaptiveResponseProfile, createProjectState, updateProjectState, addProjectCheckpoint, projectProgress, buildProjectBrief, createProjectFromMission } from './nexus-core.js';
 import { routeModel } from './model-router.js';
 import { buildContextSupport, buildVerificationPrompt, buildCorrectionPrompt, isUsefulReview, selectSpecializedAgent, selectAgentTeam, buildIntentPrompt, buildAdaptiveResponsePrompt, buildAdaptiveVerificationMode } from './nexus-assist.js';
 
@@ -14,10 +14,13 @@ export default async function handler(req,res){
   if(!message)return res.status(400).json({error:'Message vide.'});
   const images=imageDataList.length?imageDataList:(imageData?[imageData]:[]),hasImage=images.length>0,hasDocument=documentText.length>0,mode=detectMode(message),missionPlan=planMission(message);
   const suppliedMission=body.mission&&typeof body.mission==='object'?body.mission:null;
-  let mission=suppliedMission?.steps?resumeMissionExecution(suppliedMission):createMissionExecution(message);if(missionPlan.isMission&&!mission?.startedAt)mission=startMissionExecution(mission);
+  const suppliedProject=body.project&&typeof body.project==='object'?body.project:null;
+  let mission=suppliedMission?.steps?resumeMissionExecution(suppliedMission):createMissionExecution(message);
+  let project=suppliedProject||createProjectFromMission(message,mission);if(missionPlan.isMission&&!mission?.startedAt)mission=startMissionExecution(mission);
   const historyItems=rawHistory.filter(item=>item&&(item.type==='user'||item.type==='nexus')&&typeof item.text==='string').slice(-MAX_HISTORY),historyMessages=[];let historyChars=0;
   for(let i=historyItems.length-1;i>=0;i--){const item=historyItems[i],text=cleanText(item.text,MAX_CONTEXT_MESSAGE_CHARS);if(!text)continue;if(historyChars+text.length>MAX_HISTORY_CHARS)break;historyMessages.unshift({role:item.type==='user'?'user':'assistant',content:text});historyChars+=text.length}
-  const contextSupport=buildContextSupport({message,mode,history:historyItems,memory,documentText,documentName});
+  const contextSupport=buildContextSupport({message,mode,history:historyItems,memory,documentText,documentName,mission});
+  const projectBrief=buildProjectBrief(project);
   const intent=analyzeIntent(message,historyItems),responseProfile=buildAdaptiveResponseProfile(intent),specializedAgent=selectSpecializedAgent(message,mode),agentTeam=selectAgentTeam(message,mode),verificationMode=buildAdaptiveVerificationMode({mode,intent});
   const history=historyMessages.map(item=>(item.role==='user'?'Utilisateur: ':'Nexus AI: ')+item.content).join('\n\n');
   const complexitySignals=[message.length>900,/\b(explique|compare|analyse|pourquoi|comment|détaille|raisonne|conçois|architecture|optimise|diagnostique|debug|planifie|vérifie)\b/i.test(message),mode==='code'||mode==='maths',hasImage||hasDocument,historyMessages.length>=8,intent.complexity>=3].filter(Boolean).length,isDeepTask=complexitySignals>=2;
@@ -33,14 +36,15 @@ export default async function handler(req,res){
    contextSupport.support?'NEXUS CONTEXT ADVISOR V4.4 :\n'+contextSupport.support:'',
    buildIntentPrompt({intent,message,historyLength:historyItems.length}),
    buildAdaptiveResponsePrompt(responseProfile),
-   mission.isMission?'MISSION ENGINE V4.4 : plan de mission : '+missionPlan.steps.join(' → ')+'. Les étapes sont ordonnées par dépendances ; utilise ce plan comme cadre et vérifie le résultat avant de conclure.':'',
-   'ORCHESTRATION AUTONOME V4.4 :\n- Choisis automatiquement le niveau de planification adapté à la complexité.\n- Sélectionne l’agent spécialisé le plus pertinent quand cela apporte une valeur réelle.\n- Réévalue le plan après les étapes importantes et adapte la stratégie si nécessaire.\n- Pour une tâche simple, évite les étapes inutiles. Pour une tâche complexe, utilise la chaîne complète de planification, spécialisation et vérification.\n- Stratégie sélectionnée : '+autonomousStrategy+'\n\nPROTOCOLE DE VÉRIFICATION INTERNE :\n- Identifie mentalement objectif, contraintes et contexte.\n- Vérifie silencieusement faits, calculs, code, noms, unités et contraintes.\n- Si plusieurs interprétations sont possibles, choisis celle qui correspond au contexte.\n- Fais une seconde passe silencieuse pour détecter oubli, contradiction ou erreur.\n- N’expose pas ton raisonnement interne privé ; donne seulement les conclusions et étapes utiles.',
-   specializedAgent?'AGENT ROUTER NEXUS V4.4 :\nAgent principal : '+specializedAgent.name+' ('+specializedAgent.id+') score '+String(specializedAgent.score||0)+'.\n'+specializedAgent.instruction+'\nAgents complémentaires disponibles : '+(agentTeam.filter(a=>a.id!==specializedAgent.id).map(a=>a.name+' ('+a.score+')').join(', ')||'aucun')+'.\nTous les rôles restent sous le contrôle de Nexus Core et ne possèdent aucun accès implicite à des données externes.':'',
+   mission.isMission?'MISSION ENGINE V4.5 : plan de mission : '+missionPlan.steps.join(' → ')+'. Les étapes sont ordonnées par dépendances ; utilise ce plan comme cadre et vérifie le résultat avant de conclure.':'',
+   'ORCHESTRATION AUTONOME V4.5 :\n- Choisis automatiquement le niveau de planification adapté à la complexité.\n- Sélectionne l’agent spécialisé le plus pertinent quand cela apporte une valeur réelle.\n- Réévalue le plan après les étapes importantes et adapte la stratégie si nécessaire.\n- Pour une tâche simple, évite les étapes inutiles. Pour une tâche complexe, utilise la chaîne complète de planification, spécialisation et vérification.\n- Stratégie sélectionnée : '+autonomousStrategy+'\n\nPROTOCOLE DE VÉRIFICATION INTERNE :\n- Identifie mentalement objectif, contraintes et contexte.\n- Vérifie silencieusement faits, calculs, code, noms, unités et contraintes.\n- Si plusieurs interprétations sont possibles, choisis celle qui correspond au contexte.\n- Fais une seconde passe silencieuse pour détecter oubli, contradiction ou erreur.\n- N’expose pas ton raisonnement interne privé ; donne seulement les conclusions et étapes utiles.',
+   projectBrief?'NEXUS PROJECT OS V4.5 :\n'+projectBrief+'\nMets à jour mentalement l’état du projet sans inventer de livrable terminé.':'',
+   specializedAgent?'AGENT ROUTER NEXUS V4.5 :\nAgent principal : '+specializedAgent.name+' ('+specializedAgent.id+') score '+String(specializedAgent.score||0)+'.\n'+specializedAgent.instruction+'\nAgents complémentaires disponibles : '+(agentTeam.filter(a=>a.id!==specializedAgent.id).map(a=>a.name+' ('+a.score+')').join(', ')||'aucun')+'.\nTous les rôles restent sous le contrôle de Nexus Core et ne possèdent aucun accès implicite à des données externes.':'',
    memory&&memory!=='{}'?'MÉMOIRE LOCALE FOURNIE PAR L’APPLICATION :\n'+memory+'\nUtilise-la uniquement lorsqu’elle est pertinente.':'',
    history?'CONTEXTE DE LA CONVERSATION :\n'+history+'\n\nContinue naturellement cette conversation.':'',
    hasImage?'IMAGES JOINTES : analyse réellement les images disponibles. Décris uniquement ce qui est visible ou raisonnablement déductible.':'',
    hasDocument?'DOCUMENT JOINT : le document « '+(documentName||'document')+' » est fourni sous forme de texte extrait. Base-toi d’abord sur ce contenu.':'',
-   'Tu es maintenant Nexus AI V4.4. Ne prétends jamais avoir utilisé un outil ou vérifié une information externe si ce n’est pas réellement le cas.'
+   'Tu es maintenant Nexus AI V4.5. Ne prétends jamais avoir utilisé un outil ou vérifié une information externe si ce n’est pas réellement le cas.'
   ].filter(Boolean).join('\n\n');
   const userContent=hasImage?[{type:'text',text:message},...images.map(url=>({type:'image_url',image_url:{url}}))]:hasDocument?message+'\n\n--- CONTENU DU DOCUMENT : '+(documentName||'document')+' ---\n'+documentText+'\n--- FIN DU DOCUMENT ---':message;
   let routed;
@@ -65,7 +69,13 @@ export default async function handler(req,res){
     }
   }
   mission=mission.isMission===false?mission:completeMissionExecution(mission);
+  if(project){
+    const completedSteps=Array.isArray(mission.steps)?mission.steps.filter(s=>s.status==='completed').map(s=>s.id):[];
+    const deliverables=(project.deliverables||[]).map(d=>completedSteps.includes(d.missionStep)?{...d,status:'completed'}:d);
+    project=updateProjectState(project,{deliverables,activeMissionId:mission.id});
+    project=addProjectCheckpoint(project,{label:'Réponse Nexus V4.5',status:mission.status==='completed'?'completed':'in_progress',summary:text.slice(0,700),missionId:mission.id});
+  }
   const finalMissionProgress=getMissionProgress(mission);
-  return res.status(200).json({text,version:'4.4',core:buildFutureEngineContract(),autonomousCore:{enabled:true,strategy:autonomousStrategy,replanned:isDeepTask,responseProfile},mode,mission,hasImage,hasDocument,provider:routed.provider,model:routed.model,fallbackUsed:Boolean(routed.fallbackUsed),fallbackReason:routed.fallbackReason||null,contextAdvisor:{used:contextSupport.needed,ambiguityScore:contextSupport.ambiguityScore},intent:{goal:intent.goal,domain:intent.domain,complexity:intent.complexity,confidence:intent.confidence},specializedAgent:{id:specializedAgent.id,name:specializedAgent.name,score:specializedAgent.score||0,team:agentTeam.map(a=>({id:a.id,name:a.name,score:a.score}))},verification,verificationMode,missionProgress:finalMissionProgress,coreStatus:{version:'4.4.0',missionEngine:'4.4',autoRecovery:true,missionResume:true,agentRouter:'4.4'}});
- }catch(error){console.error('Nexus AI V4.4 chat error:',error);return res.status(error.status===503?503:500).json({error:error.message||'Erreur du moteur IA.'});}
+  return res.status(200).json({text,version:'4.5',core:buildFutureEngineContract(),autonomousCore:{enabled:true,strategy:autonomousStrategy,replanned:isDeepTask,responseProfile},mode,mission,hasImage,hasDocument,provider:routed.provider,model:routed.model,fallbackUsed:Boolean(routed.fallbackUsed),fallbackReason:routed.fallbackReason||null,contextAdvisor:{used:contextSupport.needed,ambiguityScore:contextSupport.ambiguityScore},intent:{goal:intent.goal,domain:intent.domain,complexity:intent.complexity,confidence:intent.confidence},specializedAgent:{id:specializedAgent.id,name:specializedAgent.name,score:specializedAgent.score||0,team:agentTeam.map(a=>({id:a.id,name:a.name,score:a.score}))},verification,verificationMode,missionProgress:finalMissionProgress,coreStatus:{version:'4.5.0',missionEngine:'4.5',projectOS:true,projectMemory:'4.5',checkpoints:true,autoRecovery:true,missionResume:true,agentRouter:'4.5'},project,projectProgress:projectProgress(project)});
+ }catch(error){console.error('Nexus AI V4.5 chat error:',error);return res.status(error.status===503?503:500).json({error:error.message||'Erreur du moteur IA.'});}
 }
