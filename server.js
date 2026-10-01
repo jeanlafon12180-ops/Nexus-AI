@@ -9,6 +9,7 @@ const MAX_BODY = 25 * 1024 * 1024;
 
 const routes = {
   '/api/admin': () => import('./api/admin.js'),
+  '/api/capabilities': () => import('./api/capabilities.js'),
   '/api/chat': () => import('./api/chat.js'),
   '/api/edit-image': () => import('./api/edit-image.js'),
   '/api/generate-image': () => import('./api/generate-image.js'),
@@ -88,12 +89,12 @@ async function serveStatic(req, res) {
 const server = http.createServer(async (req, res) => {
   try {
     const pathname = new URL(req.url || '/', 'http://localhost').pathname;
-    res.setHeader('X-Nexus-Version', '5.0.0');
+    res.setHeader('X-Nexus-Version', '4.2.1');
 
     if (pathname === '/api/health') {
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
-      res.end(JSON.stringify({ok:true,version:'5.0.1',service:'Nexus IA'}));
+      res.end(JSON.stringify({ok:true,version:'4.2.1',service:'Nexus IA',localFirst:true}));
       return;
     }
 
@@ -129,5 +130,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Nexus IA V5.0 listening on port ${PORT}`);
+  console.log(`Nexus IA 4.2.1 listening on port ${PORT}`);
 });
