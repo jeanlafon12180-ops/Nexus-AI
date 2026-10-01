@@ -2,18 +2,18 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Nexus Workspace V4.8</title>
+<title>Nexus Workspace V4.9</title>
 <style>
 body{margin:0;background:#090909;color:#eee;font-family:system-ui,-apple-system,sans-serif}.wrap{max-width:1100px;margin:auto;padding:24px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.card{background:#121212;border:1px solid #292929;border-radius:18px;padding:18px}.muted{color:#999}.bar{height:10px;background:#242424;border-radius:99px;overflow:hidden}.fill{height:100%;background:#eee;width:0}.item{padding:10px 0;border-bottom:1px solid #252525}.done{color:#7dff9a}.pending{color:#ffd479}a,button{color:#fff}.back{display:inline-block;padding:10px 14px;border:1px solid #333;border-radius:10px;text-decoration:none}.big{font-size:28px;font-weight:700}
 </style></head>
 <body><main class="wrap">
-<div class="top"><div><div class="big">🌌 Nexus Workspace</div><div class="muted">Nexus IA V4.8 · espace projet local</div></div><a class="back" href="/">← Retour à Nexus IA</a></div>
+<div class="top"><div><div class="big">🌌 Nexus Workspace</div><div class="muted">Nexus IA V4.9 · espace projet local</div></div><a class="back" href="/">← Retour à Nexus IA</a></div>
 <div id="content" class="grid" style="margin-top:20px"></div>
 <script>
-const key='nexus-project-v48';
+const key='nexus-project-v49';
 const project=(()=>{try{return JSON.parse(localStorage.getItem(key)||'null')}catch{return null}})();
 const root=document.getElementById('content');
-if(!project){root.innerHTML='<div class="card"><h2>📁 Aucun projet actif</h2><p class="muted">Crée ou lance une mission depuis Nexus IA V4.8 pour alimenter cet espace.</p></div>';return;}
+if(!project){root.innerHTML='<div class="card"><h2>📁 Aucun projet actif</h2><p class="muted">Crée ou lance une mission depuis Nexus IA V4.9 pour alimenter cet espace.</p></div>';return;}
 const items=Array.isArray(project.deliverables)?project.deliverables:[];
 const done=items.filter(x=>x.status==='completed').length;const risks=Array.isArray(project.risks)?project.risks:[];
 const percent=items.length?Math.round(done/items.length*100):0;
@@ -21,6 +21,6 @@ root.innerHTML=
 '<div class="card"><h2>🎯 '+escapeHtml(project.name||'Projet Nexus')+'</h2><p>'+escapeHtml(project.goal||'Aucun objectif défini.')+'</p><div class="bar"><div class="fill" style="width:'+percent+'%"></div></div><p class="muted">'+percent+'% · '+done+'/'+items.length+' livrables terminés</p></div>'+
 '<div class="card"><h2>📦 Livrables</h2>'+items.map(x=>'<div class="item '+(x.status==='completed'?'done':'pending')+'">'+(x.status==='completed'?'✓':'○')+' '+escapeHtml(x.label||x.id)+'</div>').join('')+'</div>'+
 '<div class="card"><h2>⚠️ Risques</h2>'+(risks.length?risks.map(x=>'<div class="item pending">'+escapeHtml(x.severity||'')+' · '+escapeHtml(x.label||'Risque')+'</div>').join(''):'<p class="muted">Aucun risque détecté.</p>')+'</div>'+ '<div class="card"><h2>🧭 Checkpoints</h2>'+((project.checkpoints||[]).slice().reverse().slice(0,8).map(x=>'<div class="item"><strong>'+escapeHtml(x.label||'Checkpoint')+'</strong><br><span class="muted">'+escapeHtml(x.status||'')+'</span></div>').join('')||'<p class="muted">Aucun checkpoint.</p>')+'</div>'+
-'<div class="card"><h2>⚙️ Nexus Core V4.8</h2><p class="done">✓ Adaptive Intelligence</p><p class="done">✓ Goal Engine</p><p class="done">✓ Self-Evaluation</p><p class="done">✓ Context Priority</p><p class="done">✓ Cognitive Core</p><p class="done">✓ Decision Engine</p><p class="done">✓ Context Intelligence</p><p class="done">✓ Project OS</p><p class="done">✓ Model Gateway</p><p class="done">✓ Provider-independent routing</p><p class="muted">Les modèles restent configurables séparément. Le Workspace affiche l’état local du projet ; il ne prétend pas fournir une mémoire serveur.</p></div>';
+'<div class="card"><h2>⚙️ Nexus Core V4.9</h2><p class="done">✓ Nexus Runtime</p><p class="done">✓ Mission Continuity</p><p class="done">✓ Event Trace</p><p class="done">✓ Structured Memory</p><p class="done">✓ Adaptive Intelligence</p><p class="done">✓ Goal Engine</p><p class="done">✓ Self-Evaluation</p><p class="done">✓ Context Priority</p><p class="done">✓ Cognitive Core</p><p class="done">✓ Decision Engine</p><p class="done">✓ Context Intelligence</p><p class="done">✓ Project OS</p><p class="done">✓ Model Gateway</p><p class="done">✓ Provider-independent routing</p><p class="muted">Les modèles restent configurables séparément. Le Workspace affiche l’état local du projet ; il ne prétend pas fournir une mémoire serveur.</p></div>';
 function escapeHtml(v){return String(v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
 </script></main></body></html>
