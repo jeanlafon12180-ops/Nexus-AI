@@ -1,4 +1,4 @@
-export const DEVICE_KEY='nexus_ia_profile_id_v11';
+export const DEVICE_KEY='nexus_ia_profile_id_v12';
 export const MEMORY_PREFIX='nexus_ia_memory_v11_';
 export const CHAT_PREFIX='nexus_ia_conversation_v11_';
 
@@ -17,7 +17,7 @@ function migratePrivateLegacyData(){try{
   if(!localStorage.getItem(CHAT_KEY)){const value=localStorage.getItem(oldChat);if(value)localStorage.setItem(CHAT_KEY,value);}
 }catch{}}
 migratePrivateLegacyData();
-export function createMemory(){return{prenom:'',ville:'',preferences:{},notes:[]};}
+export function createMemory(){return{version:'5.3.0',prenom:'',ville:'',preferences:{},notes:[]};}
 export function loadMemory(){const value=read(MEMORY_KEY,createMemory());return value&&typeof value==='object'?{...createMemory(),...value}:createMemory();}
 export function saveMemory(memory){try{localStorage.setItem(MEMORY_KEY,JSON.stringify(memory));}catch{}}
 export function loadConversation(){const value=read(CHAT_KEY,[]);return Array.isArray(value)?value:[];}
@@ -35,4 +35,4 @@ export function buildMemoryContext(memory, history, message) {
   return {profile:{prenom:source.prenom||'',ville:source.ville||''},preferences:source.preferences||{},notes:selected,recentHistory:Array.isArray(history)?history.slice(-8):[]};
 }
 
-export function buildMemoryInstruction(){return 'MÉMOIRE AVANCÉE V4.3 : utilise uniquement les souvenirs fournis par l’application, privilégie ceux qui sont pertinents pour la demande actuelle, traite les préférences comme des indications et ne transforme jamais une supposition en souvenir certain. En cas de contradiction, privilégie l’information la plus récente ou demande une clarification.';}
+export function buildMemoryInstruction(){return 'MÉMOIRE APPRENANTE 5.3.0 : utilise uniquement les souvenirs fournis par l’application, privilégie ceux qui sont pertinents pour la demande actuelle, traite les préférences comme des indications et ne transforme jamais une supposition en souvenir certain. En cas de contradiction, privilégie l’information la plus récente ou demande une clarification.';}
