@@ -4,21 +4,22 @@ Projet d’intelligence artificielle développé progressivement autour de **Nex
 
 ## 🚀 Version actuelle
 
-**Nexus IA V4.3 — Nexus Core Adaptive**
+**Nexus IA V4.4 — Nexus Core Intelligence**
 
-La V4.3 renforce l’intelligence interne de Nexus Core tout en conservant les capacités multimodales et l’architecture de résilience des versions précédentes.
+La V4.4 transforme Nexus Core en moteur de missions plus structuré : reprise de mission, récupération automatique limitée, routage d’agents par score, vérification adaptative et statut Core enrichi, tout en conservant les capacités multimodales et la résilience des versions précédentes.
 
-### 🧠 Nexus Core V4.3
+### 🧠 Nexus Core V4.4
 
-- 🎯 **Intent Engine V4.3** : analyse de l’objectif, du domaine, de la complexité, du contexte et du niveau de confiance.
-- 🧩 **Mission Graph** : missions découpées en étapes avec dépendances et états de progression.
-- 🤖 **Orchestration spécialisée** : sélection dynamique des agents Code, Science, Study, Analysis, Creative ou General.
-- 🔗 **Context Advisor V4.3** : meilleure utilisation de l’historique, de la mémoire et des documents pertinents.
+- 🎯 **Intent Engine V4.4** : analyse de l’objectif, du domaine, de la complexité, du contexte et du niveau de confiance.
+- 🧩 **Mission Graph V4.4** : missions découpées en étapes avec dépendances, états, progression et reprise.
+- 🤖 **Agent Router V4.4** : scoring des agents, sélection d’un agent principal et constitution d’une équipe complémentaire lorsque c’est pertinent.
+- 🔗 **Context Advisor V4.4** : meilleure utilisation de l’historique, de la mémoire et des documents pertinents.
 - 🎚️ **Adaptive Response** : niveau de détail et structure adaptés à la complexité réelle de la demande.
-- 🔍 **Verification V4.3** : contrôle interne des réponses importantes et correction automatique lorsqu’une correction est nécessaire.
-- 🛡️ **Resilience / Fallback** : conservation du routage principal et du moteur de secours configuré.
+- 🔍 **Verification V4.4** : contrôle interne des réponses importantes avec mode de vérification adapté au domaine.
+- 🛡️ **Auto-Recovery + Fallback** : récupération limitée d’une étape en échec et maintien du routage de secours.
 - 🔒 **Honnêteté opérationnelle** : Nexus ne prétend jamais avoir utilisé un outil, testé du code ou effectué une action qui n’a pas réellement eu lieu.
-- 🔐 **Mémoire locale** : contexte isolé par profil navigateur ; les préférences de présentation restent locales et non sensibles.
+- ▶️ **Mission Resume** : reprise d’une mission fournie par l’application sans mélanger ses états avec une autre session.
+- 🔐 **Mémoire locale** : contexte isolé par profil navigateur ; les données persistantes restent limitées à ce que l’application fournit réellement au Core.
 
 ## 📚 Historique des versions
 
@@ -35,7 +36,7 @@ La V4.3 renforce l’intelligence interne de Nexus Core tout en conservant les c
 | **V3.6** | 🤖 Specialized Agents. |
 | **V3.7** | 🌌 Autonomous Nexus Core et orchestration adaptative. |
 | **V4.2** | 🎯 Smart Intent : meilleure compréhension de l’objectif, du contexte et de la complexité. |
-| **V4.3** | 🧠 **Nexus Core Adaptive** : Intent Engine V4.3, Mission Graph, orchestration multi-agents, réponse adaptative, vérification renforcée et interface alignée. |
+| **V4.4** | 🧠 **Nexus Core Adaptive** : Intent Engine V4.4, Mission Graph, orchestration multi-agents, réponse adaptative, vérification renforcée et interface alignée. |
 
 ## ✨ Capacités
 
@@ -59,14 +60,14 @@ La V4.3 renforce l’intelligence interne de Nexus Core tout en conservant les c
 
 ## 🏗️ Architecture
 
-- `api/nexus-core.js` — intelligence et orchestration Nexus Core V4.3
-- `api/nexus-assist.js` — contexte, agents, intention et vérification
+- `api/nexus-core.js` — intelligence, missions, reprise et récupération Nexus Core V4.4
+- `api/nexus-assist.js` — contexte, scoring d’agents, équipe spécialisée, intention et vérification adaptative
 - `api/chat.js` — pipeline conversationnel Nexus Core
 - `api/model-router.js` — routage des modèles
 - `js/memory.js` — mémoire et contexte local
 - `js/app.js` — interface principale
-- `index.html` — application Web Nexus IA V4.3
-- `admin.html` — console privée Nexus Core V4.3
+- `index.html` — application Web Nexus IA V4.4
+- `admin.html` — console privée Nexus Core V4.4
 
 ## 🔐 Confidentialité et fiabilité
 
@@ -79,3 +80,4 @@ Nexus distingue les informations disponibles, les hypothèses et les limites. Il
 Le projet peut être publié sur GitHub Pages pour la partie statique et sur Vercel pour les endpoints serveur.
 
 > Chaque nouvelle version doit compléter cet historique et apporter au moins une amélioration supplémentaire, même si elle n’était pas demandée initialement.
+\n\n## 🆕 V4.4 — Pipeline de mission\n\n`Demande → contexte → intention → plan → Agent Router → exécution → vérification adaptative → récupération éventuelle → correction → résultat`\n\nLes mécanismes de récupération sont volontairement bornés pour éviter les boucles infinies. Les agents spécialisés restent des rôles orchestrés par Nexus Core et ne sont pas présentés comme des systèmes autonomes indépendants.\n
