@@ -1,5 +1,5 @@
-import { getModelRoutingStatus } from './model-router.js';
-import { buildFutureEngineContract } from './nexus-core.js';
+import { getModelRoutingStatus } from '../lib/model-router.js';
+import { buildFutureEngineContract } from '../lib/nexus-core.js';
 import crypto from 'node:crypto';
 
 function unauthorized(res) {
