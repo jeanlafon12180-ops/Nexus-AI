@@ -90,12 +90,12 @@ async function serveStatic(req, res) {
 const server = http.createServer(async (req, res) => {
   try {
     const pathname = new URL(req.url || '/', 'http://localhost').pathname;
-    res.setHeader('X-Nexus-Version', '5.2.6');
+    res.setHeader('X-Nexus-Version', '5.3.0');
 
     if (pathname === '/api/health') {
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
-      res.end(JSON.stringify({ok:true,version:'5.2.6',service:'Nexus IA',localFirst:true}));
+      res.end(JSON.stringify({ok:true,version:'5.3.0',service:'Nexus IA',localFirst:true}));
       return;
     }
 
@@ -131,5 +131,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Nexus IA 5.2.6 listening on port ${PORT}`);
+  console.log(`Nexus IA 5.3.0 listening on port ${PORT}`);
 });
