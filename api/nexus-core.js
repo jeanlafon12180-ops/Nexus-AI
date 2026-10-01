@@ -1,14 +1,14 @@
-const VERSION='4.9.0';
+const VERSION='5.0.0';
 
 export function buildNexusIdentity(){return[
-'IDENTITÉ NEXUS CORE V4.9 : tu es le moteur central d’intelligence, de planification, d’orchestration et de récupération de Nexus IA.',
+'IDENTITÉ NEXUS CORE V5.0 : tu es le moteur central d’intelligence, de planification, d’orchestration et de récupération de Nexus IA.',
 'Tu analyses objectif, contraintes, contexte, complexité, dépendances et critères de réussite avant de choisir une stratégie.',
-'Nexus Core reste indépendant du fournisseur de modèle et peut continuer avec un moteur de secours configuré si le modèle principal devient indisponible.',
+'Nexus Core privilégie les moteurs natifs/local-first et conserve les fournisseurs cloud comme fallback optionnel. et peut continuer avec un moteur de secours configuré si le modèle principal devient indisponible.',
 'Tu restes honnête : aucune action, vérification, navigation, exécution ou observation ne doit être prétendue si elle n’a réellement eu lieu.'
 ].join('\n')}
 
 export function buildReasoningPolicy(){return[
-'POLITIQUE NEXUS CORE V4.9 :',
+'POLITIQUE NEXUS CORE V5.0 :',
 '- Décompose les tâches complexes en étapes utiles avant de répondre.',
 '- Identifie objectif, résultat attendu, contraintes, contexte, dépendances et critères de réussite.',
 '- Choisis une stratégie proportionnée : réponse directe, analyse, mission ou orchestration spécialisée.',
@@ -23,10 +23,10 @@ export function buildReasoningPolicy(){return[
 ].join('\n')}
 
 export function buildFutureEngineContract(){return{
-version:VERSION,architecture:'nexus-core',orchestration:true,missionMode:true,missionEngine:'4.9',projectOS:true,projectWorkspace:true,projectState:'4.9',modelGateway:'4.9',providerIndependent:true,decisionEngine:'4.9',cognitiveCore:'4.9',contextIntelligence:'4.9',goalEngine:'4.9',qualityEngine:'4.9',selfEvaluation:true,projectRiskEngine:'4.9',
+version:VERSION,architecture:'nexus-core',orchestration:true,missionMode:true,missionEngine:'5.0',projectOS:true,projectWorkspace:true,projectState:'5.0',modelGateway:'5.0',providerIndependent:true,decisionEngine:'5.0',cognitiveCore:'5.0',contextIntelligence:'5.0',goalEngine:'5.0',qualityEngine:'5.0',selfEvaluation:true,projectRiskEngine:'5.0',
 modelResilience:true,primaryModel:'gpt-5.6-sol',fallbackReady:true,contextAdvisor:true,selfCorrection:true,
 specializedAgents:true,agentOrchestration:true,autonomousCore:true,adaptivePlanning:true,adaptiveResponse:true,
-intentEngine:'4.9',missionGraph:true,missionResume:true,autoRecovery:true,agentRouter:'4.9',projectMemory:'4.9',checkpointEngine:true,deliverableTracking:true,
+intentEngine:'5.0',missionGraph:true,missionResume:true,autoRecovery:true,agentRouter:'5.0',projectMemory:'5.0',checkpointEngine:true,deliverableTracking:true,
 verification:true,adaptiveVerification:true,multimodalReady:true,privacyBoundary:'session-scoped'
 }}
 
@@ -189,7 +189,7 @@ export function projectProgress(project){
 export function buildProjectBrief(project){
  if(!project)return'';
  return[
-  'NEXUS PROJECT OS V4.9',
+  'NEXUS PROJECT OS V5.0',
   'Projet : '+cleanProjectText(project.name,120),
   'Objectif : '+cleanProjectText(project.goal,2000),
   project.context?'Contexte : '+cleanProjectText(project.context,2000):'',
