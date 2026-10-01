@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Nexusia V5 — assistant IA multimodal local-first, conversations, fichiers, voix et moteurs créatifs.">
-<title>Nexusia</title>
+<meta name="description" content="Nexus IA V5 — assistant IA multimodal local-first, conversations, fichiers, voix et moteurs créatifs.">
+<title>Nexus IA</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="style.css?v=5.0.2">
+<link rel="stylesheet" href="style.css?v=5.3.0">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.21.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.9.0/mammoth.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.20.1/dist/jszip.min.js"></script>
@@ -17,7 +17,7 @@
 <div class="app">
 <aside class="sidebar" aria-label="Navigation">
   <div class="sidebar-top">
-    <div class="brand"><div class="logo">N</div><strong>Nexusia</strong></div>
+    <div class="brand"><div class="logo">N</div><strong>Nexus IA</strong></div>
     <button class="new-chat" id="newChatButton"><span>＋</span><span>Nouvelle discussion</span></button>
     <div class="section-label">Discussions</div>
     <div id="conversationList" class="conversation-list"></div>
@@ -28,13 +28,13 @@
     <button class="side-link" id="helpButton">Capacités</button>
     <button class="side-link" id="exportChatButton">Exporter</button>
     <button class="side-link" id="clearMemoryButton">Effacer la mémoire</button>
-    <div class="side-meta">Nexusia V5.0<br><span>Native-first · Nexus Core</span></div>
+    <div class="side-meta">Nexus IA 5.3<br><span>Native-first · Nexus Core</span></div>
   </div>
 </aside>
 
 <div class="mobile-drawer-backdrop" id="mobileDrawerBackdrop" hidden></div>
 <aside class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
-  <div class="mobile-drawer-head"><strong>Nexusia</strong><button id="closeMobileMenu" aria-label="Fermer">×</button></div>
+  <div class="mobile-drawer-head"><strong>Nexus IA</strong><button id="closeMobileMenu" aria-label="Fermer">×</button></div>
   <button class="new-chat" id="mobileNewChatButton">＋ Nouvelle discussion</button>
   <div class="section-label">Navigation</div>
   <a class="side-link" href="/workspace.html">Workspace</a>
@@ -47,7 +47,7 @@
 <main class="main">
 <header class="topbar">
   <button class="mobile-menu-button" id="mobileMenuButton" aria-label="Ouvrir le menu">☰</button>
-  <div class="top-title">Nexusia</div>
+  <div class="top-title">Nexus IA</div>
   <div class="top-actions">
     <span class="local-badge">● Local-first</span>
     <button class="top-icon" id="topNewChat" aria-label="Nouvelle discussion">✎</button>
@@ -59,7 +59,7 @@
   <div class="empty-state">
     <div class="empty-logo">N</div>
     <h1>Que puis-je faire pour vous ?</h1>
-    <p>Écrivez simplement ce dont vous avez besoin. Nexusia choisit le moteur adapté.</p>
+    <p>Écrivez simplement ce dont vous avez besoin. Nexus IA choisit le moteur adapté.</p>
     <div class="suggestions">
       <button class="suggestion">Analyse ce document</button>
       <button class="suggestion">Crée une image</button>
@@ -84,11 +84,11 @@
       </div>
     </div>
     <input id="imageFileInput" type="file" accept="image/*,video/*,.pdf,.docx,.odt,.txt,.md,.csv,.json,audio/*" multiple hidden>
-    <textarea id="messageInput" placeholder="Message à Nexusia…" rows="1"></textarea>
+    <textarea id="messageInput" placeholder="Message à Nexus IA…" rows="1"></textarea>
     <button class="composer-tool" id="audioRecordButton" aria-label="Voix" title="Voix">♩</button>
     <button id="sendButton" aria-label="Envoyer" title="Envoyer">↑</button>
   </div>
-  <div class="composer-note">Nexusia peut faire des erreurs. Vérifiez les informations importantes.</div>
+  <div class="composer-note">Nexus IA peut faire des erreurs. Vérifiez les informations importantes.</div>
 </div>
 </main>
 </div>
@@ -99,6 +99,6 @@
 <script src="js/audio-upload.js?v=5.0"></script>
 <script src="js/live-mode.js?v=5.0"></script>
 <script src="js/mobile-menu.js?v=5.0"></script>
-<script type="module" src="js/app.js?v=5.0.2"></script>
+<script type="module" src="js/app.js?v=5.3.0"></script>
 </body>
 </html>
