@@ -35,4 +35,4 @@ export function buildMemoryContext(memory, history, message) {
   return {profile:{prenom:source.prenom||'',ville:source.ville||''},preferences:source.preferences||{},notes:selected,recentHistory:Array.isArray(history)?history.slice(-8):[]};
 }
 
-export function buildMemoryInstruction(){return 'MÉMOIRE AVANCÉE V3.5 : utilise uniquement les souvenirs fournis par l’application, privilégie ceux qui sont pertinents pour la demande actuelle, traite les préférences comme des indications et ne transforme jamais une supposition en souvenir certain. En cas de contradiction, privilégie l’information la plus récente ou demande une clarification.';}
+export function buildMemoryInstruction(){return 'MÉMOIRE AVANCÉE V4.3 : utilise uniquement les souvenirs fournis par l’application, privilégie ceux qui sont pertinents pour la demande actuelle, traite les préférences comme des indications et ne transforme jamais une supposition en souvenir certain. En cas de contradiction, privilégie l’information la plus récente ou demande une clarification.';}
