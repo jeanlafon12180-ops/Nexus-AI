@@ -1,4 +1,5 @@
 import { getModelRoutingStatus } from './model-router.js';
+import { buildFutureEngineContract } from './nexus-core.js';
 import crypto from 'node:crypto';
 
 function unauthorized(res) {
@@ -66,7 +67,7 @@ export default async function handler(req, res) {
 
   return res.status(200).json({
     ok: true,
-    version: '4.3.0',
+    version: '4.4.0',
     name: 'Nexus IA',
     generatedAt: new Date().toISOString(),
     runtime: process.version,
@@ -86,6 +87,9 @@ export default async function handler(req, res) {
       historyScope: 'browser profile',
       sharedLegacyHistoryKey: false
     },
-    note: 'Le tableau de bord V4.3 affiche des diagnostics serveur en temps réel. Les erreurs détaillées restent dans les Runtime Logs Vercel.'
+    core: buildFutureEngineContract(),
+    missionEngine: { version:'4.4', resume:true, autoRecovery:true, dependencyGraph:true },
+    agentRouter: { version:'4.4', scoring:true, teamSelection:true },
+    note: 'Le tableau de bord V4.4 affiche les diagnostics serveur et l’état des nouveaux moteurs. Les erreurs détaillées restent dans les Runtime Logs Vercel.'
   });
 }
