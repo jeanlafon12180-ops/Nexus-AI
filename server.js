@@ -32,10 +32,12 @@ const mime = {
 function wrapResponse(res) {
   return {
     status(code) { res.statusCode = code; return this; },
+    setHeader(name, value) { res.setHeader(name, value); return this; },
     json(value) {
       if (!res.headersSent) res.setHeader('Content-Type', 'application/json; charset=utf-8');
       res.end(JSON.stringify(value));
     },
+    send(value = '') { res.end(value); },
     end(value = '') { res.end(value); }
   };
 }
@@ -88,10 +90,23 @@ const server = http.createServer(async (req, res) => {
     const pathname = new URL(req.url || '/', 'http://localhost').pathname;
     res.setHeader('X-Nexus-Version', '5.0.0');
 
+    if (pathname === '/api/health') {
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.end(JSON.stringify({ok:true,version:'5.0.1',service:'Nexus IA'}));
+      return;
+    }
+
     if (routes[pathname]) {
       const body = await parseBody(req);
       const mod = await routes[pathname]();
-      const wrappedReq = { ...req, body, query: Object.fromEntries(new URL(req.url || '/', 'http://localhost').searchParams) };
+      const wrappedReq = {
+        method: req.method,
+        url: req.url,
+        headers: req.headers,
+        body,
+        query: Object.fromEntries(new URL(req.url || '/', 'http://localhost').searchParams)
+      };
       await mod.default(wrappedReq, wrapResponse(res));
       return;
     }
