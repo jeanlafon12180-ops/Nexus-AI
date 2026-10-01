@@ -88,7 +88,7 @@ export function listConfiguredProviders() {
     id: provider.id,
     kind: provider.kind,
     model: provider.model,
-    configured: Boolean(provider.url && provider.key)
+    configured: Boolean(provider.url && (provider.id === 'local' || provider.key))
   }));
 }
 
@@ -96,13 +96,13 @@ export async function generateWithProvider({ providerId, messages, temperature, 
   const definition = PROVIDERS[providerId];
   if (!definition) throw new Error('Fournisseur Nexus inconnu : ' + providerId);
   const provider = resolveProvider(definition);
-  if (!provider.url || !provider.key) throw new Error('Fournisseur Nexus non configuré : ' + providerId);
+  if (!provider.url || (provider.id !== 'local' && !provider.key)) throw new Error('Fournisseur Nexus non configuré : ' + providerId);
   const data = await requestOpenAICompatible({ provider, messages, temperature, maxTokens });
   return { data, provider: provider.id, model: provider.model };
 }
 
 export async function generate({ messages, temperature, maxTokens, preferredProvider = 'openai' }) {
-  const order = [...new Set([preferredProvider, 'openai', 'fallback', 'legacy'])].filter(id => PROVIDERS[id]);
+  const order = [...new Set(['local', preferredProvider, 'openai', 'fallback', 'legacy'])].filter(id => PROVIDERS[id]);
   let lastError = null;
 
   for (const providerId of order) {
@@ -123,7 +123,7 @@ export async function generate({ messages, temperature, maxTokens, preferredProv
 export function getGatewayStatus() {
   const providers = listConfiguredProviders();
   return {
-    version: '4.8',
+    version: '5.0',
     abstraction: 'Nexus Model Gateway',
     providerIndependent: true,
     providers,
@@ -132,7 +132,7 @@ export function getGatewayStatus() {
 }
 
 export function getModelCapabilities(){
- return Object.values(PROVIDERS).map(provider=>({id:provider.id,kind:provider.kind,configured:Boolean(process.env[provider.keyEnv]),model:process.env[provider.modelEnv]||provider.defaultModel,capabilities:{text:true,vision:provider.id==='openai',reasoning:provider.id!=='legacy-compatible-fallback',code:true}}));
+ return Object.values(PROVIDERS).map(provider=>({id:provider.id,kind:provider.kind,configured:Boolean(process.env[provider.urlEnv] || process.env[provider.keyEnv]),model:process.env[provider.modelEnv]||provider.defaultModel,capabilities:{text:true,vision:provider.id==='openai',reasoning:provider.id!=='legacy-compatible-fallback',code:true}}));
 }
 export function selectProviderForCapability({preferredProvider='openai',capability='text'}={}){
  const candidates=getModelCapabilities().filter(x=>x.configured||x.id===preferredProvider);
