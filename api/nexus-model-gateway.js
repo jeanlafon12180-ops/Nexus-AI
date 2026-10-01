@@ -114,7 +114,7 @@ export async function generate({ messages, temperature, maxTokens, preferredProv
 export function getGatewayStatus() {
   const providers = listConfiguredProviders();
   return {
-    version: '4.6',
+    version: '4.7',
     abstraction: 'Nexus Model Gateway',
     providerIndependent: true,
     providers,
