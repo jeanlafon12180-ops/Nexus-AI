@@ -114,10 +114,18 @@ export async function generate({ messages, temperature, maxTokens, preferredProv
 export function getGatewayStatus() {
   const providers = listConfiguredProviders();
   return {
-    version: '4.7',
+    version: '4.8',
     abstraction: 'Nexus Model Gateway',
     providerIndependent: true,
     providers,
     configuredCount: providers.filter(provider => provider.configured).length
   };
+}
+
+export function getModelCapabilities(){
+ return Object.values(PROVIDERS).map(provider=>({id:provider.id,kind:provider.kind,configured:Boolean(process.env[provider.keyEnv]),model:process.env[provider.modelEnv]||provider.defaultModel,capabilities:{text:true,vision:provider.id==='openai',reasoning:provider.id!=='legacy-compatible-fallback',code:true}}));
+}
+export function selectProviderForCapability({preferredProvider='openai',capability='text'}={}){
+ const candidates=getModelCapabilities().filter(x=>x.configured||x.id===preferredProvider);
+ return candidates.find(x=>x.capabilities?.[capability])||candidates[0]||null;
 }
