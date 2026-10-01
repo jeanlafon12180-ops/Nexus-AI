@@ -1,13 +1,13 @@
-import { buildFutureEngineContract, buildNexusIdentity, buildReasoningPolicy, planMission, createMissionExecution, startMissionExecution, completeMissionExecution, recoverMissionExecution, resumeMissionExecution, getMissionProgress, analyzeIntent, buildAdaptiveResponseProfile, createProjectState, updateProjectState, addProjectCheckpoint, projectProgress, buildProjectBrief, createProjectFromMission } from './nexus-core.js';
-import { routeModel } from './model-router.js';
-import { buildGoal, evaluateGoal, buildQualitySignal, buildAdaptiveGoalPlan, buildProjectRisks } from './nexus-goal-engine.js';
-import { createRuntimeMission, appendRuntimeEvent, getRuntimeStatus, checkpointRuntimeMission, recoverRuntimeMission, continueMission } from './nexus-runtime.js';
-import { buildNativeExecutionPlan, buildNativeCapabilityContract } from './nexus-native-engine.js';
-import { createMemoryStore, recordMemoryEvent, getMemorySnapshot } from './nexus-memory-engine.js';
-import { prioritizeContext, buildPrioritizedContextPrompt } from './nexus-context-engine.js';
-import { decideNextAction, buildDecisionPrompt, buildCognitiveLoop } from './nexus-decision-engine.js';
-import { buildCognitiveContext, buildCognitivePlan } from './nexus-core.js';
-import { buildContextSupport, buildVerificationPrompt, buildCorrectionPrompt, isUsefulReview, selectSpecializedAgent, selectAgentTeam, buildIntentPrompt, buildAdaptiveResponsePrompt, buildAdaptiveVerificationMode, buildGoalControlPrompt, buildQualityControlPrompt, buildRuntimeControlPrompt, buildContinuityPrompt } from './nexus-assist.js';
+import { buildFutureEngineContract, buildNexusIdentity, buildReasoningPolicy, planMission, createMissionExecution, startMissionExecution, completeMissionExecution, recoverMissionExecution, resumeMissionExecution, getMissionProgress, analyzeIntent, buildAdaptiveResponseProfile, createProjectState, updateProjectState, addProjectCheckpoint, projectProgress, buildProjectBrief, createProjectFromMission } from '../lib/nexus-core.js';
+import { routeModel } from '../lib/model-router.js';
+import { buildGoal, evaluateGoal, buildQualitySignal, buildAdaptiveGoalPlan, buildProjectRisks } from '../lib/nexus-goal-engine.js';
+import { createRuntimeMission, appendRuntimeEvent, getRuntimeStatus, checkpointRuntimeMission, recoverRuntimeMission, continueMission } from '../lib/nexus-runtime.js';
+import { buildNativeExecutionPlan, buildNativeCapabilityContract } from '../lib/nexus-native-engine.js';
+import { createMemoryStore, recordMemoryEvent, getMemorySnapshot } from '../lib/nexus-memory-engine.js';
+import { prioritizeContext, buildPrioritizedContextPrompt } from '../lib/nexus-context-engine.js';
+import { decideNextAction, buildDecisionPrompt, buildCognitiveLoop } from '../lib/nexus-decision-engine.js';
+import { buildCognitiveContext, buildCognitivePlan } from '../lib/nexus-core.js';
+import { buildContextSupport, buildVerificationPrompt, buildCorrectionPrompt, isUsefulReview, selectSpecializedAgent, selectAgentTeam, buildIntentPrompt, buildAdaptiveResponsePrompt, buildAdaptiveVerificationMode, buildGoalControlPrompt, buildQualityControlPrompt, buildRuntimeControlPrompt, buildContinuityPrompt } from '../lib/nexus-assist.js';
 
 export const config={api:{bodyParser:{sizeLimit:'15mb'}}};
 const MAX_IMAGES=20,MAX_HISTORY=24,MAX_HISTORY_CHARS=30000,MAX_MEMORY_CHARS=6000,MAX_CONTEXT_MESSAGE_CHARS=6000;
