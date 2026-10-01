@@ -90,6 +90,6 @@ export default async function handler(req, res) {
     core: buildFutureEngineContract(),
     missionEngine: { version:'4.7', resume:true, autoRecovery:true, dependencyGraph:true, cognitivePlanning:true, adaptiveRecovery:true },
     agentRouter: { version:'4.7', scoring:true, teamSelection:true, strategyComposition:true },
-    note: 'Le tableau de bord V4.6 affiche les diagnostics serveur et l’état des nouveaux moteurs. Les erreurs détaillées restent dans les Runtime Logs Vercel.'
+    note: 'Le tableau de bord V4.7 affiche les diagnostics serveur et l’état des nouveaux moteurs. Les erreurs détaillées restent dans les Runtime Logs Vercel.'
   });
 }
