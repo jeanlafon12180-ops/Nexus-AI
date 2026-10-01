@@ -1,4 +1,4 @@
-const VERSION='4.5.0';
+const VERSION='4.6.0';
 
 export function buildNexusIdentity(){return[
 'IDENTITÉ NEXUS CORE V4.6 : tu es le moteur central d’intelligence, de planification, d’orchestration et de récupération de Nexus IA.',
@@ -23,10 +23,10 @@ export function buildReasoningPolicy(){return[
 ].join('\n')}
 
 export function buildFutureEngineContract(){return{
-version:VERSION,architecture:'nexus-core',orchestration:true,missionMode:true,missionEngine:'4.5',projectOS:true,projectWorkspace:true,projectState:'4.5',
+version:VERSION,architecture:'nexus-core',orchestration:true,missionMode:true,missionEngine:'4.6',projectOS:true,projectWorkspace:true,projectState:'4.6',modelGateway:'4.6',providerIndependent:true,
 modelResilience:true,primaryModel:'gpt-5.6-sol',fallbackReady:true,contextAdvisor:true,selfCorrection:true,
 specializedAgents:true,agentOrchestration:true,autonomousCore:true,adaptivePlanning:true,adaptiveResponse:true,
-intentEngine:'4.5',missionGraph:true,missionResume:true,autoRecovery:true,agentRouter:'4.5',projectMemory:'4.5',checkpointEngine:true,deliverableTracking:true,
+intentEngine:'4.6',missionGraph:true,missionResume:true,autoRecovery:true,agentRouter:'4.6',projectMemory:'4.6',checkpointEngine:true,deliverableTracking:true,
 verification:true,adaptiveVerification:true,multimodalReady:true,privacyBoundary:'session-scoped'
 }}
 
