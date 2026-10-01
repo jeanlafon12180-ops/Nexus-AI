@@ -1,4 +1,12 @@
 const PROVIDERS = Object.freeze({
+  local: {
+    id: 'local',
+    kind: 'local-openai-compatible',
+    urlEnv: 'NEXUS_LOCAL_TEXT_URL',
+    keyEnv: null,
+    modelEnv: 'NEXUS_LOCAL_TEXT_MODEL',
+    defaultModel: 'local-model'
+  },
   openai: {
     id: 'openai',
     kind: 'openai-compatible',
@@ -36,6 +44,7 @@ function isRetryableStatus(status) {
 }
 
 function resolveProvider(definition) {
+  if (definition.id === 'local') return {id:'local',kind:definition.kind,url:process.env[definition.urlEnv]||'',key:'',model:process.env[definition.modelEnv]||definition.defaultModel};
   return {
     id: definition.id,
     kind: definition.kind,
@@ -128,4 +137,9 @@ export function getModelCapabilities(){
 export function selectProviderForCapability({preferredProvider='openai',capability='text'}={}){
  const candidates=getModelCapabilities().filter(x=>x.configured||x.id===preferredProvider);
  return candidates.find(x=>x.capabilities?.[capability])||candidates[0]||null;
+}
+
+
+export function getGatewayMode(){
+ return{version:'5.0.0',mode:'local-first',localConfigured:Boolean(process.env.NEXUS_LOCAL_TEXT_URL),cloudFallbackOptional:true,apiKeyRequired:false};
 }
