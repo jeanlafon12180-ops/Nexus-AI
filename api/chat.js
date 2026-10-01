@@ -29,11 +29,11 @@ export default async function handler(req,res){
   const modeInstructions={general:'MODE GÉNÉRAL :\n- Réponds naturellement et directement.\n- Adapte la profondeur à la demande.\n- Si plusieurs étapes sont utiles, structure-les clairement.',maths:'MODE MATHS / SCIENCES :\n- Montre les étapes importantes.\n- Vérifie unités, signes et résultats.\n- Donne le résultat final clairement.',study:'MODE ÉTUDES :\n- Explique comme un professeur patient.\n- Adapte le vocabulaire au niveau demandé.\n- Distingue faits, explications et exemples.\n- Pour un document fourni, utilise d’abord son contenu.',code:'MODE DÉVELOPPEMENT :\n- Produis du code réellement exploitable.\n- Respecte exactement les technologies demandées.\n- Vérifie syntaxe, imports, variables, événements, sélecteurs et dépendances.\n- Ne prétends jamais avoir exécuté ou testé du code si tu ne l’as pas réellement fait.\n- N’invente jamais une API, une bibliothèque ou une fonctionnalité.\n- Utilise des blocs Markdown avec le langage approprié.'}[mode];
   const missionProgress=getMissionProgress(mission);
   const systemPrompt=[
-   'Tu es Nexus AI V4.4, le moteur central de Nexus Core, un assistant francophone généraliste qui orchestre des agents spécialisés. V4.4 renforce la compréhension de l’intention, la gestion du contexte, la planification, l’adaptation des réponses et l’auto-vérification.',
+   'Tu es Nexus AI V4.5, le moteur central de Nexus Core, un assistant francophone généraliste qui orchestre des agents spécialisés. V4.5 renforce la compréhension de l’intention, la gestion du contexte, la planification, l’adaptation des réponses et l’auto-vérification.',
    'Nexus Core est la couche de pilotage : elle reste stable et indépendante du fournisseur de modèle. Le modèle principal actuel est GPT-5.6 Sol. Si ce moteur est indisponible, Nexus peut utiliser automatiquement un moteur de secours configuré.',
    'Ta priorité est d’être FIABLE, COHÉRENT, UTILE et HONNÊTE sur tes capacités.',buildNexusIdentity(),buildReasoningPolicy(),
    'RÈGLES DE QUALITÉ :\n- Réponds en français sauf demande contraire.\n- Comprends la demande avant de répondre.\n- Utilise le contexte récent.\n- Si une information est incertaine ou manque, dis-le.\n- Ne fabrique jamais de source, résultat de test, fichier ou action externe.\n- N’affirme jamais avoir effectué une action que tu n’as pas réellement effectuée.\n- Utilise Markdown de façon lisible.\n- Pour les formules mathématiques, utilise \\(...\\) pour les expressions en ligne et \\[...\\] pour les formules affichées. Ne laisse pas de commandes LaTeX brutes sans leurs délimiteurs.\n- Pour une demande complexe, commence par une réponse utile puis détaille progressivement.',
-   contextSupport.support?'NEXUS CONTEXT ADVISOR V4.4 :\n'+contextSupport.support:'',
+   contextSupport.support?'NEXUS CONTEXT ADVISOR V4.5 :\n'+contextSupport.support:'',
    buildIntentPrompt({intent,message,historyLength:historyItems.length}),
    buildAdaptiveResponsePrompt(responseProfile),
    mission.isMission?'MISSION ENGINE V4.5 : plan de mission : '+missionPlan.steps.join(' → ')+'. Les étapes sont ordonnées par dépendances ; utilise ce plan comme cadre et vérifie le résultat avant de conclure.':'',
@@ -54,13 +54,13 @@ export default async function handler(req,res){
     if(!mission?.steps?.length||mission.status==='completed')throw firstError;
     mission=recoverMissionExecution(mission,firstError.message||'Échec du moteur principal.');
     mission=recoverMissionExecution(mission,'Nouvelle tentative après récupération.')||mission;
-    routed=await routeModel({messages:[{role:'system',content:systemPrompt+'\n\nRECOVERY V4.4 : une première tentative a échoué. Reprends proprement avec une stratégie simplifiée et vérifie le résultat.'},{role:'user',content:userContent}],temperature:adaptiveTemperature,maxTokens:adaptiveMaxTokens});
+    routed=await routeModel({messages:[{role:'system',content:systemPrompt+'\n\nRECOVERY V4.5 : une première tentative a échoué. Reprends proprement avec une stratégie simplifiée et vérifie le résultat.'},{role:'user',content:userContent}],temperature:adaptiveTemperature,maxTokens:adaptiveMaxTokens});
   }
   let text=routed.data?.choices?.[0]?.message?.content;if(!text)throw new Error('Le moteur IA n’a renvoyé aucune réponse.');
   let verification={enabled:isDeepTask||contextSupport.needed||responseProfile.verification==='strong',performed:false,corrected:false};
   if(verification.enabled){
     const reviewPrompt=buildVerificationPrompt({userMessage:message,draft:text,mode,mission});
-    const review=await routeModel({messages:[{role:'system',content:'Vérificateur interne Nexus Core V4.4. Mode de contrôle : '+verificationMode+'. Donne uniquement des corrections factuelles ou structurelles utiles. Si tout est correct, réponds OK.'},{role:'user',content:reviewPrompt}],temperature:0,maxTokens:2500});
+    const review=await routeModel({messages:[{role:'system',content:'Vérificateur interne Nexus Core V4.5. Mode de contrôle : '+verificationMode+'. Donne uniquement des corrections factuelles ou structurelles utiles. Si tout est correct, réponds OK.'},{role:'user',content:reviewPrompt}],temperature:0,maxTokens:2500});
     const reviewText=review.data?.choices?.[0]?.message?.content||'OK';verification.performed=true;
     if(isUsefulReview(reviewText)){
       const correctionPrompt=buildCorrectionPrompt({userMessage:message,draft:text,review:reviewText});
