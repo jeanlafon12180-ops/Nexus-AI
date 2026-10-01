@@ -4,18 +4,18 @@ Projet d’intelligence artificielle développé progressivement autour de **Nex
 
 ## 🚀 Version actuelle
 
-**Nexus IA V4.4 — Nexus Core Intelligence**
+**Nexus IA V4.5 — Nexus Core Intelligence**
 
-La V4.4 transforme Nexus Core en moteur de missions plus structuré : reprise de mission, récupération automatique limitée, routage d’agents par score, vérification adaptative et statut Core enrichi, tout en conservant les capacités multimodales et la résilience des versions précédentes.
+La V4.5 transforme Nexus Core en moteur de missions plus structuré : reprise de mission, récupération automatique limitée, routage d’agents par score, vérification adaptative et statut Core enrichi, tout en conservant les capacités multimodales et la résilience des versions précédentes.
 
-### 🧠 Nexus Core V4.4
+### 🧠 Nexus Core V4.5
 
-- 🎯 **Intent Engine V4.4** : analyse de l’objectif, du domaine, de la complexité, du contexte et du niveau de confiance.
-- 🧩 **Mission Graph V4.4** : missions découpées en étapes avec dépendances, états, progression et reprise.
-- 🤖 **Agent Router V4.4** : scoring des agents, sélection d’un agent principal et constitution d’une équipe complémentaire lorsque c’est pertinent.
-- 🔗 **Context Advisor V4.4** : meilleure utilisation de l’historique, de la mémoire et des documents pertinents.
+- 🎯 **Intent Engine V4.5** : analyse de l’objectif, du domaine, de la complexité, du contexte et du niveau de confiance.
+- 🧩 **Mission Graph V4.5** : missions découpées en étapes avec dépendances, états, progression et reprise.
+- 🤖 **Agent Router V4.5** : scoring des agents, sélection d’un agent principal et constitution d’une équipe complémentaire lorsque c’est pertinent.
+- 🔗 **Context Advisor V4.5** : meilleure utilisation de l’historique, de la mémoire et des documents pertinents.
 - 🎚️ **Adaptive Response** : niveau de détail et structure adaptés à la complexité réelle de la demande.
-- 🔍 **Verification V4.4** : contrôle interne des réponses importantes avec mode de vérification adapté au domaine.
+- 🔍 **Verification V4.5** : contrôle interne des réponses importantes avec mode de vérification adapté au domaine.
 - 🛡️ **Auto-Recovery + Fallback** : récupération limitée d’une étape en échec et maintien du routage de secours.
 - 🔒 **Honnêteté opérationnelle** : Nexus ne prétend jamais avoir utilisé un outil, testé du code ou effectué une action qui n’a pas réellement eu lieu.
 - ▶️ **Mission Resume** : reprise d’une mission fournie par l’application sans mélanger ses états avec une autre session.
@@ -36,7 +36,7 @@ La V4.4 transforme Nexus Core en moteur de missions plus structuré : reprise de
 | **V3.6** | 🤖 Specialized Agents. |
 | **V3.7** | 🌌 Autonomous Nexus Core et orchestration adaptative. |
 | **V4.2** | 🎯 Smart Intent : meilleure compréhension de l’objectif, du contexte et de la complexité. |
-| **V4.4** | 🧠 **Nexus Core Adaptive** : Intent Engine V4.4, Mission Graph, orchestration multi-agents, réponse adaptative, vérification renforcée et interface alignée. |
+| **V4.5** | 🧠 **Nexus Core Adaptive** : Intent Engine V4.5, Mission Graph, orchestration multi-agents, réponse adaptative, vérification renforcée et interface alignée. |
 
 ## ✨ Capacités
 
@@ -60,14 +60,14 @@ La V4.4 transforme Nexus Core en moteur de missions plus structuré : reprise de
 
 ## 🏗️ Architecture
 
-- `api/nexus-core.js` — intelligence, missions, reprise et récupération Nexus Core V4.4
+- `api/nexus-core.js` — intelligence, missions, reprise et récupération Nexus Core V4.5
 - `api/nexus-assist.js` — contexte, scoring d’agents, équipe spécialisée, intention et vérification adaptative
 - `api/chat.js` — pipeline conversationnel Nexus Core
 - `api/model-router.js` — routage des modèles
 - `js/memory.js` — mémoire et contexte local
 - `js/app.js` — interface principale
-- `index.html` — application Web Nexus IA V4.4
-- `admin.html` — console privée Nexus Core V4.4
+- `index.html` — application Web Nexus IA V4.5
+- `admin.html` — console privée Nexus Core V4.5
 
 ## 🔐 Confidentialité et fiabilité
 
@@ -80,4 +80,23 @@ Nexus distingue les informations disponibles, les hypothèses et les limites. Il
 Le projet peut être publié sur GitHub Pages pour la partie statique et sur Vercel pour les endpoints serveur.
 
 > Chaque nouvelle version doit compléter cet historique et apporter au moins une amélioration supplémentaire, même si elle n’était pas demandée initialement.
-\n\n## 🆕 V4.4 — Pipeline de mission\n\n`Demande → contexte → intention → plan → Agent Router → exécution → vérification adaptative → récupération éventuelle → correction → résultat`\n\nLes mécanismes de récupération sont volontairement bornés pour éviter les boucles infinies. Les agents spécialisés restent des rôles orchestrés par Nexus Core et ne sont pas présentés comme des systèmes autonomes indépendants.\n
+\n\n## 🆕 V4.5 — Pipeline de mission\n\n`Demande → contexte → intention → plan → Agent Router → exécution → vérification adaptative → récupération éventuelle → correction → résultat`\n\nLes mécanismes de récupération sont volontairement bornés pour éviter les boucles infinies. Les agents spécialisés restent des rôles orchestrés par Nexus Core et ne sont pas présentés comme des systèmes autonomes indépendants.\n
+
+## 🌌 V4.5 — Nexus Project OS
+
+La V4.5 introduit une couche de gestion de projet au-dessus du Mission Engine.
+
+- 🎯 **Project State** : objectif, contexte et contraintes structurés.
+- 📦 **Deliverable Tracking** : suivi des livrables et de leur état.
+- 🧭 **Project Checkpoints** : jalons horodatés pour suivre l’avancement.
+- 🧠 **Project Brief** : synthèse structurée injectée dans le contexte de Nexus.
+- 🔄 **Mission ↔ Project** : une mission peut alimenter l’état d’un projet.
+- 🤖 **Agent Router 4.5** : sélection et composition de rôles spécialisés.
+- 🛡️ **Recovery** : reprise bornée des étapes en échec.
+- 🔒 **État fourni par l’application** : le Core ne prétend pas disposer d’une persistance externe qu’il n’a pas réellement.
+
+Pipeline V4.5 :
+
+`Projet → contexte → intention → plan → Agent Router → mission → checkpoints → vérification → livrables → résultat`
+
+La V4.5 conserve la règle d’honnêteté opérationnelle : un livrable, une vérification ou une action externe ne sont pas déclarés réalisés sans résultat correspondant.
