@@ -10,6 +10,7 @@ const MAX_BODY = 25 * 1024 * 1024;
 const routes = {
   '/api/admin': () => import('./api/admin.js'),
   '/api/capabilities': () => import('./api/capabilities.js'),
+  '/api/native-capability': () => import('./api/native-capability.js'),
   '/api/chat': () => import('./api/chat.js'),
   '/api/edit-image': () => import('./api/edit-image.js'),
   '/api/generate-image': () => import('./api/generate-image.js'),
