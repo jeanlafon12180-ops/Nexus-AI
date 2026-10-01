@@ -7,7 +7,7 @@ export default async function handler(req,res){
  const status=getNativeCapabilityStatus();
  return res.status(200).json({
   ok:true,
-  version:'5.2.5',
+  version:'5.2.6',
   product:'Nexus IA',
   architecture:'Nexus Core → Nexusia Cognitive Engine → capability router → native engine',
   localFirst:true,
