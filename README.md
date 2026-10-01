@@ -4,18 +4,18 @@ Projet d’intelligence artificielle développé progressivement autour de **Nex
 
 ## 🚀 Version actuelle
 
-**Nexus IA V4.7 — Nexus Cognitive Core**
+**Nexus IA V4.8 — Nexus Cognitive Core**
 
-La V4.7 transforme Nexus Core en moteur cognitif plus structuré : reprise de mission, récupération automatique limitée, routage d’agents par score, vérification adaptative et statut Core enrichi, tout en conservant les capacités multimodales et la résilience des versions précédentes.
+La V4.8 transforme Nexus Core en moteur cognitif plus structuré : reprise de mission, récupération automatique limitée, routage d’agents par score, vérification adaptative et statut Core enrichi, tout en conservant les capacités multimodales et la résilience des versions précédentes.
 
-### 🧠 Nexus Core V4.7
+### 🧠 Nexus Core V4.8
 
-- 🎯 **Intent Engine V4.7** : analyse de l’objectif, du domaine, de la complexité, du contexte et du niveau de confiance.
-- 🧩 **Mission Graph V4.7** : missions découpées en étapes avec dépendances, états, progression et reprise.
-- 🤖 **Agent Router V4.7** : scoring des agents, sélection d’un agent principal et constitution d’une équipe complémentaire lorsque c’est pertinent.
-- 🔗 **Context Advisor V4.7** : meilleure utilisation de l’historique, de la mémoire et des documents pertinents.
+- 🎯 **Intent Engine V4.8** : analyse de l’objectif, du domaine, de la complexité, du contexte et du niveau de confiance.
+- 🧩 **Mission Graph V4.8** : missions découpées en étapes avec dépendances, états, progression et reprise.
+- 🤖 **Agent Router V4.8** : scoring des agents, sélection d’un agent principal et constitution d’une équipe complémentaire lorsque c’est pertinent.
+- 🔗 **Context Advisor V4.8** : meilleure utilisation de l’historique, de la mémoire et des documents pertinents.
 - 🎚️ **Adaptive Response** : niveau de détail et structure adaptés à la complexité réelle de la demande.
-- 🔍 **Verification V4.7** : contrôle interne des réponses importantes avec mode de vérification adapté au domaine.
+- 🔍 **Verification V4.8** : contrôle interne des réponses importantes avec mode de vérification adapté au domaine.
 - 🛡️ **Auto-Recovery + Fallback** : récupération limitée d’une étape en échec et maintien du routage de secours.
 - 🔒 **Honnêteté opérationnelle** : Nexus ne prétend jamais avoir utilisé un outil, testé du code ou effectué une action qui n’a pas réellement eu lieu.
 - ▶️ **Mission Resume** : reprise d’une mission fournie par l’application sans mélanger ses états avec une autre session.
@@ -60,14 +60,14 @@ La V4.7 transforme Nexus Core en moteur cognitif plus structuré : reprise de mi
 
 ## 🏗️ Architecture
 
-- `api/nexus-core.js` — intelligence, missions, reprise et récupération Nexus Core V4.7
+- `api/nexus-core.js` — intelligence, missions, reprise et récupération Nexus Core V4.8
 - `api/nexus-assist.js` — contexte, scoring d’agents, équipe spécialisée, intention et vérification adaptative
 - `api/chat.js` — pipeline conversationnel Nexus Core
 - `api/model-router.js` — routage des modèles
 - `js/memory.js` — mémoire et contexte local
 - `js/app.js` — interface principale
-- `index.html` — application Web Nexus IA V4.7
-- `admin.html` — console privée Nexus Core V4.7
+- `index.html` — application Web Nexus IA V4.8
+- `admin.html` — console privée Nexus Core V4.8
 
 ## 🔐 Confidentialité et fiabilité
 
@@ -84,7 +84,7 @@ Le projet peut être publié sur GitHub Pages pour la partie statique et sur Ver
 
 ## 🌌 V4.5 — Nexus Project OS
 
-La V4.7 introduit une couche de gestion de projet au-dessus du Mission Engine.
+La V4.8 introduit une couche de gestion de projet au-dessus du Mission Engine.
 
 - 🎯 **Project State** : objectif, contexte et contraintes structurés.
 - 📦 **Deliverable Tracking** : suivi des livrables et de leur état.
@@ -95,23 +95,23 @@ La V4.7 introduit une couche de gestion de projet au-dessus du Mission Engine.
 - 🛡️ **Recovery** : reprise bornée des étapes en échec.
 - 🔒 **État fourni par l’application** : le Core ne prétend pas disposer d’une persistance externe qu’il n’a pas réellement.
 
-Pipeline V4.7 :
+Pipeline V4.8 :
 
 `Projet → contexte → intention → plan → Agent Router → mission → checkpoints → vérification → livrables → résultat`
 
-La V4.7 conserve la règle d’honnêteté opérationnelle : un livrable, une vérification ou une action externe ne sont pas déclarés réalisés sans résultat correspondant.
+La V4.8 conserve la règle d’honnêteté opérationnelle : un livrable, une vérification ou une action externe ne sont pas déclarés réalisés sans résultat correspondant.
 
 
-## 🚀 V4.7 — Nexus Workspace & Model Gateway
+## 🚀 V4.8 — Nexus Workspace & Model Gateway
 
-La V4.7 prépare Nexus IA à fonctionner sans dépendre architecturalement d'un fournisseur unique.
+La V4.8 prépare Nexus IA à fonctionner sans dépendre architecturalement d'un fournisseur unique.
 
-- 🧠 **Nexus Model Gateway V4.7** : couche d'abstraction entre Nexus Core et les fournisseurs de modèles.
+- 🧠 **Nexus Model Gateway V4.8** : couche d'abstraction entre Nexus Core et les fournisseurs de modèles.
 - 🔌 **Provider-independent Core** : le Core ne connaît plus les détails HTTP du fournisseur.
-- 🔀 **Model Router V4.7** : choisit un fournisseur configuré et applique le fallback.
+- 🔀 **Model Router V4.8** : choisit un fournisseur configuré et applique le fallback.
 - 🏗️ **Nexus Workspace** : base préparatoire pour réunir projet, missions, livrables, checkpoints et état du Core.
-- 💾 **Project State V4.7** : la clé locale évolue vers le format V4.7.
-- 🔒 **Aucune dépendance fictive** : V4.7 ne prétend pas posséder son propre modèle. L'abstraction est prête, les modèles restent configurés séparément.
+- 💾 **Project State V4.8** : la clé locale évolue vers le format V4.8.
+- 🔒 **Aucune dépendance fictive** : V4.8 ne prétend pas posséder son propre modèle. L'abstraction est prête, les modèles restent configurés séparément.
 
 Architecture cible :
 
@@ -120,28 +120,51 @@ Architecture cible :
 À terme, un moteur Nexus hébergé ou local pourra remplacer un fournisseur externe sans réécrire l'orchestration métier.
 
 
-## 🧠 V4.7 — Nexus Cognitive Core
+## 🧠 V4.8 — Nexus Cognitive Core
 
-La V4.7 suit une règle simple : améliorer l’ensemble du système à chaque version, renforcer fortement Nexus Core, puis ajouter une amélioration originale.
+La V4.8 suit une règle simple : améliorer l’ensemble du système à chaque version, renforcer fortement Nexus Core, puis ajouter une amélioration originale.
 
 ### Cognitive Core
-- 🧠 **Cognitive Core V4.7** : boucle structurée Comprendre → Contextualiser → Décider → Exécuter → Vérifier → Adapter.
+- 🧠 **Cognitive Core V4.8** : boucle structurée Comprendre → Contextualiser → Décider → Exécuter → Vérifier → Adapter.
 - 🔁 **Multi-pass Intelligence** : profondeur adaptative selon la complexité ; les tâches simples restent rapides.
 - 🗂️ **Context Intelligence** : séparation du contexte immédiat, conversationnel, projet, mémoire et preuves documentaires.
-- 🧭 **Decision Engine V4.7** : choix automatique entre réponse directe, mission, analyse, correction, création, outil ou clarification.
+- 🧭 **Decision Engine V4.8** : choix automatique entre réponse directe, mission, analyse, correction, création, outil ou clarification.
 - 🤖 **Agent Strategy Composition** : le routage d’agents devient une stratégie plutôt qu’un simple score.
 - 🛡️ **Adaptive Recovery** : récupération bornée et réévaluation de stratégie.
 - 🔍 **Multi-pass Verification** : vérification renforcée sur les tâches qui le nécessitent.
-- 🔌 **Model Gateway V4.7** : abstraction fournisseur conservée et renforcée.
+- 🔌 **Model Gateway V4.8** : abstraction fournisseur conservée et renforcée.
 
 ### Project Intelligence
-Le Project OS conserve ses objectifs, contraintes, décisions, missions, livrables et checkpoints. Le Workspace V4.7 expose ces éléments localement sans prétendre fournir une persistance serveur inexistante.
+Le Project OS conserve ses objectifs, contraintes, décisions, missions, livrables et checkpoints. Le Workspace V4.8 expose ces éléments localement sans prétendre fournir une persistance serveur inexistante.
 
 ### Touche Nexus
 **Decision Engine** : une couche centrale décide du niveau d’orchestration nécessaire avant l’exécution, afin d’éviter à la fois le sous-traitement des tâches complexes et la sur-orchestration des demandes simples.
 
-Pipeline V4.7 :
+Pipeline V4.8 :
 
 `Projet → contexte structuré → compréhension → décision → plan cognitif → Agent Router → exécution → vérification multi-pass → adaptation → livrable`
 
-> V4.7 n’introduit pas un nouveau modèle fondamental. Il améliore l’intelligence d’orchestration autour des modèles configurés.
+> V4.8 n’introduit pas un nouveau modèle fondamental. Il améliore l’intelligence d’orchestration autour des modèles configurés.
+
+
+## 🚀 V4.8 — Nexus Adaptive Intelligence
+
+V4.8 applique la règle d’évolution globale : Nexus Core est fortement renforcé, puis les systèmes périphériques sont alignés.
+
+### 🧠 Nexus Adaptive Intelligence
+- 🎯 **Goal Engine V4.8** : transforme la demande en objectif, critères et résultat attendu.
+- 📊 **Self-Evaluation / Quality Engine** : évalue l’alignement du résultat avec l’objectif et déclenche une adaptation bornée si nécessaire.
+- 🗂️ **Context Priority Engine** : hiérarchise contexte immédiat, projet, document, conversation et mémoire.
+- 🔄 **Adaptive Goal Plan** : amélioration et vérification supplémentaires uniquement lorsque le résultat n’est pas suffisamment aligné.
+- ⚠️ **Project Risk Engine** : détecte quelques risques structurels simples dans l’état du projet.
+- 🤖 **Goal-driven Agent Strategy** : les agents restent sous le contrôle de Nexus Core mais leur sélection peut être guidée par l’objectif.
+- 🔌 **Model Capability Registry** : décrit les capacités disponibles des fournisseurs configurés afin de préparer un routage par capacité.
+
+### 🔐 Fiabilité
+L’auto-évaluation V4.8 est bornée. Elle ne transforme pas une heuristique en preuve et ne prétend pas qu’un livrable externe a été exécuté ou testé sans résultat réel.
+
+Pipeline V4.8 :
+
+`Demande → Goal Engine → Context Priority → Decision Engine → Cognitive Plan → Agent Strategy → Model Gateway → Résultat → Verification → Self-Evaluation → Adaptation éventuelle → Réponse`
+
+> V4.8 n’introduit toujours pas de modèle fondamental Nexus propriétaire. Elle renforce la couche d’intelligence et d’orchestration autour des modèles configurés.
