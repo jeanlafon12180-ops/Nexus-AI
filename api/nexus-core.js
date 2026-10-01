@@ -1,14 +1,14 @@
-const VERSION='4.7.0';
+const VERSION='4.8.0';
 
 export function buildNexusIdentity(){return[
-'IDENTITÉ NEXUS CORE V4.7 : tu es le moteur central d’intelligence, de planification, d’orchestration et de récupération de Nexus IA.',
+'IDENTITÉ NEXUS CORE V4.8 : tu es le moteur central d’intelligence, de planification, d’orchestration et de récupération de Nexus IA.',
 'Tu analyses objectif, contraintes, contexte, complexité, dépendances et critères de réussite avant de choisir une stratégie.',
 'Nexus Core reste indépendant du fournisseur de modèle et peut continuer avec un moteur de secours configuré si le modèle principal devient indisponible.',
 'Tu restes honnête : aucune action, vérification, navigation, exécution ou observation ne doit être prétendue si elle n’a réellement eu lieu.'
 ].join('\n')}
 
 export function buildReasoningPolicy(){return[
-'POLITIQUE NEXUS CORE V4.7 :',
+'POLITIQUE NEXUS CORE V4.8 :',
 '- Décompose les tâches complexes en étapes utiles avant de répondre.',
 '- Identifie objectif, résultat attendu, contraintes, contexte, dépendances et critères de réussite.',
 '- Choisis une stratégie proportionnée : réponse directe, analyse, mission ou orchestration spécialisée.',
@@ -23,10 +23,10 @@ export function buildReasoningPolicy(){return[
 ].join('\n')}
 
 export function buildFutureEngineContract(){return{
-version:VERSION,architecture:'nexus-core',orchestration:true,missionMode:true,missionEngine:'4.7',projectOS:true,projectWorkspace:true,projectState:'4.7',modelGateway:'4.7',providerIndependent:true,decisionEngine:'4.7',cognitiveCore:'4.7',contextIntelligence:'4.7',
+version:VERSION,architecture:'nexus-core',orchestration:true,missionMode:true,missionEngine:'4.8',projectOS:true,projectWorkspace:true,projectState:'4.8',modelGateway:'4.8',providerIndependent:true,decisionEngine:'4.8',cognitiveCore:'4.8',contextIntelligence:'4.8',goalEngine:'4.8',qualityEngine:'4.8',selfEvaluation:true,projectRiskEngine:'4.8',
 modelResilience:true,primaryModel:'gpt-5.6-sol',fallbackReady:true,contextAdvisor:true,selfCorrection:true,
 specializedAgents:true,agentOrchestration:true,autonomousCore:true,adaptivePlanning:true,adaptiveResponse:true,
-intentEngine:'4.7',missionGraph:true,missionResume:true,autoRecovery:true,agentRouter:'4.7',projectMemory:'4.7',checkpointEngine:true,deliverableTracking:true,
+intentEngine:'4.8',missionGraph:true,missionResume:true,autoRecovery:true,agentRouter:'4.8',projectMemory:'4.8',checkpointEngine:true,deliverableTracking:true,
 verification:true,adaptiveVerification:true,multimodalReady:true,privacyBoundary:'session-scoped'
 }}
 
@@ -140,6 +140,8 @@ export function analyzeIntent(message,history=[]){
 }
 
 export function buildCognitiveContext({message='',history=[],memory='',project=null,documentText='',intent=null}={}){return{version:VERSION,immediate:String(message||'').slice(0,6000),conversation:history.slice(-12),memory:String(memory||'').slice(0,5000),project:project?{id:project.id,name:project.name,goal:project.goal,constraints:project.constraints||[],decisions:project.decisions||[],checkpoints:(project.checkpoints||[]).slice(-5)}:null,evidence:{document:Boolean(documentText),documentChars:String(documentText||'').length},intent:intent||null};}
+export function buildAdaptiveMissionState({mission,goal,evaluation=null}={}){return{version:VERSION,missionId:mission?.id||null,goalId:goal?.id||null,evaluation:evaluation||null,status:evaluation?.needsAdaptation?'adapting':mission?.status||'pending'};}
+
 export function buildCognitivePlan({intent,decision}={}){const complexity=Number(intent?.complexity||0);return{version:VERSION,objective:intent?.goal||'répondre',complexity,mode:decision?.action||'direct',passes:complexity>=4?4:complexity>=2?3:2,stages:['comprendre','contextualiser','décider','exécuter','vérifier','adapter']};}
 
 export function buildAdaptiveResponseProfile(intent){
@@ -163,7 +165,7 @@ export function createProjectState({name='',goal='',constraints=[],deliverables=
 
 export function updateProjectState(project,patch={}){
  if(!project)return null;
- const updated={...project,...patch,version:VERSION,updatedAt:new Date().toISOString()};
+ const updated={...project,...patch,version:VERSION,updatedAt:new Date().toISOString(),risks:Array.isArray(patch.risks)?patch.risks.slice(0,20):(project.risks||[])};
  if(Array.isArray(patch.constraints))updated.constraints=patch.constraints.map(x=>cleanProjectText(x,500)).filter(Boolean).slice(0,20);
  if(Array.isArray(patch.deliverables))updated.deliverables=patch.deliverables.slice(0,30);
  if(Array.isArray(patch.decisions))updated.decisions=patch.decisions.slice(0,30);
@@ -185,7 +187,7 @@ export function projectProgress(project){
 export function buildProjectBrief(project){
  if(!project)return'';
  return[
-  'NEXUS PROJECT OS V4.7',
+  'NEXUS PROJECT OS V4.8',
   'Projet : '+cleanProjectText(project.name,120),
   'Objectif : '+cleanProjectText(project.goal,2000),
   project.context?'Contexte : '+cleanProjectText(project.context,2000):'',
