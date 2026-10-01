@@ -4,6 +4,12 @@ Projet d’intelligence artificielle développé progressivement autour de **Nex
 
 ## 🚀 Version actuelle
 
+**Nexusia V5.0 — Native-first + nouveau design**
+
+V5 commence une refonte majeure : interface de chat sobre et premium, Nexus Core local-first et registre de moteurs natifs. Les fournisseurs cloud restent optionnels tant qu'un moteur local équivalent n'est pas réellement disponible.
+
+
+
 **Nexus IA V4.9 — Nexus Cognitive Core**
 
 La V4.9 transforme Nexus Core en moteur cognitif plus structuré : reprise de mission, récupération automatique limitée, routage d’agents par score, vérification adaptative et statut Core enrichi, tout en conservant les capacités multimodales et la résilience des versions précédentes.
@@ -193,3 +199,38 @@ V4.9 fait évoluer Nexus Adaptive Intelligence vers un moteur d'exécution struc
 Une mission peut conserver un checkpoint technique et reprendre depuis son dernier état connu. V4.9 limite volontairement la récupération et ne prétend pas qu'une action externe a été exécutée lorsqu'aucun résultat réel n'est disponible.
 
 > V4.9 n'introduit toujours pas de modèle fondamental Nexus propriétaire. Le gain vient du Runtime, de la mémoire structurée et de l'orchestration.
+
+
+## 🌌 V5.0 — Nexusia Native-first
+
+### 🎨 Nouvelle interface
+- design minimaliste centré sur la conversation
+- navigation secondaire discrète
+- compositeur unique
+- responsive mobile/desktop
+- fonctions avancées accessibles sans surcharger l'écran
+- identité **Nexusia** distincte, sans reproduction exacte d'une interface tierce
+
+### 🧠 Native Engine Registry
+Le nouveau registre prépare les moteurs locaux pour :
+- texte
+- vision
+- fichiers
+- images
+- vidéo
+- audio
+- musique
+- LIVE
+
+Le routage est **local-first**. Une clé API n'est pas requise par l'architecture pour un moteur local ; un fournisseur cloud peut rester un fallback optionnel.
+
+### ⚠️ Limite importante
+Le registre et le routage ne créent pas à eux seuls des modèles génératifs. Pour que la génération locale d'images, de vidéo, de musique ou de texte fonctionne réellement, les modèles et l'infrastructure de calcul correspondants doivent être installés/configurés. V5 ne prétend donc pas disposer d'une génération native opérationnelle tant que ces moteurs ne sont pas réellement disponibles.
+
+### Architecture
+
+`Nexusia UI → Nexus Core → Native Engine Registry → Runtime → moteur local`
+
+Fallback facultatif :
+
+`Nexusia UI → Nexus Core → Native Engine Registry → moteur local indisponible → fournisseur cloud configuré`
