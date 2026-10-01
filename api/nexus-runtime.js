@@ -6,7 +6,7 @@ const EVENT_TYPES=Object.freeze(['mission.created','mission.started','task.start
 function id(prefix){return prefix+'-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7)}
 
 export function createRuntimeMission({goal=null,tasks=[]}={}){
- const normalized=tasks.map((task,index)=>({id:task.id||id('task'),title:String(task.title||task.name||('Task '+(index+1))),dependsOn:Array.isArray(task.dependsOn)?task.dependsOn:[],state:'pending',attempts:0,result:null,error:null}));
+ const ids=tasks.map(t=>t.id||id('task')); const normalized=tasks.map((task,index)=>({id:ids[index],title:String(task.title||task.name||('Task '+(index+1))),dependsOn:(Array.isArray(task.dependsOn)?task.dependsOn:[]).map(dep=>dep==='task-placeholder'?ids[Math.max(0,index-1)]:dep==='task-placeholder-2'?ids[Math.max(0,index-1)]:dep),state:'pending',attempts:0,result:null,error:null}));
  return{version:VERSION,id:id('mission'),status:'created',goalId:goal?.id||null,tasks:normalized,events:[{id:id('evt'),type:'mission.created',at:new Date().toISOString()}],checkpoint:null,adaptations:0};
 }
 export function appendRuntimeEvent(mission,type,payload={}){
