@@ -67,7 +67,7 @@ export default async function handler(req, res) {
 
   return res.status(200).json({
     ok: true,
-    version: '4.9.0',
+    version: '5.0.0',
     name: 'Nexus IA',
     generatedAt: new Date().toISOString(),
     runtime: process.version,
@@ -88,8 +88,8 @@ export default async function handler(req, res) {
       sharedLegacyHistoryKey: false
     },
     core: buildFutureEngineContract(),
-    missionEngine: { version:'4.9', resume:true, autoRecovery:true, dependencyGraph:true, cognitivePlanning:true, adaptiveRecovery:true, goalDriven:true, selfEvaluation:true, runtime:true, taskGraph:true, eventTrace:true, missionContinuity:true, structuredMemory:true },
-    agentRouter: { version:'4.9', scoring:true, teamSelection:true, strategyComposition:true, goalDriven:true },
-    note: 'Le tableau de bord V4.9 affiche les diagnostics serveur et l’état des nouveaux moteurs. Les erreurs détaillées restent dans les Runtime Logs Vercel.'
+    missionEngine: { version:'5.0', resume:true, autoRecovery:true, dependencyGraph:true, cognitivePlanning:true, adaptiveRecovery:true, goalDriven:true, selfEvaluation:true, runtime:true, taskGraph:true, eventTrace:true, missionContinuity:true, nativeFirst:true, multimodalEngines:true, designSystem:'nexusia-v5', structuredMemory:true },
+    agentRouter: { version:'5.0', scoring:true, teamSelection:true, strategyComposition:true, goalDriven:true },
+    note: 'Le tableau de bord V5.0 affiche les diagnostics serveur et l’état des nouveaux moteurs. Les erreurs détaillées restent dans les Runtime Logs Vercel.'
   });
 }
