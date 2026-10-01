@@ -1,12 +1,8 @@
 {
   "name": "nexus-ia",
-  "version": "4.2.1",
+  "version": "5.2.3",
   "private": true,
   "type": "module",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "engines": {
-    "node": ">=20"
-  }
+  "scripts": {"start": "node server.js"},
+  "engines": {"node": ">=20"}
 }
