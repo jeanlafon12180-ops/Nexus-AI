@@ -67,7 +67,7 @@ export default async function handler(req, res) {
 
   return res.status(200).json({
     ok: true,
-    version: '4.6.0',
+    version: '4.7.0',
     name: 'Nexus IA',
     generatedAt: new Date().toISOString(),
     runtime: process.version,
@@ -88,8 +88,8 @@ export default async function handler(req, res) {
       sharedLegacyHistoryKey: false
     },
     core: buildFutureEngineContract(),
-    missionEngine: { version:'4.6', resume:true, autoRecovery:true, dependencyGraph:true },
-    agentRouter: { version:'4.6', scoring:true, teamSelection:true },
+    missionEngine: { version:'4.7', resume:true, autoRecovery:true, dependencyGraph:true, cognitivePlanning:true, adaptiveRecovery:true },
+    agentRouter: { version:'4.7', scoring:true, teamSelection:true, strategyComposition:true },
     note: 'Le tableau de bord V4.6 affiche les diagnostics serveur et l’état des nouveaux moteurs. Les erreurs détaillées restent dans les Runtime Logs Vercel.'
   });
 }
