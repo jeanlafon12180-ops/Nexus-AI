@@ -36,7 +36,7 @@ La V4.6 transforme Nexus Core en moteur de missions plus structuré : reprise de
 | **V3.6** | 🤖 Specialized Agents. |
 | **V3.7** | 🌌 Autonomous Nexus Core et orchestration adaptative. |
 | **V4.2** | 🎯 Smart Intent : meilleure compréhension de l’objectif, du contexte et de la complexité. |
-| **V4.6** | 🧠 **Nexus Core Adaptive** : Intent Engine V4.6, Mission Graph, orchestration multi-agents, réponse adaptative, vérification renforcée et interface alignée. |
+| **V4.5** | 🧠 **Nexus Core Adaptive** : Intent Engine V4.5, Mission Graph, orchestration multi-agents, réponse adaptative, vérification renforcée et interface alignée. |
 
 ## ✨ Capacités
 
@@ -80,9 +80,9 @@ Nexus distingue les informations disponibles, les hypothèses et les limites. Il
 Le projet peut être publié sur GitHub Pages pour la partie statique et sur Vercel pour les endpoints serveur.
 
 > Chaque nouvelle version doit compléter cet historique et apporter au moins une amélioration supplémentaire, même si elle n’était pas demandée initialement.
-\n\n## 🆕 V4.6 — Pipeline de mission\n\n`Demande → contexte → intention → plan → Agent Router → exécution → vérification adaptative → récupération éventuelle → correction → résultat`\n\nLes mécanismes de récupération sont volontairement bornés pour éviter les boucles infinies. Les agents spécialisés restent des rôles orchestrés par Nexus Core et ne sont pas présentés comme des systèmes autonomes indépendants.\n
+\n\n## 🆕 V4.5 — Pipeline de mission\n\n`Demande → contexte → intention → plan → Agent Router → exécution → vérification adaptative → récupération éventuelle → correction → résultat`\n\nLes mécanismes de récupération sont volontairement bornés pour éviter les boucles infinies. Les agents spécialisés restent des rôles orchestrés par Nexus Core et ne sont pas présentés comme des systèmes autonomes indépendants.\n
 
-## 🌌 V4.6 — Nexus Project OS
+## 🌌 V4.5 — Nexus Project OS
 
 La V4.6 introduit une couche de gestion de projet au-dessus du Mission Engine.
 
