@@ -12,6 +12,7 @@ const routes = {
   '/api/capabilities': () => import('./api/capabilities.js'),
   '/api/native-capability': () => import('./api/native-capability.js'),
   '/api/chat': () => import('./api/chat.js'),
+  '/api/llm-improvement': () => import('./api/llm-improvement.js'),
   '/api/edit-image': () => import('./api/edit-image.js'),
   '/api/generate-image': () => import('./api/generate-image.js'),
   '/api/generate-music': () => import('./api/generate-music.js'),
@@ -90,12 +91,12 @@ async function serveStatic(req, res) {
 const server = http.createServer(async (req, res) => {
   try {
     const pathname = new URL(req.url || '/', 'http://localhost').pathname;
-    res.setHeader('X-Nexus-Version', '5.3.0');
+    res.setHeader('X-Nexus-Version', '5.4.0');
 
     if (pathname === '/api/health') {
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
-      res.end(JSON.stringify({ok:true,version:'5.3.0',service:'Nexus IA',localFirst:true}));
+      res.end(JSON.stringify({ok:true,version:'5.4.0',service:'Nexus IA',localFirst:true}));
       return;
     }
 
@@ -131,5 +132,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Nexus IA 5.3.0 listening on port ${PORT}`);
+  console.log(`Nexus IA 5.4.0 listening on port ${PORT}`);
 });
