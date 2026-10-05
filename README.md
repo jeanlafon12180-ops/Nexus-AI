@@ -1,26 +1,27 @@
 # Nexus IA — V0
 
-Première base reconstruite de zéro.
+Nexus IA V0 est une base 100 % locale.
 
-## Principes
-- Aucune API externe.
-- Aucune clé API.
-- Aucune dépendance obligatoire.
-- Aucun appel réseau effectué par l'application.
-- Interface de chat simple.
-- Nexus Core V0 en JavaScript local.
-- Mémoire de session minimale.
-- Calculs simples et reconnaissance d'intentions.
+## Zéro API
+- aucune API OpenAI
+- aucune API Gemini
+- aucune clé API
+- aucun appel réseau effectué par le Core
+- aucune dépendance obligatoire
 
-## Lancer
-Ouvrir index.html dans Firefox ou un autre navigateur moderne.
+## Nexus Core V0 amélioré
+- classement d'intentions avec score
+- plusieurs formulations d'une même demande
+- contexte des derniers tours
+- mémoire persistante locale via localStorage
+- mémorisation du prénom, goûts, préférences et projet
+- effacement de la mémoire
+- calculatrice locale avec priorités opératoires, parenthèses et puissances
+- réponses variées
+- détection honnête des limites
+- interface interne window.NexusCore pour les futurs modules
 
-## Architecture
-- index.html — interface
-- style.css — interface visuelle
-- nexus-core.js — moteur local V0
+## Limite importante
+Cette V0 n'est pas encore un grand modèle de langage. Des règles JavaScript seules ne peuvent pas reproduire les capacités d'un LLM moderne. Pour rester sans API distante tout en obtenant une vraie génération de langage, la prochaine étape majeure sera un modèle de langage exécuté localement.
 
-## Limite volontaire
-Cette version n'est pas encore un grand modèle de langage. Sans modèle local ou service distant, un navigateur ne peut pas fournir spontanément les capacités d'un LLM moderne. La V0 établit donc une base stable qui pourra accueillir un modèle local dans une prochaine version.
-
-**Nexus IA V0 — zéro API externe.**
+La structure actuelle permet d'ajouter ce module sans reconstruire toute l'application.
