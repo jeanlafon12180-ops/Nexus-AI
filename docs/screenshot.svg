@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900">
+  <rect width="1440" height="900" fill="#0b0d12"/>
+  <rect x="250" y="60" width="940" height="780" rx="24" fill="#11151d" stroke="#2a3140"/>
+  <text x="300" y="125" fill="#ffffff" font-family="Arial,sans-serif" font-size="30" font-weight="700">Nexus IA</text>
+  <text x="300" y="158" fill="#8f9bad" font-family="Arial,sans-serif" font-size="16">V0.2 · local · Nexus Core actif</text>
+  <line x1="290" y1="185" x2="1150" y2="185" stroke="#2a3140"/>
+  <rect x="310" y="225" width="620" height="90" rx="16" fill="#171c26"/>
+  <circle cx="345" cy="270" r="22" fill="#273142"/>
+  <text x="338" y="277" fill="#fff" font-family="Arial" font-size="16">N</text>
+  <text x="385" y="258" fill="#fff" font-family="Arial" font-size="17" font-weight="700">Nexus IA</text>
+  <text x="385" y="286" fill="#b5bfce" font-family="Arial" font-size="16">Nexus Core V0.2 est actif. Aucune API externe.</text>
+  <rect x="430" y="370" width="620" height="75" rx="16" fill="#202938"/>
+  <text x="475" y="415" fill="#ffffff" font-family="Arial" font-size="16">Bonjour Nexus !</text>
+  <rect x="310" y="730" width="760" height="60" rx="14" fill="#171c26" stroke="#2a3140"/>
+  <text x="340" y="767" fill="#7f8a9d" font-family="Arial" font-size="16">Écris un message…</text>
+  <circle cx="1100" cy="760" r="22" fill="#273142"/>
+  <text x="1092" y="767" fill="#fff" font-family="Arial" font-size="17">➤</text>
+  <text x="720" y="820" text-anchor="middle" fill="#687386" font-family="Arial" font-size="14">Aperçu statique de Nexus IA V0.2</text>
+</svg>
