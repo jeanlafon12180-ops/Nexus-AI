@@ -1,23 +1,17 @@
-# Nexus IA — V0.3
+# Nexus IA — V0.3.1
 
-V0.3 améliore le moteur JavaScript local sans introduire de service distant ni de clé API.
+V0.3.1 améliore le moteur local sans API distante ni clé.
 
-## Améliorations
-- Réponses thématiques plus détaillées (informatique, IA, programmation, histoire et notions de mathématiques).
-- Calculatrice locale avec parenthèses, priorités opératoires, puissances et contrôle des divisions par zéro.
-- Mémoire locale explicite pour le prénom, les goûts et le projet.
-- Réponses transparentes lorsqu'une question dépasse les connaissances intégrées.
-- Interface et style conservés ; aucune dépendance obligatoire.
+## Changements
+- Réponses thématiques revues en informatique, IA, programmation, mathématiques, histoire et climat.
+- Calculatrice locale avec parenthèses, priorités et puissances.
+- Mémoire locale pour les informations explicitement données.
+- Réponses plus utiles et transparentes en cas de sujet inconnu.
+- Réponses de suivi pour demander de poursuivre ou approfondir.
+- Interface existante conservée.
 
-## Limites importantes
-V0.3 reste un moteur à règles, pas un grand modèle de langage. Il ne peut pas connaître spontanément énormément de sujets ni apprendre de nouvelles connaissances comme un LLM. Pour un assistant généraliste beaucoup plus puissant sans API cloud, la prochaine étape est d'évaluer l'exécution d'un modèle ouvert dans un environnement compatible. Les modèles de langage locaux peuvent demander beaucoup de mémoire et de calcul et ne sont pas forcément exécutables dans un simple hébergement statique Vercel.
+## Limites
+Ce projet reste un moteur JavaScript à règles, pas un LLM. Il ne peut pas connaître spontanément tous les sujets. Pour un saut majeur de capacité, il faudra évaluer un modèle de langage ouvert exécuté localement ou un service externe. Vercel statique ne fournit pas à lui seul la puissance nécessaire à un grand modèle.
 
 ## Lancement
-Ouvrir `index.html` dans un navigateur moderne ou servir le dossier avec `python -m http.server 8000`.
-
-## Architecture
-- `index.html` : interface
-- `style.css` : présentation
-- `nexus-core.js` : moteur local
-
-Aucune requête réseau ni clé API n'est utilisée par le moteur.
+Ouvrir index.html dans un navigateur ou lancer python -m http.server 8000.
