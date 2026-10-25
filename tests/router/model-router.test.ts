@@ -1,8 +1,8 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { ModelRegistry } from "../../src/server/chat/model-registry";
-import { NoModelAvailableError, selectModel } from "../../src/server/chat/model-router";
-import { modelRegistry } from "../../src/server/chat/model-registry";
+import { ModelRegistry } from "../../src/server/chat/model-registry.ts";
+import { NoModelAvailableError, selectModel } from "../../src/server/chat/model-router.ts";
+import { modelRegistry } from "../../src/server/chat/model-registry.ts";
 
 describe("model routing", () => {
   it("returns no model when the application registry is empty", () => {
