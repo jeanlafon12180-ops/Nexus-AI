@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { validateChatRequest } from "../../src/server/security/validate-request";
+import { validateChatRequest } from "../../src/server/security/validate-request.ts";
 
 describe("validateChatRequest", () => {
   it("accepts a valid chat request and defaults the model to auto", () => {
