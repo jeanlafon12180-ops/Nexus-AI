@@ -1,4 +1,4 @@
-import type { ProviderAdapter } from "../providers/provider-adapter";
+import type { ProviderAdapter } from "../providers/provider-adapter.ts";
 
 export interface ModelDefinition {
   /** Identifiant logique public, par ex. "auto" ou "provider-model-a". */
