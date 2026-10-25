@@ -11,13 +11,14 @@ export type ProviderErrorCode =
   | "INVALID_RESPONSE";
 
 export class ProviderError extends Error {
-  constructor(
-    public readonly code: ProviderErrorCode,
-    message: string,
-    public readonly retryable: boolean,
-  ) {
+  readonly code: ProviderErrorCode;
+  readonly retryable: boolean;
+
+  constructor(code: ProviderErrorCode, message: string, retryable: boolean) {
     super(message);
     this.name = "ProviderError";
+    this.code = code;
+    this.retryable = retryable;
   }
 }
 
