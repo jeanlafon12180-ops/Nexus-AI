@@ -5,7 +5,8 @@ export type CompatibleProviderId = "openai" | "grok" | "deepseek" | "mistral";
 
 /** Adaptateur commun aux API compatibles avec le format OpenAI Chat Completions. */
 export class OpenAICompatibleAdapter implements ProviderAdapter {
-  constructor(readonly providerId: CompatibleProviderId) {}
+  readonly providerId: CompatibleProviderId;
+  constructor(providerId: CompatibleProviderId) { this.providerId = providerId; }
 
   isConfigured(): boolean {
     const config = getProviderConfig()[this.providerId];
