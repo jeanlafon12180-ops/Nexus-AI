@@ -1,4 +1,4 @@
-import type { ModelMessage } from "../providers/provider-adapter";
+import type { ModelMessage } from "../providers/provider-adapter.ts";
 
 export const MAX_MESSAGES = 30;
 export const MAX_MESSAGE_CHARS = 8_000;
