@@ -1,4 +1,4 @@
-import { modelRegistry, type ModelDefinition } from "./model-registry";
+import { modelRegistry, type ModelDefinition } from "./model-registry.ts";
 
 export class NoModelAvailableError extends Error {
   constructor() {
