@@ -2,9 +2,9 @@ import type {
   GenerateInput,
   GenerateOutput,
   ProviderAdapter,
-} from "../providers/provider-adapter";
-import { modelRegistry } from "./model-registry";
-import { selectModel } from "./model-router";
+} from "../providers/provider-adapter.ts";
+import { modelRegistry } from "./model-registry.ts";
+import { selectModel } from "./model-router.ts";
 
 export interface RoutedGeneration {
   result: GenerateOutput;
