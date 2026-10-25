@@ -1,8 +1,8 @@
-import { apiError } from "../../../shared/errors";
-import { generateWithFallback } from "../../../server/chat/fallback-manager";
-import { ModelNotAllowedError, NoModelAvailableError } from "../../../server/chat/model-router";
-import { ProviderError } from "../../../server/providers/provider-adapter";
-import { validateChatRequest } from "../../../server/security/validate-request";
+import { apiError } from "../../../shared/errors.ts";
+import { generateWithFallback } from "../../../server/chat/fallback-manager.ts";
+import { ModelNotAllowedError, NoModelAvailableError } from "../../../server/chat/model-router.ts";
+import { ProviderError } from "../../../server/providers/provider-adapter.ts";
+import { validateChatRequest } from "../../../server/security/validate-request.ts";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
