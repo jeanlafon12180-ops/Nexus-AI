@@ -1,0 +1,15 @@
+{
+  "name": "nexus-ai",
+  "version": "1.0.0",
+  "description": "Nexus IA V0.2 — base d’assistant local avec tests de la couche serveur.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --experimental-specifier-resolution=node --test tests/**/*.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "typescript": "^7.0.2"
+  }
+}
